@@ -7,6 +7,7 @@
   - `mode: primary`: `business-analyst`, `system-analyst`, `product-owner` (permission: редактирование `ask`, bash `ask`).
   - `mode: subagent`: `security-reviewer` (edit: deny — пишет только в `reports/`).
 - `skills/*/SKILL.md` — скиллы OpenCode; подгружаются по frontmatter `description`. Зови скилл при запросе соответствующего артефакта (например, `openapi-spec`, `nfr-requirements`, `user-story`, `erd-model`, `security-review-checklist`).
+- `opencode.json` — конфиг: `default_agent: system-analyst`, `edit`/`bash` = ask, скиллы — только из allow-списка (все 13, `*` = deny).
 
 ## Язык и стиль
 - Все артефакты и общение — на русском.
