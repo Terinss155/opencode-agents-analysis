@@ -1,0 +1,114 @@
+@startuml
+autonumber "<b><color:DarkSlateBlue>.</color></b> "
+
+title "Процесс возврата товара: создание заявки в мобильном приложении"
+
+' ============================================================
+' УЧАСТНИКИ
+' ============================================================
+actor Client as "Клиент (мобильное приложение)"
+participant "Mobile Frontend" as FE
+participant "Mobile OrdersController\n(Mobile API)" as MobileCtrl
+participant "Order" as Order
+participant "OrderPosition" as Pos
+participant "ReturnReason" as Reason
+participant "UserRefund" as UR
+participant "OrderRefundService" as RefundSvc
+participant "OrderService" as OrderSvc
+participant "EventRunner" as Events
+participant "Outbox\n(RCRM/Mindbox/1C)" as Outbox
+
+' ============================================================
+' ЭТАП 1. ВОЗВРАТ ПОЗИЦИЙ
+' ============================================================
+== 1. Возврат позиций ==
+Client -> FE : Выбирает позиции (barcode) и причины
+FE -> MobileCtrl : HTTP POST /mobile/orders/return-positions?id={orderId}\nbody: {items: [{barcode, reason_id}], реквизиты}
+MobileCtrl -> MobileCtrl : Проверка параметра id и массива items
+MobileCtrl -> Reason : ReturnReason::find()->where(code)\n(проверка причин по code)
+alt Причины не найдены
+    MobileCtrl --> FE : JSON {error: "Причины возврата не найдены"}
+else Причины найдены
+    MobileCtrl -> Order : findOneByIdAndUserId(orderId, userId)
+    alt Заказ не найден
+        MobileCtrl --> FE : JSON {error: "Заказ не найден у пользователя"}
+    else Заказ найден
+        opt оплата курьеру
+            MobileCtrl -> MobileCtrl : UserRefundMobileValidator::validate()\n(реквизиты обязательны)
+            alt Ошибка валидации реквизитов
+                MobileCtrl --> FE : JSON {error: "Ошибка валидации"}
+            end
+        end
+        MobileCtrl -> UR : new UserRefund(user_id, ФИО, БИК, счёт)
+        MobileCtrl -> MobileCtrl : Собирает OrderRefundItemDto[]\n(позиции со статусом != STATUS_LOST)
+        MobileCtrl -> RefundSvc : prepareRefundPositionOrder(orderId, items,\nuserRefund, LAST_CHANGE_SOURCE_MOBILE)
+        loop по каждой позиции
+            RefundSvc -> Pos : status = STATUS_LOST, reason = reasonCode
+        end
+        RefundSvc -> Order : findOne(orderId)
+        RefundSvc -> RefundSvc : OrderUpdateDto(status=ORDER_RETURNED_LK,\nuser_refund, positionsToUpdate)
+        MobileCtrl -> OrderSvc : updateOrder(dto, ExternalServiceSendingDto(true, true, true),\nafterSaveEvents)
+        OrderSvc -> OrderSvc : beginTransaction()
+        loop по каждой позиции
+            OrderSvc -> Pos : save(false)\n(updateQuantityBufferDisabled, sendToGADisabled)
+        end
+        OrderSvc -> Order : status=ORDER_RETURNED_LK, user_refund, save()
+        OrderSvc -> OrderSvc : commit()
+        OrderSvc -> Events : EventRunner::runEvents()\n(UpdateOrdersCounter, UpdateQuantityBuffer)
+        loop для RCRM, Mindbox, 1C
+            OrderSvc -> Outbox : createOrderOutbox(service, UPDATE) +\npushToTargetQueue
+        end
+        OrderSvc --> MobileCtrl : ok
+        MobileCtrl -> MobileCtrl : Проверка skipBarcodes\n(не найденные/не возвращённые позиции)
+        alt Есть пропущенные позиции
+            MobileCtrl --> FE : JSON {error: "Позиции не были найдены/возвращены"}
+        else Все позиции возвращены
+            MobileCtrl --> FE : JSON {success:true}
+        end
+    end
+end
+
+' ============================================================
+' ЭТАП 2. ДЕТАЛИ ВОЗВРАТА: ГОРОД/ДАТА/СПОСОБ
+' ============================================================
+== 2. Детали возврата (город/дата/способ) ==
+Client -> FE : Указывает город/дату/способ возврата
+FE -> MobileCtrl : HTTP POST /mobile/orders/{id}/return-details
+MobileCtrl -> Order : findOneByIdAndUserId(orderId, userId)
+alt Заказ не найден
+    MobileCtrl --> FE : JSON {error: "Заказ не найден"}
+else Заказ найден
+    MobileCtrl -> MobileCtrl : ReturnDetailsDto::denormalize()\n(method_return по умолчанию = COURIER)
+    alt Ошибка десериализации
+        MobileCtrl --> FE : JSON {error: INVALID_REQUEST}
+    else DTO получен
+        MobileCtrl -> MobileCtrl : returnDetailsValidatorFacade->validate(dto, order)
+        alt Ошибка валидации
+            MobileCtrl --> FE : JSON {error: INVALID_REQUEST, errors}
+        else Валидация пройдена
+            MobileCtrl -> MobileCtrl : clearReturnDetailsDto(dto)
+            MobileCtrl -> OrderSvc : updateOrderReturnDetails(order, dto)
+            OrderSvc -> Order : setReturnCity/setReturnDate/setReturnDeliveryTk/\nsetReturnPostal/setReturnAddress, save()
+            OrderSvc -> Outbox : RcrmOutboxService::pushUpdateOrder(order)
+            OrderSvc --> MobileCtrl : ok
+            MobileCtrl --> FE : JSON {success:true}
+        end
+    end
+end
+
+' ============================================================
+' ЭТАП 3. СПИСОК ДОСТУПНЫХ СПОСОБОВ ВОЗВРАТА
+' ============================================================
+== 3. Список доступных способов возврата ==
+Client -> FE : Открывает выбор способа возврата
+FE -> MobileCtrl : HTTP GET /mobile/orders/{id}/return-method-list
+MobileCtrl -> Order : findOneByIdAndUserId(orderId, userId)
+alt Заказ не найден
+    MobileCtrl --> FE : JSON {error: "Заказ не найден"}
+else Заказ найден
+    MobileCtrl -> MobileCtrl : ReturnMethodListRequestDto::denormalize()
+    MobileCtrl -> MobileCtrl : returnDetailsServiceFacade->getReturnMethodList(dto, order)
+    MobileCtrl --> FE : JSON {список доступных способов возврата}
+end
+
+@enduml

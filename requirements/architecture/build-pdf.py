@@ -1,15 +1,15 @@
 #!/usr/bin/env python3
 """
-Собирает docs/architecture/*.md в один PDF с кликабельным оглавлением.
+Собирает requirements/architecture/*.md в один PDF с кликабельным оглавлением.
 
 Зависимости (один раз):
     brew install pandoc weasyprint poppler
     npm install -g @mermaid-js/mermaid-cli
 
 Запуск:
-    python3 docs/architecture/build-pdf.py
+    python3 requirements/architecture/build-pdf.py
 
-Результат: docs/architecture/dist/12storeez-architecture.pdf
+Результат: requirements/architecture/dist/12storeez-architecture.pdf
 """
 import re
 import os
@@ -21,7 +21,7 @@ DOCS_DIR = os.path.dirname(os.path.abspath(__file__))
 DIST_DIR = os.path.join(DOCS_DIR, 'dist')
 OUT_PDF = os.path.join(DIST_DIR, '12storeez-architecture.pdf')
 STYLE_CSS = os.path.join(DOCS_DIR, 'build-pdf.css')
-DOCUMENT_DATE = '01.08.2026'
+DOCUMENT_DATE = '06.09.2026'
 
 ORDER = [
     ('README.md', 'chapter-readme'),
@@ -87,7 +87,7 @@ def process_file(fn, cid, is_first, images):
 
     text = re.sub(r'\[([^\]]*)\]\((\S+?\.md)\)', link_repl, text)
     text = re.sub(
-        r'\[docs/sale/categories-sale\.md\]\(\.\./sale/categories-sale\.md\)',
+        r'\[docs/sale/categories-sale\.md\]\(\.\./\.\./12storeez-master/docs/sale/categories-sale\.md\)',
         '`docs/sale/categories-sale.md`',
         text
     )

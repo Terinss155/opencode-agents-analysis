@@ -1,0 +1,87 @@
+@startuml
+autonumber "<b><color:DarkSlateBlue>.</color></b> "
+
+title "Процесс возврата товара: прочие интеграции (Mindbox, Lamoda)"
+
+' ============================================================
+' УЧАСТНИКИ
+' ============================================================
+participant "OrderRefundService /\nOrderService" as OrderSvc
+participant "MindboxOutboxService" as MindboxOutbox
+participant "LamodaOrderOutboxService" as LamodaOutbox
+participant "Outbox\n(mindbox_update_transaction_outbox /\nlamoda_order_outbox)" as Outbox
+participant "RabbitMQ\n(mindbox.order.update.v1.command /\nlamoda_order)" as Rabbit
+participant "UpdateOutboxTransactionService\n(консьюмер Mindbox)" as MindboxConsumer
+participant "MindboxTransactionHandler" as MindboxHandler
+participant "MindboxService" as MindboxSvc
+participant "Mindbox" as Mindbox
+participant "Lamoda Consumer\n(lamoda_order)" as LamodaConsumer
+participant "Lamoda" as Lamoda
+
+' ============================================================
+' ЭТАП 1. ПЕРЕДАЧА В MINDBOX (ЛОЯЛЬНОСТЬ, БОНУСЫ)
+' ============================================================
+== 1. Передача в Mindbox ==
+OrderSvc -> MindboxOutbox : pushUpdateOrder(order)\n(при создании возврата Web/Mobile)
+alt Сертификатный заказ
+    alt Оплачен
+        MindboxOutbox -> MindboxOutbox : sqlQueueHelper->pushMindBoxAnalytics(order)
+    else Не оплачен
+        MindboxOutbox -> MindboxOutbox : return (не отправляется)
+    end
+else Обычный заказ
+    MindboxOutbox -> Outbox : createOrderOutbox(MINDBOX, UPDATE, dto)\n(запись в mindbox_update_transaction_outbox)
+    note over Outbox, Rabbit : Публикация в очередь выполняется\nотдельной cron-задачей (сканирование outbox)
+    Rabbit --> MindboxConsumer : Сообщение (payload: orderId)
+    MindboxConsumer -> MindboxHandler : update(payloadJson)
+    MindboxHandler -> MindboxHandler : decode(payload) + findOne(orderId)
+    alt orderId отсутствует / заказ не найден
+        MindboxHandler -> MindboxHandler : throw OutboxTransactionSkipException
+    else Заказ найден
+        MindboxHandler -> MindboxSvc : patchOrder(order)
+        MindboxSvc -> Mindbox : REST/gRPC: обновление заказа\n(статус возврата, бонусы)
+        Mindbox --> MindboxSvc : Ответ
+        MindboxSvc --> MindboxHandler : ok
+    end
+end
+
+' ============================================================
+' ЭТАП 2. ПЕРЕДАЧА В LAMODA (МАРКЕТПЛЕЙС)
+' ============================================================
+== 2. Передача в Lamoda ==
+OrderSvc -> LamodaOutbox : changeStatus(order)\n(при создании возврата Web)
+alt Не Lamoda-заказ
+    LamodaOutbox -> LamodaOutbox : return (пропуск)
+else Статус не менялся
+    LamodaOutbox -> LamodaOutbox : return (пропуск)
+else Lamoda-заказ, статус изменён
+    LamodaOutbox -> LamodaOutbox : Сбор статусов позиций\n(по lamoda_id)
+    alt Статусы позиций различаются
+        loop по каждой позиции
+            LamodaOutbox -> LamodaOutbox : changeOrderItemStatus(order, position)
+            LamodaOutbox -> Outbox : addChangeOrderItemStatusToOutbox()\n(запись в lamoda_order_outbox)
+        end
+    else Единый статус
+        LamodaOutbox -> LamodaOutbox : changeOrderStatus(order)\nconvertOrderStatusToLamoda()
+        alt Статус не маппится в Lamoda
+            LamodaOutbox -> LamodaOutbox : return (пропуск)
+        else Статус уже отправлен
+            LamodaOutbox -> LamodaOutbox : return (пропуск)
+        else Требуется переход
+            LamodaOutbox -> Outbox : addChangeOrderStatusToOutbox()\n(запись в lamoda_order_outbox)
+            LamodaOutbox -> Rabbit : pushToRabbitQueue(lamoda_order, outboxId)
+        end
+    end
+    LamodaOutbox -> LamodaOutbox : resetStatusChangedFlag()
+    Rabbit --> LamodaConsumer : Сообщение (outboxId)
+    LamodaConsumer -> Outbox : getById(outboxId)
+    LamodaConsumer -> Lamoda : REST: смена статуса заказа/позиции\n(orderNumber, status, reason)
+    Lamoda --> LamodaConsumer : Ответ
+    alt Успех
+        LamodaConsumer -> Outbox : success(outboxId)\n(удаление записи)
+    else Ошибка
+        LamodaConsumer -> Outbox : fail(outboxId, message)\n(статус ERROR)
+    end
+end
+
+@enduml

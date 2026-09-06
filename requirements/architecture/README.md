@@ -1,11 +1,16 @@
-# Архитектура 12 STOREEZ
+# Архитектура 12 STOREEZ (AS-IS)
 
 Описание фактического устройства монолита: слои, домены, БД, API, фронтенд, инфраструктура.
 Документация описывает состояние ветки `master` и опирается на код, а не на планы.
 Все утверждения прошли независимый аудит против исходного кода (сентябрь 2026).
 
+> **Статус: AS-IS.** Этот документ описывает текущее (фактическое) состояние системы
+> `12storeez-master`, которое мы анализируем как исходную точку. Для нашего проекта
+> (выделение процесса возвратов в отдельную сущность) целевое состояние будет описано
+> отдельно как **TO-BE** — в артефактах процессов (`requirements/{process}/`).
+
 Единый PDF со всеми разделами и кликабельным оглавлением: [dist/12storeez-architecture.pdf](dist/12storeez-architecture.pdf).
-Пересобрать после правок: `python3 docs/architecture/build-pdf.py` (нужны `pandoc`, `weasyprint`,
+Пересобрать после правок: `python3 requirements/architecture/build-pdf.py` (нужны `pandoc`, `weasyprint`,
 `@mermaid-js/mermaid-cli` — см. комментарий в начале скрипта).
 
 ## Состав
@@ -29,6 +34,27 @@
 - **Новый эндпоинт** — [05-api.md](05-api.md).
 - **Новая интеграция или очередь** — [07-infrastructure.md](07-infrastructure.md) + [08-integrations.md](08-integrations.md).
 
+## Наш проект: выделение возвратов (TO-BE)
+
+**Цель проекта:** выделить процесс возвратов из домена «Заказы» в отдельную сущность «Возвраты».
+
+**Исходная точка (AS-IS):** в текущей системе возвраты не являются самостоятельной сущностью —
+логика размазана по нескольким местам:
+
+| Аспект | Где сейчас (AS-IS) |
+|---|---|
+| Модель возврата | `modules/orders/models/OrderReturnPosition.php`, `modules/users/models/UserRefund.php` |
+| Сервис возврата | `src/Modules/Order/Services/OrderRefundService.php` |
+| Валидаторы | `src/Modules/Order/Validators/OrderRefundValidator.php`, `validators/order/OrderRefundRequestValidator.php` |
+| Чеки возврата (АТОЛ) | `src/Modules/Receipt/` (RefundPrepayment, RefundFullpayment) |
+| Мобильный возврат | `src/Modules/Mobile/Controllers/OrdersController.php` (actionReturnPositions, actionReturnDetails) |
+| Причины возврата | `modules/orders/models/ReturnReason.php`, `ReturnReasonGroup.php` |
+| Статусы возврата | `src/Modules/Order/Enum/StatusEnum.php`, `modules/orders/models/Order.php` (STATUS_ORDER_RETURNED_LK=31) |
+
+**Целевое состояние (TO-BE):** отдельный домен «Возвраты» со своей моделью данных, сервисами,
+API и статусной моделью. Артефакты TO-BE будут создаваться в `requirements/product-return/`
+(или аналогичном каталоге процесса) на основе этого AS-IS описания.
+
 ## Ключевые цифры
 
 | Метрика | Значение |
@@ -51,5 +77,5 @@
 - изменилась схема аутентификации или версионирование API;
 - изменился способ сборки фронтенда или связка PHP↔Vue.
 
-Описание отдельных фич живёт рядом по теме — например, [docs/sale/categories-sale.md](../sale/categories-sale.md).
+Описание отдельных фич живёт рядом по теме — например, [docs/sale/categories-sale.md](../../12storeez-master/docs/sale/categories-sale.md).
 Контракты API — в `docs/frontend/openapi.yml`, `docs/mobileApi/openapi.yml`, `docs/ssr/openapi.yml`.

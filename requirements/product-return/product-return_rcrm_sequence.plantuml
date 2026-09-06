@@ -1,0 +1,75 @@
+@startuml
+autonumber "<b><color:DarkSlateBlue>.</color></b> "
+
+title "Процесс возврата товара: интеграция с RetailCRM (RCRM)"
+
+' ============================================================
+' УЧАСТНИКИ
+' ============================================================
+participant "OrderRefundService /\nOrderService" as OrderSvc
+participant "RcrmOutboxService" as RcrmOutbox
+participant "OrderIntegrationOutboxFacade" as Facade
+participant "Outbox\n(rcrm_update_transaction_outbox)" as Outbox
+participant "RabbitMQ\n(to.rcrm.order.update.v1.command)" as Rabbit
+participant "UpdateOutboxTransactionService\n(консьюмер)" as Consumer
+participant "RcrmTransactionHandler" as Handler
+participant "RcrmExchangeService" as Exchange
+participant "RcrmClient\n(REST)" as RcrmClient
+participant "RetailCRM" as RCRM
+
+' ============================================================
+' ЭТАП 1. ФОРМИРОВАНИЕ OUTBOX-ЗАПИСИ
+' ============================================================
+== 1. Формирование outbox-записи (после создания возврата) ==
+OrderSvc -> RcrmOutbox : pushUpdateOrder(order)
+alt Заказ — сертификатный
+    RcrmOutbox -> RcrmOutbox : return (не отправляется)
+else Заказ старше 2 лет
+    RcrmOutbox -> RcrmOutbox : return (не отправляется)
+else Заказ подходит для отправки
+    RcrmOutbox -> Facade : createOrderOutbox(RCRM, UPDATE, OrderOutboxDto)
+    Facade -> Outbox : Создание записи\n(rcrm_update_transaction_outbox)
+    Outbox --> Facade : outboxModel (id, payload)
+    RcrmOutbox -> Facade : pushToTargetQueue(to.rcrm.order.update.v1.command,\noutboxModel)
+    Facade -> Rabbit : rabbitMQ->push(queue, serialized outboxModel)
+end
+
+' ============================================================
+' ЭТАП 2. ОБРАБОТКА КОНСЬЮМЕРОМ И ОТПРАВКА В RETAILCRM
+' ============================================================
+== 2. Обработка консьюмером и отправка в RetailCRM ==
+Rabbit --> Consumer : Сообщение (payload: orderId)
+Consumer -> Handler : update(payloadJson)
+Handler -> Handler : deserialize(OrderOutboxPayloadDto)
+Handler -> Handler : findOne(orderId) + oldOrder
+alt Заказ не найден
+    Handler -> Handler : throw OrderNotFoundException\n→ OutboxTransactionRetryException
+else Сертификатный заказ
+    Handler -> Handler : throw RcrmOrderNotSendException\n→ OutboxTransactionSkipException
+else retail_id отсутствует
+    Handler -> Handler : throw RuntimeException\n→ OutboxTransactionRetryException\n(ждём create-транзакцию)
+else Заказ готов к обновлению
+    opt notSendTo1C == false
+        Handler -> Handler : oldOrder->pushTo1cQueue()\n(отправка в 1С перед RCRM)
+    end
+    Handler -> Exchange : setUpOrderCustomer(order)\n(создание клиента при необходимости)
+    Handler -> Exchange : sendOrderUpdate(order)
+    Exchange -> RcrmClient : updateOrder(OrderDataDto, by, site)\n(REST API RetailCRM)
+    RcrmClient -> RCRM : HTTP PATCH/POST /api/v5/orders/{id}\n(статус возврата, позиции, суммы)
+    RCRM --> RcrmClient : Ответ API
+    RcrmClient --> Exchange : ApiResponse
+    Exchange --> Handler : ok
+    Handler -> Handler : sendAnalytic(oldOrder)\n(Mindbox, Admitad)
+end
+
+' ============================================================
+' ЭТАП 3. ОБРАБОТКА ОШИБОК ОТПРАВКИ
+' ============================================================
+== 3. Обработка ошибок отправки ==
+alt RcrmDiscountException / RcrmRequestFailedException / RcrmNeedSetUpException
+    Handler -> Handler : throw OutboxTransactionRetryException\n(повторная попытка)
+else NotEncodableValueException / RcrmCreatePaymentException /\nRcrmRequestUnsuccessfulException
+    Handler -> Handler : throw OutboxTransactionSkipException\n(пропуск транзакции)
+end
+
+@enduml

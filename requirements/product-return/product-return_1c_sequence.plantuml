@@ -1,0 +1,73 @@
+@startuml
+autonumber "<b><color:DarkSlateBlue>.</color></b> "
+
+title "Процесс возврата товара: интеграция с 1С"
+
+' ============================================================
+' УЧАСТНИКИ
+' ============================================================
+participant "OrderService /\nOrderRefundService" as OrderSvc
+participant "Outbox\n(onec_update_transaction_outbox)" as Outbox
+participant "RabbitMQ\n(to.onec.order.update.v1.command)" as Rabbit
+participant "UpdateOutboxTransactionService\n(консьюмер)" as Consumer
+participant "OnecTransactionHandler" as Handler
+participant "OneCExchangeService" as Exchange
+participant "OneCClient\n(SOAP)" as OneCClient
+participant "1С" as OneC
+participant "Webhook\n(POST /api/onec/webhooks/*)" as Webhook
+participant "OrderUpdateService\n(Inbox)" as Inbox
+participant "OrderReturnPosition\n(order_return_positions)" as ORP
+
+' ============================================================
+' ЭТАП 1. ИСХОДЯЩАЯ ПЕРЕДАЧА ОБНОВЛЕНИЯ ЗАКАЗА В 1С
+' ============================================================
+== 1. Исходящая передача: outbox → RabbitMQ → SOAP ==
+OrderSvc -> Outbox : createOrderOutbox(ONEC, UPDATE, dto)\n(при создании возврата Web/Mobile)
+OrderSvc -> Rabbit : pushToTargetQueue(to.onec.order.update.v1.command,\noutboxModel)
+Rabbit --> Consumer : Сообщение (payload: orderId)
+Consumer -> Handler : update(payloadJson)
+Handler -> Handler : deserialize(OrderOutboxOneCUpdatePayloadDto)
+Handler -> Handler : pingConnection()
+Handler -> Handler : findOne(orderId)
+alt Заказ не найден
+    Handler -> Handler : throw OneCOrderNotFoundException\n→ OutboxTransactionErrorException
+else Заказ найден
+    opt withoutMethod == true
+        Handler -> Handler : Redis-флаг order_{id}\n(защита от двойной отправки)
+        alt Флаг уже установлен
+            Handler -> Handler : throw OneCOrderInWorkException\n→ OutboxTransactionRetryException
+        end
+    end
+    Handler -> Exchange : sendOrderUpdateToOneC(orderId)
+    Exchange -> OneCClient : updateOrder(RequestBodyDto)\n(SOAP 1.2: loadOrder)
+    OneCClient -> OneC : SOAP-запрос loadOrder\n(позиции с return=true, return_reason)
+    OneC --> OneCClient : SOAP-ответ (bitrixId)
+    OneCClient --> Exchange : Результат
+    Exchange --> Handler : ok
+    Handler -> Handler : setPositionsSentAt(orderId)\n(sent_at_to_1c = now)
+    Handler -> Handler : updatePositionBuffer(orderId)\n(OrderPositionBufferJob)
+end
+
+' ============================================================
+' ЭТАП 2. ВХОДЯЩИЙ ВОЗВРАТ ИЗ 1С (ВЕБХУК)
+' ============================================================
+== 2. Входящий возврат: вебхук 1С → фиксация возврата ==
+OneC -> Webhook : HTTP POST /api/onec/webhooks/*\nbody: {id, return_positions: [{id, return_guid, quantity}]}
+Webhook -> Inbox : OrderUpdateService::run(params)
+Inbox -> Inbox : handleStatus / handleReturnStatusWms\n(обработка статусов заказа)
+Inbox -> Inbox : handleReturnPositions(return_positions)
+alt return_positions пуст
+    Inbox -> Inbox : return (пропуск)
+else return_positions передан
+    Inbox -> Inbox : findAllByIds(returnPositionIds)
+    loop по каждой позиции
+        Inbox -> ORP : OrderReturnPosition::create()
+        Inbox -> ORP : setOrderId/setPositionId/setBarcode
+        Inbox -> ORP : setReturnQuid(return_guid)
+        Inbox -> ORP : setQuantity(min(quantity, доступный остаток))
+        Inbox -> ORP : OrderReturnPositionRepository::save()
+    end
+    ORP --> Inbox : Возврат зафиксирован в order_return_positions
+end
+
+@enduml
