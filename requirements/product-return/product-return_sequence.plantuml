@@ -1,0 +1,150 @@
+@startuml
+autonumber "<b><color:DarkSlateBlue>.</color></b> "
+
+title "Процесс возврата товара (AS-IS, 12storeez)"
+
+' ============================================================
+' УЧАСТНИКИ
+' ============================================================
+actor Client as "Клиент (ЛК / МП)"
+participant "Web / Mobile\nFrontend" as FE
+participant "RefundController\n(Web REST)" as RefundCtrl
+participant "OrdersController\n(Mobile API)" as MobileCtrl
+participant "OrderRefundService" as RefundSvc
+participant "OrderService" as OrderSvc
+participant "OrderPosition" as Pos
+participant "Order" as Order
+participant "UserRefund" as UR
+participant "ReturnReason /\nReturnReasonGroup" as Reason
+participant "Outbox\n(Lamoda/RCRM/Mindbox)" as Outbox
+participant "1C Inbox\nOrderUpdateService" as OneC
+
+' ============================================================
+' ЭТАП 1. ПРОВЕРКА ВОЗМОЖНОСТИ ВОЗВРАТА (Web)
+' ============================================================
+== 1. Проверка возможности возврата (Web) ==
+Client -> FE : Открывает карточку заказа
+FE -> RefundCtrl : HTTP GET /refund/get-positions-json?id={orderId}
+RefundCtrl -> Order : findOneByIdAndUserId(orderId, userId)
+Order --> RefundCtrl : Заказ (или null)
+alt Заказ не найден
+    RefundCtrl --> FE : JSON {success:false, "Заказ не найден"}
+else Заказ найден
+    RefundCtrl -> Pos : findAllForRefundByOrderId(orderId)\n(status=STATUS_ADDED, price>PRESENT_MAX)
+    Pos --> RefundCtrl : Позиции, доступные к возврату
+    RefundCtrl -> Reason : findActiveGroupsWithReasons()
+    Reason --> RefundCtrl : Активные группы причин
+    RefundCtrl -> Order : getPaymentTypeId()\n(online или нет)
+    RefundCtrl --> FE : JSON {positions, reason_groups, need_bank_details}
+end
+
+' ============================================================
+' ЭТАП 2. БАНКОВСКИЕ РЕКВИЗИТЫ (только не-онлайн оплата)
+' ============================================================
+== 2. Банковские реквизиты (не-онлайн оплата) ==
+opt need_bank_details == true
+    FE -> RefundCtrl : HTTP GET /refund/get-bank-data-json
+    RefundCtrl -> UR : findOneByUserId(userId)
+    UR --> RefundCtrl : Сохранённые реквизиты (или пустая модель)
+    RefundCtrl --> FE : JSON {банковские реквизиты}
+
+    FE -> RefundCtrl : HTTP POST /refund/save-bank-data-json
+    RefundCtrl -> RefundCtrl : RefundBankDataForm::validate()
+    alt Валидация успешна
+        RefundCtrl -> UR : findOneByUserId / createModel
+        RefundCtrl -> RefundCtrl : UserRefundService::fillModelByForm()
+        RefundCtrl -> UR : save()
+        UR --> RefundCtrl : ok
+        RefundCtrl --> FE : JSON {success:true}
+    else Ошибка валидации
+        RefundCtrl --> FE : JSON {success:false, errors}
+    end
+end
+
+' ============================================================
+' ЭТАП 3. СОЗДАНИЕ ЗАЯВКИ НА ВОЗВРАТ (Web)
+' ============================================================
+== 3. Создание заявки на возврат (Web) ==
+Client -> FE : Выбирает позиции и причины, подтверждает
+FE -> RefundCtrl : HTTP POST /refund/save-reason-json
+RefundCtrl -> RefundCtrl : SaveReasonForm::validate()\n(позиции + reasonCode)
+alt Валидация не пройдена
+    RefundCtrl --> FE : JSON {success:false, errors}
+else Валидация пройдена
+    RefundCtrl -> RefundSvc : refundPositions(form, user)
+    RefundSvc -> RefundSvc : getOrderPositions(form)
+    RefundSvc -> UR : findOneByUserId(userId)
+    RefundSvc -> RefundSvc : validateReasons()\n(принадлежность заказа, reason_code,\nuser_refund для не-онлайн)
+    RefundSvc -> RefundSvc : beginTransaction()
+    loop по каждой позиции
+        RefundSvc -> Order : setUserRefund() (если не-онлайн)
+        RefundSvc -> Order : unsafeSave()
+        RefundSvc -> Pos : returnPosition(reasonCode)
+        Pos -> Pos : status = STATUS_LOST, reason = reasonCode
+        Pos -> Order : updateReturnStatus()\n(если есть возвращённые -> STATUS_ORDER_RETURNED_LK)
+        RefundSvc -> Outbox : LamodaOrderOutboxService::changeStatus(order)
+        RefundSvc -> OrderSvc : changeStatus(order)
+    end
+    RefundSvc -> Outbox : RcrmOutboxService::pushUpdateOrder(order)
+    RefundSvc -> Outbox : MindboxOutboxService::pushUpdateOrder(order)
+    RefundSvc -> RefundSvc : commit()
+    RefundSvc --> RefundCtrl : ok
+    RefundCtrl --> FE : JSON {success:true}
+end
+
+' ============================================================
+' ЭТАП 4. ВОЗВРАТ ЧЕРЕЗ МОБИЛЬНОЕ ПРИЛОЖЕНИЕ
+' ============================================================
+== 4. Возврат через мобильное приложение ==
+Client -> FE : Выбирает позиции (barcode) и причины
+FE -> MobileCtrl : HTTP POST /mobile/orders/{id}/return-positions
+MobileCtrl -> MobileCtrl : Проверка причин (ReturnReason по code)
+MobileCtrl -> Order : findOneByIdAndUserId(orderId, userId)
+alt Заказ не найден
+    MobileCtrl --> FE : JSON {error: "Заказ не найден"}
+else Заказ найден
+    opt оплата курьеру
+        MobileCtrl -> MobileCtrl : UserRefundMobileValidator::validate()
+    end
+    MobileCtrl -> MobileCtrl : Собирает OrderRefundItemDto[]\n(позиции со статусом != STATUS_LOST)
+    MobileCtrl -> RefundSvc : prepareRefundPositionOrder(orderId, items, userRefund, MOBILE)
+    RefundSvc -> Pos : status = STATUS_LOST, reason = reasonCode
+    RefundSvc -> Order : findOne(orderId)
+    RefundSvc -> RefundSvc : OrderUpdateDto(status=ORDER_RETURNED_LK,\nuser_refund, positionsToUpdate)
+    MobileCtrl -> OrderSvc : updateOrder(dto, externalSending, events)
+    OrderSvc -> Pos : save(false) (для каждой позиции)
+    OrderSvc -> Order : status=ORDER_RETURNED_LK, user_refund, save()
+    OrderSvc -> OrderSvc : EventRunner::runEvents()\n(UpdateOrdersCounter, UpdateQuantityBuffer)
+    OrderSvc -> Outbox : createOrderOutbox(UPDATE) + pushToTargetQueue
+    OrderSvc --> MobileCtrl : ok
+    MobileCtrl --> FE : JSON {success:true}
+end
+
+' ============================================================
+' ЭТАП 5. ДЕТАЛИ ВОЗВРАТА (МП): город/дата/способ
+' ============================================================
+== 5. Детали возврата (МП) ==
+Client -> FE : Указывает город/дату/способ возврата
+FE -> MobileCtrl : HTTP POST /mobile/orders/{id}/return-details
+MobileCtrl -> Order : findOneByIdAndUserId(orderId, userId)
+MobileCtrl -> MobileCtrl : ReturnDetailsDto::denormalize() + validate()
+MobileCtrl -> OrderSvc : updateOrderReturnDetails(order, dto)
+OrderSvc -> Order : setReturnCity/setReturnDate/setReturnDeliveryTk/\nsetReturnPostal/setReturnAddress, save()
+OrderSvc -> Outbox : RcrmOutboxService::pushUpdateOrder(order)
+OrderSvc --> MobileCtrl : ok
+MobileCtrl --> FE : JSON {success:true}
+
+' ============================================================
+' ЭТАП 6. ВХОДЯЩИЙ ВОЗВРАТ ИЗ 1С
+' ============================================================
+== 6. Входящий возврат из 1С ==
+OneC -> OneC : handleReturnPositions(returnPositions)
+OneC -> Pos : findAllByIds(returnPositionIds)
+loop по каждой позиции
+    OneC -> OneC : OrderReturnPosition::create()
+    OneC -> OneC : setOrderId/setPositionId/setBarcode/\nsetReturnQuid/setQuantity
+    OneC -> OneC : OrderReturnPositionRepository::save()
+end
+OneC --> OneC : Возврат зафиксирован в order_return_positions
+
+@enduml
