@@ -6,8 +6,8 @@
 - `.opencode/agents/*.md` — определения агентов (frontmatter).
   - `mode: primary`: `business-analyst`, `system-analyst`, `product-owner` (permission: редактирование `ask`, bash `ask`).
   - `mode: subagent`: `security-reviewer` (edit: deny — пишет только в `reports/`).
-- `skill/*/SKILL.md` — скиллы OpenCode; подгружаются по frontmatter `description` через `skills.paths` в `opencode.json`. Зови скилл при запросе соответствующего артефакта (например, `openapi-spec`, `nfr-requirements`, `user-story`, `erd-model`, `security-review-checklist`).
-- `opencode.json` — конфиг: `default_agent: system-analyst`, `edit`/`bash` = ask, `skills.paths: ["./skill"]`, скиллы — только из allow-списка (все 13, `*` = deny).
+- `skill/*/SKILL.md` — скиллы OpenCode; подгружаются по frontmatter `description` через `skills.paths` в `opencode.json`. Зови скилл при запросе соответствующего артефакта (например, `openapi-spec`, `nfr-requirements`, `user-story`, `use-case`, `erd-model`, `security-review-checklist`).
+- `opencode.json` — конфиг: `default_agent: system-analyst`, `edit`/`bash` = ask, `skills.paths: ["./skill"]`, скиллы — только из allow-списка (все 14, `*` = deny).
 
 ## Разделение контекстов
 - **Бизнес-контекст (код):** `12storeez-master/` — внешний репозиторий (Yii2-монолит 12Storeez). Только для чтения при анализе; **запрещено изменять** и **запрещено добавлять в git** (правило в `.gitignore`).

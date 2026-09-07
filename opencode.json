@@ -17,6 +17,7 @@
       "asyncapi-spec": "allow",
       "nfr-requirements": "allow",
       "user-story": "allow",
+      "use-case": "allow",
       "backlog-prioritization": "allow",
       "business-case": "allow",
       "product-roadmap": "allow",
