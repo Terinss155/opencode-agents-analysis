@@ -18,11 +18,13 @@
       "nfr-requirements": "allow",
       "user-story": "allow",
       "use-case": "allow",
+      "screen-spec": "allow",
       "backlog-prioritization": "allow",
       "business-case": "allow",
       "product-roadmap": "allow",
       "stakeholder-map": "allow",
       "business-process-bpmn": "allow",
+      "brd": "allow",
       "security-review-checklist": "allow"
     }
   }

@@ -6,11 +6,16 @@
 - `.opencode/agents/*.md` — определения агентов (frontmatter).
   - `mode: primary`: `business-analyst`, `system-analyst`, `product-owner` (permission: редактирование `ask`, bash `ask`).
   - `mode: subagent`: `security-reviewer` (edit: deny — пишет только в `reports/`).
-- `skill/*/SKILL.md` — скиллы OpenCode; подгружаются по frontmatter `description` через `skills.paths` в `opencode.json`. Зови скилл при запросе соответствующего артефакта (например, `openapi-spec`, `nfr-requirements`, `user-story`, `use-case`, `erd-model`, `security-review-checklist`).
-- `opencode.json` — конфиг: `default_agent: system-analyst`, `edit`/`bash` = ask, `skills.paths: ["./skill"]`, скиллы — только из allow-списка (все 14, `*` = deny).
+- `skill/*/SKILL.md` — скиллы OpenCode; подгружаются по frontmatter `description` через `skills.paths` в `opencode.json`. Зови скилл при запросе соответствующего артефакта (например, `brd`, `openapi-spec`, `nfr-requirements`, `user-story`, `use-case`, `screen-spec`, `erd-model`, `security-review-checklist`).
+- `opencode.json` — конфиг: `default_agent: system-analyst`, `edit`/`bash` = ask, `skills.paths: ["./skill"]`, скиллы — только из allow-списка (все 16, `*` = deny).
+
+## Запрет на изменение `12storeez-master/`
+- **Категорически запрещено изменять, создавать, удалять или переименовывать любые файлы и папки внутри `12storeez-master/`.** Это внешний репозиторий (Yii2-монолит 12Storeez), доступен **только для чтения** при анализе.
+- Запрещено также добавлять `12storeez-master/` в git (правило в `.gitignore`).
+- Любые правки, которые «кажутся» нужными в коде монолита, оформляются как артефакты аналитики в `requirements/`, а не вносятся в сам код.
 
 ## Разделение контекстов
-- **Бизнес-контекст (код):** `12storeez-master/` — внешний репозиторий (Yii2-монолит 12Storeez). Только для чтения при анализе; **запрещено изменять** и **запрещено добавлять в git** (правило в `.gitignore`).
+- **Бизнес-контекст (код):** `12storeez-master/` — внешний репозиторий (Yii2-монолит 12Storeez). Только для чтения при анализе; **запрещено изменять** (см. раздел «Запрет на изменение `12storeez-master/`») и **запрещено добавлять в git** (правило в `.gitignore`).
 - **Артефакты аналитики (описывают работу):** `requirements/` — все документы требований, диаграммы, черновики, справочники. Создавать и сохранять артефакты только здесь.
   - `requirements/{process}/` — артефакты по процессу/фиче (например, `requirements/product-return/`).
   - `requirements/drafts/` — черновики и исходные бизнес-материалы.
@@ -26,7 +31,7 @@
 - Каждый артефакт сохраняется в отдельный файл в `requirements/` (см. «Разделение контекстов»).
 
 ## Конвенция имён файлов (легко ошибиться)
-- `business-analyst`: `*_as-is.bpmn.md`, `*_to-be.bpmn.md`, `*_brd.md`, `*_use-case.md`, `*_gap-analysis.md`, `*_brs.md`
+- `business-analyst`: `*_as-is.bpmn.md`, `*_to-be.bpmn.md`, `*_brd.md`, `*_use-case.md`, `*_screen-spec.md`, `*_gap-analysis.md`, `*_brs.md`
 - `system-analyst`: `*_backend.md`, `*_erd.plantuml` + `*_sql.sql`, `*_sequence.plantuml`, `*_openapi.yaml`, `*_asyncapi.yaml`, `*_nfr.md`
 - `product-owner`: `*_user-story.md`, `*_backlog-priority.md`, `*_business-case.md`, `*_roadmap.md`, `*_stakeholder-map.md`
 - Ревью/отчёты: папка `reports/` (создать, если нет); `security-reviewer` → `{артефакт}_security_review.md`, `system-analyst` (по явному запросу) → `{артефакт}_review_report.md`.
@@ -36,6 +41,18 @@
 - SA → технические артефакты: backend-логика, ERD, Sequence, OpenAPI, AsyncAPI, NFR; обеспечивает совместимость с User Story/Use Case.
 - `security-reviewer` — ревью ИБ требований (ISO 27001, NIST, OWASP, PCI DSS, 152-ФЗ; STRIDE/PASTA/DREAD).
 - Перед фиксацией требований BA/PO синхронизируются по приоритетам; технические детали — только через SA.
+
+## Выбор артефакта: Use Case / Спецификация экрана / US + Gherkin
+
+User Story ≠ Use Case 1:1. Один UC покрывает несколько US; часть US ложится на спецификацию экрана; часть — только на критерии приёмки. Как выбрать:
+
+| Что описывает стори | Признак | Артефакт |
+|---|---|---|
+| **Действие / транзакция** | Триггер → шаги с решениями → система **создаёт / изменяет** состояние → наблюдаемый результат; есть ветвления | **Use Case** (`skill/use-case`) |
+| **Просмотр / восприятие** (карточка, список, дашборд) | 1 действие пользователя (открыл); система ничего не меняет; «сценарий» = «открыл → показано»; ценность — в том, *что и когда показано* | **Спецификация экрана** (`skill/screen-spec`) |
+| **Мелкое / самоочевидное** | Нечего расписывать сверх «вижу X, Y, Z» | Только **US + критерии приёмки Gherkin** (`skill/user-story`) |
+
+Триггер к переключению с Use Case: основной сценарий вышел в 1–2 шага, «гарантия успеха» = «информация отображена», нет шага, где система создаёт/меняет сущность → это спецификация экрана, а не Use Case. Не натягивать просмотровый экран на пошаговый формат.
 
 ## Домен по умолчанию
 
