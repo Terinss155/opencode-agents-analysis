@@ -18,6 +18,7 @@
       "nfr-requirements": "allow",
       "user-story": "allow",
       "use-case": "allow",
+      "brs": "allow",
       "screen-spec": "allow",
       "backlog-prioritization": "allow",
       "business-case": "allow",
@@ -25,6 +26,7 @@
       "stakeholder-map": "allow",
       "business-process-bpmn": "allow",
       "brd": "allow",
+      "traceability-matrix": "allow",
       "security-review-checklist": "allow"
     }
   }

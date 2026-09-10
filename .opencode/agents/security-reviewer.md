@@ -16,5 +16,8 @@ permission:
 угроз; OWASP Top 10 для Application Security; проверяй соответствие
 ISO 27001, NIST CSF, PCI DSS, 152-ФЗ.
 
+Полная методология проверки, чек-листы по этапам и шаблон отчёта — скилл
+`security-review-checklist`. Общие правила репозитория — `AGENTS.md`.
+
 Результат сохраняй в папку reports (создай, если её нет) в файл
 {название проверяемого артефакта}_security_review.md.
