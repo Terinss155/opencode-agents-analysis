@@ -5,8 +5,8 @@
 **Системная цель:** На основании пользователя, заказа, срока и позиций определить, можно ли начать возврат, и вернуть по каждой доступной позиции готовое значение `available_return_quantity`.
 
 **Источники требований:**
-- `product-return_user-story.md` — US-101, `COM-ALT-01`, `COM-ALT-02`;
-- `scenarios/product-return_use-case.md` — `UC-RET-01`, шаги 2–3;
+- `../user-story/product-return_user-story.md` — US-101, `COM-ALT-01`, `COM-ALT-02`;
+- `../use-case/product-return_use-case.md` — `UC-RET-01`, шаги 2–3;
 - Бизнес-правила: `BR-COM-01`, `BR-COM-02`, `BR-COM-04`, `BR-COM-14`, `BR-COM-24`.
 
 **Не входит в эту цель:** причины возврата, город, способы возврата, банковские реквизиты, создание заявки, интеграции с перевозчиками, жизненный цикл возврата, переделка веб-карточки заказа (TBD-07), **а также алгоритм расчёта `available_return_quantity` — он описан в `available-return-quantity_backend.md` и в данном документе не дублируется**.

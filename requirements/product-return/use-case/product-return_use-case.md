@@ -8,11 +8,11 @@
 
 **Источники:**
 
-- `product-return_user-story.md`;
-- `../drafts/obshie-biznes-pravila-oformleniya-vozvrata.md`;
-- `../drafts/vozvrat-kurerom-biznes-process-to-be.md`;
-- `../drafts/vozvrat-cherez-5post-biznes-process-to-be.md`;
-- `../drafts/vozvrat-cherez-sdek-pvz-biznes-process-to-be.md`;
+- `../user-story/product-return_user-story.md`;
+- `../../drafts/obshie-biznes-pravila-oformleniya-vozvrata.md`;
+- `../../drafts/vozvrat-kurerom-biznes-process-to-be.md`;
+- `../../drafts/vozvrat-cherez-5post-biznes-process-to-be.md`;
+- `../../drafts/vozvrat-cherez-sdek-pvz-biznes-process-to-be.md`;
 - уточнения заказчика от 07.09.2026.
 
 ## 2. Сквозная последовательность
@@ -848,7 +848,7 @@
 
 ## UC-RET-06. Просмотреть клиентские идентификаторы возврата
 
-> **Примечание (TO-BE):** это экран восприятия, а не Use Case (система ничего не меняет). В целевой модели переоформлено как спецификация экрана — `screens/product-return_screen-spec.md`, `SCR-RET-01`, блок 3. Ниже — исходная формулировка.
+> **Примечание (TO-BE):** это экран восприятия, а не Use Case (система ничего не меняет). В целевой модели переоформлено как спецификация экрана — `../screen-spec/product-return_screen-spec.md`, `SCR-RET-01`, блок 3. Ниже — исходная формулировка.
 
 | Поле | Содержание |
 |---|---|

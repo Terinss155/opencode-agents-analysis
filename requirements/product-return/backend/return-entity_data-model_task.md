@@ -4,7 +4,7 @@
 **Домен:** E-commerce / Fashion-ритейл, процесс возврата товара.
 **Статус:** DRAFT — требует проработки SA + ревью бэкенда и архитектора.
 **Дата:** 2026-09-08.
-**Связанные артефакты:** `scenarios/product-return_use-case-to-be.md` (UC-RET-01…06), `available-return-quantity_backend.md`, `product-return-eligibility_backend.md`, `product-return_user-story.md` (US-101…US-206).
+**Связанные артефакты:** `../use-case/product-return_use-case-to-be.md` (UC-RET-01…06), `available-return-quantity_backend.md`, `product-return-eligibility_backend.md`, `../user-story/product-return_user-story.md` (US-101…US-206).
 
 ---
 
@@ -300,7 +300,7 @@
 - [ ] Наполнение справочников `cms_return_statuses`, `cms_return_status_groups`, `cms_return_statuses_map` (по клиентской статусной модели из макетов и US-106/US-110).
 - [ ] Скрипт исторической миграции `cms_orders.return_*` → `cms_returns` (+ откат).
 - [ ] Слой совместимости для 1С / RCRM / Lamoda / Mindbox / WMS на переходный период.
-- [ ] Новый эндпоинт карточки возврата `GET /returns/{return_id}` (сайт и МП) — read-модель для `SCR-RET-01` (`screens/product-return_screen-spec.md`, таблица «Параметры экрана»).
+- [ ] Новый эндпоинт карточки возврата `GET /returns/{return_id}` (сайт и МП) — read-модель для `SCR-RET-01` (`../screen-spec/product-return_screen-spec.md`, таблица «Параметры экрана»).
 - [ ] Обновлённые `available-return-quantity_backend.md` (источник = `cms_return_positions`) и `product-return-eligibility_backend.md`.
 - [ ] Ответы на открытые вопросы §5 зафиксированы или явно отложены с владельцем.
 

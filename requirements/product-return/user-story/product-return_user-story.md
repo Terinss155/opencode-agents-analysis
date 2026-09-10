@@ -2,7 +2,7 @@
 
 **Документ:** пользовательские истории (User Story) на процесс возврата товара и возврата денег клиентом.
 **Домен:** E-commerce / Fashion-ритейл. Стиль — INVEST, Acceptance Criteria — Gherkin.
-**Источники фактов:** `drafts/obshie-biznes-pravila-oformleniya-vozvrata.md`, `drafts/vozvrat-kurerom-biznes-process-to-be.md`, `drafts/vozvrat-cherez-sdek-pvz-biznes-process-to-be.md`, `drafts/vozvrat-cherez-5post-biznes-process-to-be.md`.
+**Источники фактов:** `../../drafts/obshie-biznes-pravila-oformleniya-vozvrata.md`, `../../drafts/vozvrat-kurerom-biznes-process-to-be.md`, `../../drafts/vozvrat-cherez-sdek-pvz-biznes-process-to-be.md`, `../../drafts/vozvrat-cherez-5post-biznes-process-to-be.md`.
 
 ## Подтверждённые исходные данные (факты, не допущения)
 
@@ -145,7 +145,7 @@ Scenario: Данные утратили актуальность перед по
   And сообщает, какие данные необходимо выбрать повторно
 ```
 
-**Декомпозиция:** подробный клиентский путь и канальные ветки описаны в `scenarios/product-return_use-case.md`; детальные продуктовые истории сохранены в разделах A и B настоящего документа.
+**Декомпозиция:** подробный клиентский путь и канальные ветки описаны в `../use-case/product-return_use-case.md`; детальные продуктовые истории сохранены в разделах A и B настоящего документа.
 
 ---
 
@@ -367,7 +367,7 @@ Scenario: Ошибка при создании заявки
 Оценка: 5 story points
 Ценность: даёт клиенту уверенность в правильности оформления до передачи товара, прозрачность этапов и денег, самостоятельный доступ к документам — снижает отмены/переоформления и обращения в поддержку.
 Зависимости: US-105
-Детальный сценарий: `screens/product-return_screen-spec.md` — `SCR-RET-01. Карточка созданного возврата` (спецификация экрана, не Use Case: экран ничего не меняет — см. `AGENTS.md` → «Выбор артефакта»).
+Детальный сценарий: `../screen-spec/product-return_screen-spec.md` — `SCR-RET-01. Карточка созданного возврата` (спецификация экрана, не Use Case: экран ничего не меняет — см. `AGENTS.md` → «Выбор артефакта»).
 
 ```gherkin
 Feature: Карточка созданного возврата
@@ -426,7 +426,7 @@ Scenario: Отклонение возврата
 Оценка: 3 story points
 Ценность: клиент может сдать возврат в любом случае — резервный идентификатор снимает зависимость от исправности сканера и приложения; меньше повторных визитов и обращений в поддержку.
 Зависимости: US-105, US-203, US-204
-Детальный сценарий: `screens/product-return_screen-spec.md` — `SCR-RET-01`, блок 3 «Канальное действие с документом».
+Детальный сценарий: `../screen-spec/product-return_screen-spec.md` — `SCR-RET-01`, блок 3 «Канальное действие с документом».
 Примечание: консолидирует «просмотр идентификаторов в карточке» из канальных историй US-203, US-204, US-205 в одну кросс-канальную историю; канальные истории описывают полный процесс передачи по своему каналу.
 
 ```gherkin
@@ -469,8 +469,8 @@ Scenario: Набор идентификаторов ещё не готов
 Оценка: 3 story points
 Ценность: единая точка контроля всех возвратов — клиент не ищет возврат через историю заказов, сразу видит статусы, суммы и то, где требуется его действие.
 Зависимости: US-105
-Детальный сценарий: `screens/product-return_screen-spec.md` — `SCR-RET-02. Список возвратов`.
-Макеты: `ui-mockups-returns/28-returns-list.png`, `ui-mockups-returns/29-returns-list-empty.png`.
+Детальный сценарий: `../screen-spec/product-return_screen-spec.md` — `SCR-RET-02. Список возвратов`.
+Макеты: `../../../ui-mockups-returns/28-returns-list.png`, `../../../ui-mockups-returns/29-returns-list-empty.png`.
 
 ```gherkin
 Feature: Список возвратов
