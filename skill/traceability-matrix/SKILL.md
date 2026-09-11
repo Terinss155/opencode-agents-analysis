@@ -6,7 +6,7 @@ description: Построение матрицы трассируемости т
 
 #### 1. Назначение
 
-RTM — вкладка 03 бандла `requirements/{процесс}/`. Прослеживает требование на всю глубину:
+RTM — вкладка 03 бандла `requirements/`. Прослеживает требование на всю глубину:
 
 ```
 BO → PP → BR → US → UC → бэк-логика → модель данных → API → sequence → экран → NFR → тест
@@ -60,7 +60,7 @@ ADR при наличии указывается только в легенде:
 | User Story | Use Case | Бэк-логика | Модель данных | API-контракт | Sequence | Экран / фронт | NFR | Тест-кейс |
 |---|---|---|---|---|---|---|---|---|
 | US-RET-102 | UC-RET-01, UC-RET-02 | BL-RET-QTY-01 | — | API-RET-GETPOS | — | — | — | — |
-| US-RET-105 | UC-RET-05 | TASK-RET-DATA | TASK-RET-DATA | — | SEQ-RET-WEB, SEQ-RET-MOB | — | — | — |
+| US-RET-105 | UC-RET-05 | TASK-RET-DATA | TASK-RET-DATA | — | SEQ-RET-MOB, SEQ-RET-1C | — | — | — |
 | US-RET-106 | — | TASK-RET-DATA | TASK-RET-DATA | — | — | SCR-RET-01 | — | — |
 ```
 
@@ -79,12 +79,12 @@ ADR при наличии указывается только в легенде:
 |---|---|---|---|---|
 | BL-RET-QTY-01 | Бэк-логика | `./backend/available-return-quantity_backend.md` | backend-logic | DRAFT |
 | TASK-RET-DATA | Модель данных / задача БД | `./backend/return-entity_data-model_task.md` | backend-logic, erd-model | DRAFT |
-| SEQ-RET-WEB | Sequence | `./sequence/product-return_web_sequence.plantuml` | sequence-diagram | — |
-| SCR-RET-01 | Экран | `./screen-spec/product-return_screen-spec.md` (SCR-RET-01) | screen-spec | DRAFT |
+| SEQ-RET-MOB | Sequence | `./as-is/sequence/mobile_sequence.plantuml` | sequence-diagram | — |
+| SCR-RET-01 | Экран | `./screen-spec/screen-spec.md` (SCR-RET-01) | screen-spec | DRAFT |
 ```
 
 - `Тип`: Бэк-логика · Модель данных · Экран · API-контракт · Sequence · ERD · NFR · Тест-кейс.
-- `Файл` — путь (не пересказ). Пути относительны файлу матрицы: `./backend/…`, `./sequence/…`, `../reference/api/web/…`.
+- `Файл` — путь (не пересказ). Пути относительны файлу матрицы: `./backend/…`, `./as-is/sequence/…`, `../reference/api/web/…`.
 - Тип, которого в бандле нет (ERD, OpenAPI-yaml, NFR, тест-кейсы) — **строк нет**; под таблицей примечание «Артефакты типов … отсутствуют».
 - AS-IS sequence — строка `SEQ-<ТЕМА>-ASIS`, тип «Sequence (AS-IS, базовая линия)».
 
@@ -105,12 +105,12 @@ ADR при наличии указывается только в легенде:
 ## Легенда идентификаторов
 | Префикс | Расшифровка | Где определяется |
 |---|---|---|
-| BO-<n> | Бизнес-цель | product-return_brd.md, «Бизнес-цели» |
-| BR-<n> | Бизнес-требование | product-return_brd.md, «Бизнес-требования» |
-| US-<n> | User Story | user-story/product-return_user-story.md |
-| UC-RET-<n> | Use Case | use-case/product-return_use-case.md |
+| BO-<n> | Бизнес-цель | brd.md, «Бизнес-цели» |
+| BR-<n> | Бизнес-требование | brd.md, «Бизнес-требования» |
+| US-<n> | User Story | user-story/user-story.md |
+| UC-RET-<n> | Use Case | use-case/use-case.md |
 | TASK-RET-DATA | Модель данных | backend/return-entity_data-model_task.md |
-| SEQ-RET-* | Sequence | sequence/*.plantuml |
+| SEQ-RET-* | Sequence | as-is/sequence/*.plantuml |
 
 ## Таблица 1. Обоснование
 | Бизнес-цель | Болевая точка | Бизнес-требование | User Story | Use Case | Статус |
@@ -120,16 +120,16 @@ ADR при наличии указывается только в легенде:
 ## Таблица 2. Реализация
 | User Story | Use Case | Бэк-логика | Модель данных | API-контракт | Sequence | Экран / фронт | NFR | Тест-кейс |
 |---|---|---|---|---|---|---|---|---|
-| US-105 | UC-RET-05 | TASK-RET-DATA | TASK-RET-DATA | — | SEQ-RET-WEB, SEQ-RET-MOB | — | — | — |
+| US-105 | UC-RET-05 | TASK-RET-DATA | TASK-RET-DATA | — | SEQ-RET-MOB, SEQ-RET-1C | — | — | — |
 | US-106 | — | TASK-RET-DATA | TASK-RET-DATA | — | — | SCR-RET-01 | — | — |
 
 ## Таблица 3. Реестр технических артефактов
 | ID | Тип | Файл | Скилл | Статус |
 |---|---|---|---|---|
 | TASK-RET-DATA | Модель данных / задача БД | ./backend/return-entity_data-model_task.md | backend-logic, erd-model | DRAFT |
-| SEQ-RET-WEB | Sequence | ./sequence/product-return_web_sequence.plantuml | sequence-diagram | — |
-| SEQ-RET-MOB | Sequence | ./sequence/product-return_mobile_sequence.plantuml | sequence-diagram | — |
-| SCR-RET-01 | Экран | ./screen-spec/product-return_screen-spec.md (SCR-RET-01) | screen-spec | DRAFT |
+| SEQ-RET-1C | Sequence | ./as-is/sequence/1c_sequence.plantuml | sequence-diagram | — |
+| SEQ-RET-MOB | Sequence | ./as-is/sequence/mobile_sequence.plantuml | sequence-diagram | — |
+| SCR-RET-01 | Экран | ./screen-spec/screen-spec.md (SCR-RET-01) | screen-spec | DRAFT |
 
 > Артефакты типов ERD, OpenAPI-yaml, NFR, тест-кейсы QA — отсутствуют; соответствующие столбцы таблицы 2 — «—».
 ```
@@ -150,4 +150,4 @@ ADR при наличии указывается только в легенде:
 
 #### Формат сохранения
 
-`{процесс}_traceability.md` в корне бандла `requirements/{процесс}/`.
+`traceability.md` в корне бандла `requirements/`.
