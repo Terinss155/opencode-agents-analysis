@@ -149,7 +149,6 @@ available_return_quantity = выкупленное количество − ко
       "title": "Платье летнее",
       "quantity": 3,
       "available_return_quantity": 1,
-      "category_returnable": true,
       "is_present": false
     }
   ],
