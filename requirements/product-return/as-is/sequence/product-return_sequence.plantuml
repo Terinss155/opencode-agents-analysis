@@ -9,6 +9,7 @@ title "Процесс возврата товара (AS-IS, 12storeez)"
 actor Client as "Клиент (ЛК / МП)"
 participant "Web / Mobile\nFrontend" as FE
 participant "RefundController\n(Web REST)" as RefundCtrl
+participant "UserRefundController\n(Web REST, legacy)" as UserRefundCtrl
 participant "OrdersController\n(Mobile API)" as MobileCtrl
 participant "OrderRefundService" as RefundSvc
 participant "OrderService" as OrderSvc
@@ -24,7 +25,7 @@ participant "1C Inbox\nOrderUpdateService" as OneC
 ' ============================================================
 == 1. Проверка возможности возврата (Web) ==
 Client -> FE : Открывает карточку заказа
-FE -> RefundCtrl : HTTP GET /refund/get-positions-json?id={orderId}
+FE -> RefundCtrl : HTTP GET /orders/refund/get-positions?id={orderId}
 RefundCtrl -> Order : findOneByIdAndUserId(orderId, userId)
 Order --> RefundCtrl : Заказ (или null)
 alt Заказ не найден
@@ -43,21 +44,24 @@ end
 ' ============================================================
 == 2. Банковские реквизиты (не-онлайн оплата) ==
 opt need_bank_details == true
-    FE -> RefundCtrl : HTTP GET /refund/get-bank-data-json
+    FE -> RefundCtrl : HTTP GET /orders/refund/get-bank-data
     RefundCtrl -> UR : findOneByUserId(userId)
     UR --> RefundCtrl : Сохранённые реквизиты (или пустая модель)
     RefundCtrl --> FE : JSON {банковские реквизиты}
 
-    FE -> RefundCtrl : HTTP POST /refund/save-bank-data-json
-    RefundCtrl -> RefundCtrl : RefundBankDataForm::validate()
+    FE -> UserRefundCtrl : HTTP POST /user/cabinet/return-item/ajax/check-bank-details
+    UserRefundCtrl -> UR : createModel() + load(post) + user_id
+    UserRefundCtrl -> UserRefundCtrl : validate()
     alt Валидация успешна
-        RefundCtrl -> UR : findOneByUserId / createModel
-        RefundCtrl -> RefundCtrl : UserRefundService::fillModelByForm()
-        RefundCtrl -> UR : save()
-        UR --> RefundCtrl : ok
-        RefundCtrl --> FE : JSON {success:true}
+        UserRefundCtrl -> UR : findOneByUserId(userId)
+        alt Реквизиты уже есть
+            UserRefundCtrl -> UR : setAttributes(новые значения)
+        end
+        UserRefundCtrl -> UR : save()
+        UR --> UserRefundCtrl : ok
+        UserRefundCtrl --> FE : JSON {success:true}
     else Ошибка валидации
-        RefundCtrl --> FE : JSON {success:false, errors}
+        UserRefundCtrl --> FE : JSON {success:false, errors}
     end
 end
 
@@ -66,7 +70,7 @@ end
 ' ============================================================
 == 3. Создание заявки на возврат (Web) ==
 Client -> FE : Выбирает позиции и причины, подтверждает
-FE -> RefundCtrl : HTTP POST /refund/save-reason-json
+FE -> RefundCtrl : HTTP POST /orders/refund/save-reason
 RefundCtrl -> RefundCtrl : SaveReasonForm::validate()\n(позиции + reasonCode)
 alt Валидация не пройдена
     RefundCtrl --> FE : JSON {success:false, errors}
