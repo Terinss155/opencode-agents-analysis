@@ -1,15 +1,15 @@
 #!/usr/bin/env python3
 """
-Собирает requirements/architecture/*.md в один PDF с кликабельным оглавлением.
+Собирает requirements/reference/architecture/*.md в один PDF с кликабельным оглавлением.
 
 Зависимости (один раз):
     brew install pandoc weasyprint poppler
     npm install -g @mermaid-js/mermaid-cli
 
 Запуск:
-    python3 requirements/architecture/build-pdf.py
+    python3 requirements/reference/architecture/build-pdf.py
 
-Результат: requirements/architecture/dist/12storeez-architecture.pdf
+Результат: requirements/reference/architecture/dist/12storeez-architecture.pdf
 """
 import re
 import os
@@ -87,7 +87,7 @@ def process_file(fn, cid, is_first, images):
 
     text = re.sub(r'\[([^\]]*)\]\((\S+?\.md)\)', link_repl, text)
     text = re.sub(
-        r'\[docs/sale/categories-sale\.md\]\(\.\./\.\./12storeez-master/docs/sale/categories-sale\.md\)',
+        r'\[docs/sale/categories-sale\.md\]\(\.\./\.\./\.\./12storeez-master/docs/sale/categories-sale\.md\)',
         '`docs/sale/categories-sale.md`',
         text
     )

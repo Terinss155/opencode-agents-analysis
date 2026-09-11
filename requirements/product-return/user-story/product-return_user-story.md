@@ -470,7 +470,7 @@ Scenario: Набор идентификаторов ещё не готов
 Ценность: единая точка контроля всех возвратов — клиент не ищет возврат через историю заказов, сразу видит статусы, суммы и то, где требуется его действие.
 Зависимости: US-105
 Детальный сценарий: `../screen-spec/product-return_screen-spec.md` — `SCR-RET-02. Список возвратов`.
-Макеты: `../../../ui-mockups-returns/28-returns-list.png`, `../../../ui-mockups-returns/29-returns-list-empty.png`.
+Макеты: `../mockups/28-returns-list.png`, `../mockups/29-returns-list-empty.png`.
 
 ```gherkin
 Feature: Список возвратов

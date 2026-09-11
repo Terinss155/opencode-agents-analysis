@@ -21,7 +21,7 @@ sequence → экран → NFR → тест`. Связывает идентиф
 | `UC-RET-<n>` | Use Case — сценарий / ветка оформления возврата | [use-case/product-return_use-case.md](./use-case/product-return_use-case.md) |
 | `BL-RET-<...>` | backend-логика | `./backend/*.md` (skill/backend-logic) — см. таблицу 3 |
 | `TASK-RET-DATA` | задача проектирования модели данных сущности «возврат» | `./backend/return-entity_data-model_task.md` (skill/backend-logic, skill/erd-model) |
-| `API-<...>` | API-контракт / метод | `../web/`, `../mobile/` (skill/openapi-spec) — см. таблицу 3 |
+| `API-<...>` | API-контракт / метод | `../reference/api/web/`, `../reference/api/mobile/` (skill/openapi-spec) — см. таблицу 3 |
 | `SEQ-RET-<...>` | sequence-диаграмма | `./sequence/*.plantuml` (skill/sequence-diagram) — см. таблицу 3 |
 | `SCR-RET-<n>` | спецификация экрана восприятия | [screen-spec/product-return_screen-spec.md](./screen-spec/product-return_screen-spec.md) |
 | `ERD-<...>`, `NFR-<...>`, `TC-<...>` | модель данных / НФ-требование / тест-кейс | артефактов пока нет (см. примечание к таблице 3) |
@@ -101,9 +101,9 @@ Use Case UC-RET-01 … UC-RET-05 (с ветками UC-RET-04.1 … UC-RET-04.6)
 | TASK-RET-DATA | Модель данных / задача БД | `./backend/return-entity_data-model_task.md` | backend-logic, erd-model | DRAFT |
 | SCR-RET-01 | Экран | `./screen-spec/product-return_screen-spec.md` (SCR-RET-01) | screen-spec | DRAFT |
 | SCR-RET-02 | Экран | `./screen-spec/product-return_screen-spec.md` (SCR-RET-02) | screen-spec | DRAFT |
-| API-RET-GETPOS | API-контракт | `../web/order-refund-get-positions_web.md` | openapi-spec | AS-IS описан |
-| API-ORD-VIEW-WEB | API-контракт | `../web/order-view_web.md` | openapi-spec | AS-IS описан |
-| API-ORD-VIEW-MOB | API-контракт | `../mobile/order-view_mobile.md` | openapi-spec | AS-IS описан |
+| API-RET-GETPOS | API-контракт | `../reference/api/web/order-refund-get-positions_web.md` | openapi-spec | AS-IS описан |
+| API-ORD-VIEW-WEB | API-контракт | `../reference/api/web/order-view_web.md` | openapi-spec | AS-IS описан |
+| API-ORD-VIEW-MOB | API-контракт | `../reference/api/mobile/order-view_mobile.md` | openapi-spec | AS-IS описан |
 | SEQ-RET-WEB | Sequence | `./sequence/product-return_web_sequence.plantuml` | sequence-diagram | — |
 | SEQ-RET-MOB | Sequence | `./sequence/product-return_mobile_sequence.plantuml` | sequence-diagram | — |
 | SEQ-RET-1C | Sequence | `./sequence/product-return_1c_sequence.plantuml` | sequence-diagram | — |

@@ -120,7 +120,7 @@ UserOrderExtractor::extract($orderDto) → server-side HTML (render 'base')
 | 8 | **Web `delivery.type` — string** | `DeliveryTk::getDeliveryType()` (строка 440) → `$this->deliveryTypes[$this->type] ?? ''` |
 | 9 | **Web `status.steps[]` — из `cms_orders_history`** | `OrderHistory::getByOrderId()` + `Order::getStatusTitle()` + формат `j M` |
 | 10 | **Web `positions[].is_returned`** | `(bool) $object->positionStatusRelation?->cancel_status` (UserOrderPositionExtractor:68) |
-| 11 | **Банковские реквизиты: разная логика Web vs Mobile** | Web `need_bank_details` = `!in_array(payment_method, ALL_ONLINE_PAYMENT_METHODS)` (все не-онлайн, считается в `RefundController::actionGetPositionsJson` при открытии попапа возврата); Mobile `return.is_bank_data_required` = `isCourierPayment()` (только типы 3/5, приходит сразу в ответе заказа). Подробно: `web/order-view_web.md` (раздел «Банковские реквизиты») + `web/order-refund-get-positions_web.md` |
+| 11 | **Банковские реквизиты: разная логика Web vs Mobile** | Web `need_bank_details` = `!in_array(payment_method, ALL_ONLINE_PAYMENT_METHODS)` (все не-онлайн, считается в `RefundController::actionGetPositionsJson` при открытии попапа возврата); Mobile `return.is_bank_data_required` = `isCourierPayment()` (только типы 3/5, приходит сразу в ответе заказа). Подробно: `reference/api/web/order-view_web.md` (раздел «Банковские реквизиты») + `reference/api/web/order-refund-get-positions_web.md` |
 | 12 | **`expiration_date` — НЕ таймер оплаты** | Это период «создание → доставка» (`start` = `created_at`, `end` = `delivery_date`). Реальный дедлайн оплаты — `payment.pay_before` = `created_at + PT2H` (автоотмена через `OrderStatusTimer`) |
 | 13 | **`delivery_date` — ПЛАНОВАЯ дата, НЕ фактическая** | Ставится при оформлении (выбор клиента) или из 1С; при получении товара не обновляется. Поля «фактическая дата получения» в системе нет |
 | 14 | **Окно возврата считается от `end_date`, НЕ от `delivery_date`** | `canBeReturned = (isCompleted \|\| isReturned) && strtotime(end_date + "N days") > time()`, `N = Parameter::valueOf('days_can_be_returned')` (в БД, в UI = 14). Когда `end_date + N <= now` → кнопка возврата скрыта (mobile: нет сообщения `can_be_returned`; web: `show_refund_button = false`). Нюанс: для курьерки выбор даты мягче (в пределах 14 дней), для ПВЗ — точный расчёт от `end_date` |
@@ -132,9 +132,9 @@ UserOrderExtractor::extract($orderDto) → server-side HTML (render 'base')
 
 | Документ | Содержимое |
 |----------|------------|
-| `requirements/mobile/order-view_mobile.md` | Полный маппинг Mobile API: `GET /api/orders/{id}` → `GET /mobile/orders/{id}` → route `mobile/orders` |
-| `requirements/web/order-view_web.md` | Полный маппинг Web API: `GET /profile/view/{id}` → `ProfileController::actionView()` (без gateway) |
-| `requirements/web/order-refund-get-positions_web.md` | Полный маппинг Web API: `GET /orders/refund/get-positions?id={id}` → `RefundController::actionGetPositionsJson()` (позиции для возврата, причины, `need_bank_details`) |
+| `requirements/reference/api/mobile/order-view_mobile.md` | Полный маппинг Mobile API: `GET /api/orders/{id}` → `GET /mobile/orders/{id}` → route `mobile/orders` |
+| `requirements/reference/api/web/order-view_web.md` | Полный маппинг Web API: `GET /profile/view/{id}` → `ProfileController::actionView()` (без gateway) |
+| `requirements/reference/api/web/order-refund-get-positions_web.md` | Полный маппинг Web API: `GET /orders/refund/get-positions?id={id}` → `RefundController::actionGetPositionsJson()` (позиции для возврата, причины, `need_bank_details`) |
 
 ---
 

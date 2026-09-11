@@ -47,7 +47,7 @@ case SALE = 'sale';
 case EARLY_ACCESS = 'early_access';
 ```
 
-Логика SALE-режима подробно описана в [docs/sale/categories-sale.md](../sale/categories-sale.md).
+Логика SALE-режима подробно описана в [docs/sale/categories-sale.md](../../../12storeez-master/docs/sale/categories-sale.md).
 
 ### Доступность и остатки
 

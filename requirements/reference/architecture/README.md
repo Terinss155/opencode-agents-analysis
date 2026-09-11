@@ -10,7 +10,7 @@
 > отдельно как **TO-BE** — в артефактах процессов (`requirements/{process}/`).
 
 Единый PDF со всеми разделами и кликабельным оглавлением: [dist/12storeez-architecture.pdf](dist/12storeez-architecture.pdf).
-Пересобрать после правок: `python3 requirements/architecture/build-pdf.py` (нужны `pandoc`, `weasyprint`,
+Пересобрать после правок: `python3 requirements/reference/architecture/build-pdf.py` (нужны `pandoc`, `weasyprint`,
 `@mermaid-js/mermaid-cli` — см. комментарий в начале скрипта).
 
 ## Состав
@@ -77,5 +77,5 @@ API и статусной моделью. Артефакты TO-BE будут с
 - изменилась схема аутентификации или версионирование API;
 - изменился способ сборки фронтенда или связка PHP↔Vue.
 
-Описание отдельных фич живёт рядом по теме — например, [docs/sale/categories-sale.md](../../12storeez-master/docs/sale/categories-sale.md).
+Описание отдельных фич живёт рядом по теме — например, [docs/sale/categories-sale.md](../../../12storeez-master/docs/sale/categories-sale.md).
 Контракты API — в `docs/frontend/openapi.yml`, `docs/mobileApi/openapi.yml`, `docs/ssr/openapi.yml`.
