@@ -27,6 +27,7 @@
       "business-process-bpmn": "allow",
       "brd": "allow",
       "traceability-matrix": "allow",
+      "adr": "allow",
       "security-review-checklist": "allow"
     }
   }

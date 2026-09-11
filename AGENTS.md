@@ -30,9 +30,9 @@
 
 | Агент | mode | Скиллы |
 |---|---|---|
-| `product-owner` | primary | `user-story`, `backlog-prioritization`, `business-case`, `product-roadmap`, `stakeholder-map` |
-| `business-analyst` | primary | `business-process-bpmn`, `brd`, `use-case`, `screen-spec`, `traceability-matrix`, `brs` |
-| `system-analyst` | primary | `backend-logic`, `erd-model`, `sequence-diagram`, `openapi-spec`, `asyncapi-spec`, `nfr-requirements` |
+| `product-owner` | primary | `user-story`, `backlog-prioritization`, `business-case`, `product-roadmap`, `stakeholder-map`, `adr` |
+| `business-analyst` | primary | `business-process-bpmn`, `brd`, `use-case`, `screen-spec`, `traceability-matrix`, `brs`, `adr` |
+| `system-analyst` | primary | `backend-logic`, `erd-model`, `sequence-diagram`, `openapi-spec`, `asyncapi-spec`, `nfr-requirements`, `adr` |
 | `repository-researcher` | primary | — (опц. `sequence-diagram` для C4 / sequence-схем) |
 | `security-reviewer` | subagent | `security-review-checklist` |
 
@@ -50,6 +50,7 @@ requirements/{процесс}/
 ├── user-story/     ← вкладка 01: {процесс}_user-story*.md + Acceptance Criteria (skill/user-story)
 ├── use-case/       ← вкладка 02: {процесс}_use-case*.md, только сложные/ветвящиеся US (skill/use-case)
 ├── screen-spec/    ← {процесс}_screen-spec*.md, экраны восприятия (skill/screen-spec)
+├── adr/            ← ADR-<ТЕМА>-<n>-*.md, значимые решения и компромиссы (skill/adr)
 ├── as-is/          ← пошаговый AS-IS + {процесс}_as-is.bpmn.md (skill/business-process-bpmn)
 ├── to-be/          ← {процесс}_to-be.bpmn.md, если есть
 ├── backend/        ← задачи для бэка (SIS)
@@ -59,6 +60,8 @@ requirements/{процесс}/
 ```
 
 - **Правило размещения:** тип артефакта, у которого может быть больше одного файла (user story, use case, спецификация экрана, задачи для бэка, sequence, AS-IS-шаги), всегда лежит в своей подпапке — даже если сейчас файл один. В корне бандла — только `{процесс}_index.md`, `_brd.md`, `_traceability.md` и продуктовые `_business-case.md` / `_backlog-priority.md`.
+- **ADR:** хранится в `requirements/{процесс}/adr/` и объясняет причину значимого выбора, альтернативы и последствия. ADR не является новым уровнем требований и не добавляется отдельным звеном в цепочку трассировки.
+- **Первичные транскрибации:** неизменённые исходные записи встреч хранятся в `requirements/drafts/transcriptions/`. Обработанное резюме и ADR не заменяют первичную транскрибацию.
 - Связь между вкладками — только по стабильным ID (см. «Легенда ID-префиксов») и markdown-ссылкам. Содержимое между вкладками не копируется.
 
 Формат `{процесс}_index.md`:
@@ -74,6 +77,7 @@ requirements/{процесс}/
 | 01. User Stories | [user-story/](./user-story/) | Пользовательские требования + критерии приёмки | ... |
 | 02. Use Cases | [use-case/](./use-case/) | Детализация сложных сценариев | ... |
 | Спецификации экранов | [screen-spec/](./screen-spec/) | Экраны восприятия | ... |
+| ADR | [adr/](./adr/) | Обоснование значимых решений, альтернативы и последствия | ... |
 | 03. Трассируемость | [{процесс}_traceability.md](./{процесс}_traceability.md) | BO → BR → US → UC → тех. артефакты | ... |
 | Продуктовые | [{процесс}_business-case.md](./{процесс}_business-case.md), [{процесс}_backlog-priority.md](./{процесс}_backlog-priority.md) | ROI, приоритеты | ... |
 
@@ -92,6 +96,8 @@ requirements/{процесс}/
 | **SIS/SRS, ERD, Sequence, OpenAPI, NFR** | Как это реализуют системы? | Техническая реализация. | скиллы `system-analyst` |
 
 **Золотое правило:** пользовательский сценарий не пересказывается на нескольких уровнях. BRD хранит бизнес-контекст и целевое состояние; User Story + AC — канон сценария; Use Case — детализация сложного участка User Story.
+
+**ADR — вспомогательный артефакт обоснования решения:** он отвечает на вопрос «почему выбран этот вариант», ссылается на требования и технические артефакты по стабильным ID, но не копирует их содержание. Один ADR фиксирует одно решение. При замене решения старый ADR не удаляется: его статус меняется на `Устарело` или `Заменено на ADR-...`, а новое решение оформляется отдельным ADR.
 
 **Трассировка сквозная и полная:** матрица трассируемости (`skill/traceability-matrix`) прослеживает цепочку `BO → PP → BR → US → UC → бэк-логика → модель данных → API → sequence → экран → NFR → тест` — до технических артефактов включительно, не останавливаясь на Use Case. Технический артефакт, обслуживающий несколько историй, описывается в матрице один раз (реестр), в строках US/UC — только его короткий ID. Нет артефакта данного типа — прочерк, файл ради заполнения не создаётся.
 
@@ -126,19 +132,21 @@ requirements/{процесс}/
 | `SCR-<ТЕМА>-<n>` | спецификация экрана восприятия | `screen-spec/` (`skill/screen-spec`) |
 | `NFR-<КАТ>-<n>` | нефункциональное требование | `nfr/{процесс}_nfr.md` (`skill/nfr-requirements`) |
 | `TC-<...>` | тест-кейс QA (если ведётся отдельным артефактом) | QA |
+| `ADR-<ТЕМА>-<n>` | запись о значимом продуктовом, процессном или архитектурном решении | `adr/ADR-<ТЕМА>-<n>-*.md` (`skill/adr`) |
 
 `<ТЕМА>` — код процесса (например `RET` для возврата). Префикс добавляется, только когда в бандле появляется артефакт соответствующего типа; выдуманные префиксы не вводятся.
 
 ## Конвенция имён файлов
-- `business-analyst`: `*_index.md`, `*_brd.md`, `*_traceability.md`, `*_as-is.bpmn.md`, `*_to-be.bpmn.md`, `*_use-case.md`, `*_screen-spec.md`, `*_gap-analysis.md`, `*_brs.md`
-- `system-analyst`: `*_backend.md`, `*_erd.plantuml` + `*_sql.sql`, `*_sequence.plantuml`, `*_openapi.yaml`, `*_asyncapi.yaml`, `*_nfr.md`
-- `product-owner`: `*_user-story.md`, `*_backlog-priority.md`, `*_business-case.md`, `*_roadmap.md`, `*_stakeholder-map.md`
+- `business-analyst`: `*_index.md`, `*_brd.md`, `*_traceability.md`, `*_as-is.bpmn.md`, `*_to-be.bpmn.md`, `*_use-case.md`, `*_screen-spec.md`, `*_gap-analysis.md`, `*_brs.md`, `ADR-<ТЕМА>-<n>-<slug>.md`
+- `system-analyst`: `*_backend.md`, `*_erd.plantuml` + `*_sql.sql`, `*_sequence.plantuml`, `*_openapi.yaml`, `*_asyncapi.yaml`, `*_nfr.md`, `ADR-<ТЕМА>-<n>-<slug>.md`
+- `product-owner`: `*_user-story.md`, `*_backlog-priority.md`, `*_business-case.md`, `*_roadmap.md`, `*_stakeholder-map.md`, `ADR-<ТЕМА>-<n>-<slug>.md`
 - `repository-researcher`: `requirements/{процесс}_структура.md`
 - Ревью/отчёты: папка `reports/` (создать, если нет); `security-reviewer` → `{артефакт}_security_review.md`, `system-analyst` (по явному запросу) → `{артефакт}_review_report.md`.
 
 ## Рабочий процесс
 - PO → ценность и приоритеты (RICE/WSJF/MoSCoW), User Story. BA → процессы AS-IS/TO-BE, BRD, Use Case, матрица трассируемости, Gap-анализ; передаёт SA.
 - SA → технические артефакты: backend-логика, ERD, Sequence, OpenAPI, AsyncAPI, NFR; обеспечивает совместимость с User Story/Use Case.
+- Значимые решения фиксируются через `skill/adr`: PO — продуктовые, BA — процессные и бизнес-правила, SA — архитектурные, интеграционные и системные.
 - `repository-researcher` → разбор кодовой базы `12storeez-master`, карта интеграций, справочники `requirements/{процесс}_структура.md`; к нему обращаются BA/SA, когда нужно понять, где и как работает логика в монолите.
 - `security-reviewer` — ревью ИБ требований (ISO 27001, NIST, OWASP, PCI DSS, 152-ФЗ; STRIDE/PASTA/DREAD).
 - Перед фиксацией требований BA/PO синхронизируются по приоритетам; технические детали — только через SA.
