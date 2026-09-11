@@ -5,7 +5,7 @@
 **Системная цель:** На основании пользователя, заказа, срока и позиций определить, можно ли начать возврат, и вернуть по каждой доступной позиции готовое значение `available_return_quantity`.
 
 **Источники требований:**
-- `../user-story/user-story.md` — US-101, `COM-ALT-01`, `COM-ALT-02`;
+- `../user-story/user-story-creation.md` — US-101, `COM-ALT-01`, `COM-ALT-02`;
 - `../use-case/use-case.md` — `UC-RET-01`, шаги 2–3;
 - Бизнес-правила: `BR-COM-01`, `BR-COM-02`, `BR-12`, `BR-COM-24`.
 

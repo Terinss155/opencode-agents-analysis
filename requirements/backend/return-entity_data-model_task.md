@@ -4,7 +4,7 @@
 **Домен:** E-commerce / Fashion-ритейл, процесс возврата товара.
 **Статус:** DRAFT — требует проработки SA + ревью бэкенда и архитектора.
 **Дата:** 2026-09-08.
-**Связанные артефакты:** `../use-case/use-case-to-be.md` (UC-RET-01…06), `available-return-quantity_backend.md`, `return-eligibility_backend.md`, `../user-story/user-story.md` (US-101…US-206).
+**Связанные артефакты:** `../use-case/use-case-to-be.md` (UC-RET-01…06), `available-return-quantity_backend.md`, `return-eligibility_backend.md`, `../user-story/` (эпик и истории US-101…US-206).
 
 ---
 
@@ -95,7 +95,7 @@
 | `point_id` / `point_provider` | 🟡 Новое. Нужно, когда канал требует фиксации точки (СДЭК/5POST/магазин). Обязательность зависит от финального процесса (UC-RET-04.2/04.3 — «точка не сохраняется» в AS-IS). Nullable. |
 | `date` | 🔴 Плохое имя (зарезервированное слово в ряде СУБД, неинформативно). Переименовать → `handover_planned_date` или `planned_date`. AS-IS `cms_orders.return_date`. |
 | `interval_from` / `interval_to` | 🟢 Разбивка вместо строки — правильно. ⚠️ В AS-IS `return_interval` **не заполняется вообще** — это поля под будущий функционал выбора интервала (UC-RET-04.1). Пометить «TO-BE, пока не используется». |
-| `handover_deadline` | 🟢 ➕ важно (US-109/110 — доступность отмены и автоотмена по сроку передачи). Правило расчёта — открытый вопрос (см. §5). |
+| `handover_deadline` | 🟢 ➕ важно (US-120/121 — доступность отмены и автоотмена по сроку передачи). Правило расчёта — открытый вопрос (см. §5). |
 | `handed_over_at` | 🟢 Факт передачи. Триггер зависит от канала. |
 | `external_return_id` | 🟢 Интеграционный ID (1С / логистика). |
 | `tracking_number` | 🟢 Отдельно от `cms_orders.track_number` — верно. Nullable. |
@@ -111,7 +111,7 @@
 - ➕ `return_type` / `is_partial` — полный / частичный возврат. (В наброске статусов `title = "Полный возврат"` — это **тип**, а не статус; не смешивать.)
 - ➕ `created_channel` — где оформлен (`site` / `mobile`).
 - ➕ `bank_details_snapshot` (JSON) или `bank_details_id` (FK → `cms_users_refund`) + снимок. AS-IS кладёт JSON в `cms_orders.user_refund`. **Реквизиты фиксировать на момент создания возврата** (снимок), иначе поедут при редактировании профиля. Снимок заполняется **только при оплате курьеру при получении** (`payment_method ∈ {CASH_COURIER=3, CASHLESS_COURIER=5}` — доставка «курьер с примеркой»); обычный курьер = только онлайн-оплата → поле пустое, деньги идут исходным способом (см. UC-RET-04.6). В снимке `patronymic` (отчество) — обязательное поле.
-- ➕ `refund_deadline` + `refunded_at` — плановый срок и факт возврата денег (US-111: до 10 дней).
+- ➕ `refund_deadline` + `refunded_at` — плановый срок и факт возврата денег (US-122: до 10 дней).
 - ➕ `return_store` (int) — магазин/склад приёмки (в наброске только в нижней заметке).
 - ➕ `is_bank_data_required` (bool) — снимок признака на момент оформления. **TO-BE:** истинен только при `OrderHelper::isCourierPayment()` (`payment_method` 3 или 5), а не при любой не-онлайн оплате. Веб-логику `!ALL_ONLINE_PAYMENT_METHODS` сузить до этого.
 - ➕ `refund_target` — куда возвращаются деньги: `original_payment` (исходный способ, все случаи кроме оплаты курьеру) / `bank_details` (по снимку реквизитов, оплата курьеру). Заменяет AS-IS `cms_orders.return_money`.
@@ -204,10 +204,10 @@
 | `code` (`full-return`), `title` (`Полный возврат`) | 🔴 «Полный возврат» — это **тип возврата**, не статус. Примеры статусов: `created` / `accepted` / `in_transit` / `received` / `refunded` / `rejected` / `cancelled`. Пересмотреть примеры и наполнение. |
 | `active`, `_order` | 🟢 `_order` с шагом (10, 20, 30…) — верно, вставка между без перенумерации. |
 | `group` → `cms_return_status_groups.code` | 🟢 (varchar-code — как в `cms_order_statuses`). |
-| `can_be_cancelled` | 🟢 ➕ важно — управляет кнопкой «Отменить заявку» в ЛК (US-109). |
+| `can_be_cancelled` | 🟢 ➕ важно — управляет кнопкой «Отменить заявку» в ЛК (US-120). |
 | ➕ `is_final` | Терминальный статус (возврат завершён / отменён) — для джоб и аналитики. |
 | ➕ `is_client_visible` | Показывать ли статус клиенту. |
-| ➕ `notification_template` / `sends_notification` | US-112 — уведомления о событиях возврата. Либо отдельная таблица «статус → шаблон уведомления». |
+| ➕ `notification_template` / `sends_notification` | US-123 — уведомления о событиях возврата. Либо отдельная таблица «статус → шаблон уведомления». |
 
 ### 3.5. `cms_return_status_groups` (новая, справочник)
 
@@ -297,7 +297,7 @@
 
 - [ ] Финальная ER-модель 7 новых таблиц (`cms_returns`, `cms_return_positions`, `cms_return_position_history`, `cms_return_statuses`, `cms_return_status_groups`, `cms_return_status_history`, `cms_return_statuses_map`) + связи (обновить `erd-model`).
 - [ ] Миграции создания таблиц с индексами и FK.
-- [ ] Наполнение справочников `cms_return_statuses`, `cms_return_status_groups`, `cms_return_statuses_map` (по клиентской статусной модели из макетов и US-106/US-110).
+- [ ] Наполнение справочников `cms_return_statuses`, `cms_return_status_groups`, `cms_return_statuses_map` (по клиентской статусной модели из макетов и US-110/US-121).
 - [ ] Скрипт исторической миграции `cms_orders.return_*` → `cms_returns` (+ откат).
 - [ ] Слой совместимости для 1С / RCRM / Lamoda / Mindbox / WMS на переходный период.
 - [ ] Новый эндпоинт карточки возврата `GET /returns/{return_id}` (сайт и МП) — read-модель для `SCR-RET-01` (`../screen-spec/screen-spec.md`, таблица «Параметры экрана»).

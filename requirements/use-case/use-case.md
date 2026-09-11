@@ -8,7 +8,7 @@
 
 **Источники:**
 
-- `../user-story/user-story.md`;
+- `../user-story/user-story.md` (эпик и контекст вкладки 01), `../user-story/user-story-creation.md` (US-101…US-105);
 - `../drafts/obshie-biznes-pravila-oformleniya-vozvrata.md`;
 - `../drafts/vozvrat-kurerom-biznes-process-to-be.md`;
 - `../drafts/vozvrat-cherez-5post-biznes-process-to-be.md`;
@@ -919,22 +919,22 @@
 
 | Use Case | User Story | Правила/источники |
 |---|---|---|
-| `UC-RET-01` | `US-100`, `US-102` | `BR-COM-01`, `BR-COM-02`, `RET-BR-10` |
-| `UC-RET-02` | `US-100`, `US-102` | `BR-COM-03`, `RET-BR-10` |
-| `UC-RET-03` | `US-100`, `US-103` | `BR-COM-18`, `RET-BR-01`, `RET-BR-02`, `RET-BR-08` |
-| `UC-RET-04` | `US-100`, `US-103` | `BR-COM-16`, `RET-BR-03`–`RET-BR-05`, `RET-BR-08` |
-| `UC-RET-04.1` | `US-100`, `US-201` | `BR-CUR-01`–`BR-CUR-04`, `BR-CUR-09` |
-| `UC-RET-04.2` | `US-100`, `US-204`, `US-205` | `5POST-BR-01`, `5POST-BR-13`, `5POST-BR-14`, `RET-BR-07` |
-| `UC-RET-04.3` | `US-100`, `US-203` | `CDEK-BR-01`, `CDEK-BR-03`, `CDEK-BR-04`, `RET-BR-07` |
-| `UC-RET-04.4` | `US-100`, `US-206` | `RET-BR-08`; отдельный канальный процесс требует согласования |
-| `UC-RET-04.5` | `US-100` | `RET-BR-06`; отдельный канальный процесс требует согласования |
-| `UC-RET-04.6` | `US-100`, `US-104` | `BR-COM-05`–`BR-COM-07`, `RET-BR-09` |
-| `UC-RET-05` | `US-100`, `US-105` | `BR-COM-01`, `BR-COM-04`, `BR-COM-23`, `BR-COM-28` |
+| `UC-RET-01` | `Эпик`, `US-102` | `BR-COM-01`, `BR-COM-02`, `RET-BR-10` |
+| `UC-RET-02` | `Эпик`, `US-102` | `BR-COM-03`, `RET-BR-10` |
+| `UC-RET-03` | `Эпик`, `US-103` | `BR-COM-18`, `RET-BR-01`, `RET-BR-02`, `RET-BR-08` |
+| `UC-RET-04` | `Эпик`, `US-103` | `BR-COM-16`, `RET-BR-03`–`RET-BR-05`, `RET-BR-08` |
+| `UC-RET-04.1` | `Эпик`, `US-201` | `BR-CUR-01`–`BR-CUR-04`, `BR-CUR-09` |
+| `UC-RET-04.2` | `Эпик`, `US-204`, `US-205` | `5POST-BR-01`, `5POST-BR-13`, `5POST-BR-14`, `RET-BR-07` |
+| `UC-RET-04.3` | `Эпик`, `US-203` | `CDEK-BR-01`, `CDEK-BR-03`, `CDEK-BR-04`, `RET-BR-07` |
+| `UC-RET-04.4` | `Эпик`, `US-206` | `RET-BR-08`; отдельный канальный процесс требует согласования |
+| `UC-RET-04.5` | `Эпик` | `RET-BR-06`; отдельный канальный процесс требует согласования |
+| `UC-RET-04.6` | `Эпик`, `US-104` | `BR-COM-05`–`BR-COM-07`, `RET-BR-09` |
+| `UC-RET-05` | `Эпик`, `US-105` | `BR-COM-01`, `BR-COM-04`, `BR-COM-23`, `BR-COM-28` |
 | `UC-RET-06` | `US-203`, `US-204` | `RET-BR-07`, `CDEK-BR-05`, `5POST-BR-03`, `5POST-BR-04` |
 
 ## Непокрытые связанные сценарии
 
-Для полной трассировки верхнеуровневой `US-100` отдельными Use Case необходимо описать:
+Для полной трассировки эпика «Оформление возврата товара» отдельными Use Case необходимо описать:
 
 - отмену и скрытие действия отмены после ограничивающего канального статуса;
 - автоотмену после окончания срока передачи;
