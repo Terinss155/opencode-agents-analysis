@@ -4,7 +4,7 @@
 **Домен:** E-commerce / Fashion-ритейл, процесс возврата товара.
 **Статус:** DRAFT — требует проработки SA + ревью бэкенда и архитектора.
 **Дата:** 2026-09-08.
-**Связанные артефакты:** `../use-case/use-case-to-be.md` (UC-RET-01…06), `available-return-quantity_backend.md`, `return-eligibility_backend.md`, `../user-story/` (эпик и истории US-101…US-206).
+**Связанные артефакты:** `../use-case/use-case.md` (UC-RET-01…05), `available-return-quantity_backend.md`, `return-eligibility_backend.md`, `../user-story/` (эпик и истории US-101…US-207).
 
 ---
 

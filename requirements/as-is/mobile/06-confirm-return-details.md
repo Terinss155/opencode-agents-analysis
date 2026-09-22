@@ -4,6 +4,8 @@
 **Статус:** DRAFT · **Дата:** 07.09.2026
 **Результат шага:** в `cms_orders` записаны город, дата и код транспортной компании, а для курьера — индекс и адрес. Заказ отправлен в RetailCRM. Статусы возврата ещё не меняются.
 
+> **⚠️ Обновлено 12.09.2026, сверено с бэкендом `12storeez-master`.** Реальный путь: **`POST v1/delivery/{orderId}/return-details`** на новом хосте (`BASE_URL_NEW` = `mobile.12stz.com/api`, `struct ReturnOrderDetailsEndpoint: RequestTargetNew`, `Classes/Business/Network/Endpoints/ReturnOrderDetailsEndpoint.swift`) — та же семья расхождения, что и на шаге [05](05-select-return-method.md): в монолите такого маршрута нет (модуль `deliveryV2` не имеет контроллера заказов; модуль `return` содержит только `ReturnDetailsBackendController` — админку конфигурации способов возврата, без публичного API). Официальная спека и код монолита знают только старый путь `POST /mobile/orders/{order_id}/return-details` → `Mobile\OrdersController::actionReturnDetails()` (подтверждён `src/Modules/Mobile/Rules/UrlRule.php:72-75`), описанный ниже. Тело запроса iOS-клиента (`Payload { methodReturn, addressReturn, cityReturn, dateReturn, indexReturn }`) по составу полей совпадает с задокументированным ниже (`method_return, address_return, city_return, date_return, index_return`) — то есть **состав данных, скорее всего, подтверждён**, но неизвестно, тот ли это в реальности бэкенд-обработчик, к которому уходит запрос: официально задокументированный монолит эти данные принимает по другому пути. См. вывод и открытый вопрос в [12storeez-ios_структура.md, §4.3](../../reference/12storeez-ios_структура.md).
+
 ---
 
 ## 1. Пользовательский сценарий

@@ -3,6 +3,18 @@ autonumber "<b><color:DarkSlateBlue>.</color></b> "
 
 title "Процесс возврата товара: создание заявки в мобильном приложении"
 
+' ПРИМЕЧАНИЕ (12.09.2026, сверено с кодом iOS-клиента И бэкенда 12storeez-master):
+' - POST orders/{orderId}/return (реальный вызов iOS) подтверждён как тот же обработчик,
+'   что и POST /mobile/orders/return-positions?id=, показанный ниже (Mobile/Rules/UrlRule.php,
+'   regex orders/\d+/return -> route mobile/orders/return-positions).
+' - А вот способ/детали возврата iOS реально запрашивает по путям v1/delivery/{id}/return-method-list
+'   и v1/delivery/{id}/return-details (новый хост mobile.12stz.com) — ТАКИХ маршрутов в монолите
+'   12storeez-master НЕТ (модуль deliveryV2 не имеет контроллера заказов; официальная openapi-спека
+'   Mobile API тоже знает только старый путь .../orders/{id}/return-method-list). Открытый вопрос:
+'   либо отдельный сервис (см. mobile-core-api-research.md), либо спека/маршруты монолита устарели.
+' Детали см. requirements/reference/12storeez-ios_структура.md, §4.3
+' и requirements/as-is/mobile/05-07*.md.
+
 ' ============================================================
 ' УЧАСТНИКИ
 ' ============================================================

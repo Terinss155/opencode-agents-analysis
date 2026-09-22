@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Физические сценарии возвратов</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+
+<style>
+  :root{
+    --bg:#F5F7F9;
+    --surface:#FFFFFF;
+    --ink:#131820;
+    --ink-2:#39434F;
+    --muted:#697786;
+    --line:#DFE4EA;
+    --line-soft:#EAEEF2;
+    --accent:#0F5C56;
+    --accent-soft:#E2F0EE;
+    --accent-ink:#0F5C56;
+    --chip:#F0F2F5;
+    --shadow:0 1px 2px rgba(19,24,32,.05);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#0E1116;
+      --surface:#161A21;
+      --ink:#E9EDF2;
+      --ink-2:#C2CAD4;
+      --muted:#8D98A6;
+      --line:#252B34;
+      --line-soft:#1E242C;
+      --accent:#61B8AF;
+      --accent-soft:#14312F;
+      --accent-ink:#7FCAC2;
+      --chip:#1D232B;
+      --shadow:0 1px 2px rgba(0,0,0,.3);
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#0E1116;
+    --surface:#161A21;
+    --ink:#E9EDF2;
+    --ink-2:#C2CAD4;
+    --muted:#8D98A6;
+    --line:#252B34;
+    --line-soft:#1E242C;
+    --accent:#61B8AF;
+    --accent-soft:#14312F;
+    --accent-ink:#7FCAC2;
+    --chip:#1D232B;
+    --shadow:0 1px 2px rgba(0,0,0,.3);
+  }
+
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  img{max-width:100%}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:"IBM Plex Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+    font-size:16px;
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{
+    max-width:860px;
+    margin:0 auto;
+    padding:56px 24px 96px;
+  }
+
+  /* ---- header ---- */
+  header.doc{
+    display:flex;
+    flex-direction:column;
+    gap:18px;
+    padding-bottom:28px;
+    border-bottom:1px solid var(--line);
+  }
+  .eyebrow{
+    font-family:"IBM Plex Mono",ui-monospace,monospace;
+    font-size:11px;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:var(--muted);
+  }
+  h1{
+    font-family:Archivo,"IBM Plex Sans",sans-serif;
+    font-weight:700;
+    font-size:clamp(30px,5vw,44px);
+    line-height:1.08;
+    letter-spacing:-.022em;
+    margin:0;
+    text-wrap:balance;
+  }
+  .lede{
+    margin:0;
+    max-width:62ch;
+    color:var(--ink-2);
+    font-size:16.5px;
+  }
+  nav.jump{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+    margin-top:2px;
+  }
+  nav.jump a{
+    display:inline-flex;
+    align-items:baseline;
+    gap:8px;
+    padding:7px 13px 7px 11px;
+    border:1px solid var(--line);
+    border-radius:999px;
+    background:var(--surface);
+    color:var(--ink-2);
+    text-decoration:none;
+    font-size:13.5px;
+    font-weight:500;
+    transition:border-color .15s ease,color .15s ease;
+  }
+  nav.jump a span{
+    font-family:"IBM Plex Mono",ui-monospace,monospace;
+    font-size:11px;
+    color:var(--muted);
+  }
+  nav.jump a:hover{border-color:var(--accent);color:var(--accent-ink)}
+  nav.jump a:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+  /* ---- channel ---- */
+  section.channel{
+    margin-top:56px;
+    scroll-margin-top:24px;
+  }
+  .ch-head{
+    display:flex;
+    align-items:baseline;
+    gap:14px;
+    padding-bottom:14px;
+    border-bottom:2px solid var(--ink);
+  }
+  .ch-num{
+    font-family:"IBM Plex Mono",ui-monospace,monospace;
+    font-size:13px;
+    font-weight:500;
+    color:var(--accent-ink);
+    padding-top:2px;
+  }
+  h2{
+    font-family:Archivo,"IBM Plex Sans",sans-serif;
+    font-weight:600;
+    font-size:clamp(21px,3.2vw,27px);
+    letter-spacing:-.015em;
+    margin:0;
+    flex:1;
+  }
+  .ch-kind{
+    font-family:"IBM Plex Mono",ui-monospace,monospace;
+    font-size:10.5px;
+    letter-spacing:.12em;
+    text-transform:uppercase;
+    color:var(--muted);
+    white-space:nowrap;
+  }
+
+  .stage{
+    padding:26px 0 4px;
+    border-bottom:1px solid var(--line-soft);
+  }
+  .stage:last-child{border-bottom:none}
+  h3{
+    font-family:Archivo,"IBM Plex Sans",sans-serif;
+    font-weight:600;
+    font-size:13px;
+    letter-spacing:.05em;
+    text-transform:uppercase;
+    color:var(--muted);
+    margin:0 0 14px;
+  }
+  .stage p{margin:0 0 12px;max-width:68ch}
+  .stage p:last-child{margin-bottom:16px}
+
+  /* label / value rows */
+  dl.rows{
+    display:grid;
+    grid-template-columns:minmax(150px,210px) 1fr;
+    gap:1px;
+    margin:0 0 16px;
+    background:var(--line-soft);
+    border:1px solid var(--line-soft);
+    border-radius:3px;
+    overflow:hidden;
+  }
+  dl.rows dt,dl.rows dd{
+    background:var(--surface);
+    margin:0;
+    padding:11px 14px;
+  }
+  dl.rows dt{
+    font-weight:600;
+    font-size:14px;
+    color:var(--ink-2);
+  }
+  dl.rows dd{font-size:15px}
+  @media (max-width:620px){
+    dl.rows{grid-template-columns:1fr}
+    dl.rows dt{padding-bottom:2px}
+    dl.rows dd{padding-top:4px}
+  }
+
+  /* numbered flow */
+  ol.flow{
+    list-style:none;
+    margin:0 0 16px;
+    padding:0;
+    display:flex;
+    flex-direction:column;
+    gap:16px;
+    counter-reset:step;
+  }
+  ol.flow li{
+    position:relative;
+    padding-left:38px;
+    max-width:68ch;
+    counter-increment:step;
+  }
+  ol.flow li::before{
+    content:counter(step);
+    position:absolute;
+    left:0;
+    top:1px;
+    width:24px;
+    height:24px;
+    border-radius:50%;
+    border:1px solid var(--line);
+    background:var(--surface);
+    color:var(--accent-ink);
+    font-family:"IBM Plex Mono",ui-monospace,monospace;
+    font-size:12px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+  ol.flow li::after{
+    content:"";
+    position:absolute;
+    left:12px;
+    top:29px;
+    bottom:-16px;
+    width:1px;
+    background:var(--line);
+  }
+  ol.flow li:last-child::after{display:none}
+
+  /* branching paths */
+  .paths{
+    display:grid;
+    gap:14px;
+    margin:0 0 16px;
+  }
+  @media (min-width:700px){.paths{grid-template-columns:1fr 1fr}}
+  .path{
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:4px;
+    padding:16px 18px 18px;
+    box-shadow:var(--shadow);
+  }
+  .path h4{
+    font-family:Archivo,"IBM Plex Sans",sans-serif;
+    font-size:14.5px;
+    font-weight:600;
+    margin:0 0 4px;
+    letter-spacing:-.005em;
+  }
+  .path .cond{
+    display:block;
+    font-size:13px;
+    color:var(--muted);
+    margin-bottom:10px;
+  }
+  .path ul{
+    margin:0;
+    padding-left:17px;
+    font-size:14.5px;
+  }
+  .path li{margin-bottom:6px}
+  .path li:last-child{margin-bottom:0}
+  .path .rule{
+    margin-top:11px;
+    padding-top:10px;
+    border-top:1px dashed var(--line);
+    font-size:13px;
+    color:var(--ink-2);
+  }
+
+  /* status token */
+  .st{
+    font-family:"IBM Plex Mono",ui-monospace,monospace;
+    font-size:12.5px;
+    background:var(--accent-soft);
+    color:var(--accent-ink);
+    padding:1.5px 6px;
+    border-radius:3px;
+    white-space:nowrap;
+  }
+  .doc-token{
+    font-family:"IBM Plex Mono",ui-monospace,monospace;
+    font-size:12.5px;
+    background:var(--chip);
+    color:var(--ink-2);
+    padding:1.5px 6px;
+    border-radius:3px;
+  }
+  .note{
+    display:flex;
+    gap:10px;
+    align-items:flex-start;
+    background:var(--chip);
+    border-left:2px solid var(--muted);
+    padding:11px 14px;
+    margin:0 0 16px;
+    font-size:14.5px;
+    color:var(--ink-2);
+    max-width:68ch;
+  }
+  .note b{color:var(--ink)}
+  strong{font-weight:600}
+  footer.doc{
+    margin-top:64px;
+    padding-top:20px;
+    border-top:1px solid var(--line);
+    font-size:13px;
+    color:var(--muted);
+    display:flex;
+    flex-wrap:wrap;
+    gap:6px 18px;
+  }
+  /* upload block */
+  .warn{
+    display:block;
+    background:var(--chip);
+    border-left:3px solid var(--accent);
+    padding:12px 15px;
+    margin:0 0 18px;
+    font-size:14.5px;
+    color:var(--ink-2);
+    max-width:70ch;
+  }
+  .warn b{color:var(--ink)}
+  .reglink{
+    display:inline-flex;
+    align-items:center;
+    gap:9px;
+    border:1px solid var(--line);
+    border-radius:4px;
+    background:var(--surface);
+    padding:11px 15px;
+    margin:0 0 18px;
+    text-decoration:none;
+    color:var(--ink);
+    font-size:14.5px;
+    font-weight:500;
+    box-shadow:var(--shadow);
+    transition:border-color .15s ease;
+  }
+  .reglink:hover{border-color:var(--accent)}
+  .reglink:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+  .reglink .tag{
+    font-family:"IBM Plex Mono",ui-monospace,monospace;
+    font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;
+    color:var(--muted);
+  }
+  @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+
+</head>
+<body>
+<div class="wrap">
+
+  <header class="doc">
+    <div class="eyebrow">12 STOREEZ · Логистика · Возвраты B2C</div>
+    <h1>Физические сценарии возвратов</h1>
+    <p class="lede">Описание физического движения возврата по четырём каналам — от оформления до поступления на склад возвратов. Терминология и статусы приведены в том виде, в каком они используются в системах транспортных компаний.</p>
+    <nav class="jump">
+      <a href="#cdek-courier"><span>01</span> СДЭК курьер</a>
+      <a href="#cdek-pvz"><span>02</span> СДЭК ПВЗ</a>
+      <a href="#fivepost"><span>03</span> 5Post постомат</a>
+      <a href="#dalli"><span>04</span> Далли Сервис курьер</a>
+    </nav>
+  </header>
+
+  <!-- 1 -->
+  <section class="channel" id="cdek-courier">
+    <div class="ch-head">
+      <div class="ch-num">01</div>
+      <h2>СДЭК курьер</h2>
+      <div class="ch-kind">Забор у клиента</div>
+    </div>
+
+    <div class="stage">
+      <h3>Выгрузка заказа в ТК</h3>
+      <span class="warn"><b>Важно.</b> Поля и пример — по заказам, выгруженным вручную. При интеграции состав может измениться, сверяться с документацией ТК по интеграции.</span>
+      <p style="margin:0 0 8px;font-size:14px;color:var(--muted)">Пример выгрузки с обязательными полями</p>
+      <a class="reglink" href="https://docs.google.com/spreadsheets/d/1H5y2PwdJFWKy-rbGOzxzQtk6s5zRgYLlWqb4L9yW9uw/edit?gid=798640396#gid=798640396" target="_blank" rel="noopener">Реестры, передаваемые в ТК <span class="tag">Google&nbsp;Sheets</span></a>
+    </div>
+
+    <div class="stage">
+      <h3>Инициация возврата</h3>
+      <p><strong>Сотрудник 12 STOREEZ выгружает заказ в систему ТК</strong> — оформляется накладная со статусом <span class="st">создано</span>.</p>
+    </div>
+
+    <div class="stage">
+      <h3>Приём товара от клиента</h3>
+      <p>Курьер забирает возврат у клиента.</p>
+      <dl class="rows">
+        <dt>Документы при приёме</dt>
+        <dd>Бумажных документов нет. Все накладные у курьера в приложении — СДЭК не использует бумажные накладные.</dd>
+        <dt>Проверка товара курьером</dt>
+        <dd>Не проводится.</dd>
+        <dt>Упаковка / маркировка</dt>
+        <dd>ШК <strong>формируется в момент выгрузки заказа в систему ТК</strong>. Физически на короб он наносится не при заборе, а на РЦ — его клеит сотрудник РЦ СДЭК.</dd>
+        <dt>Статус</dt>
+        <dd><span class="st">в пути</span> появляется, когда заказ от курьера приняли на РЦ, — не в момент забора у клиента.</dd>
+      </dl>
+    </div>
+
+    <div class="stage">
+      <h3>Перемещение</h3>
+      <ol class="flow">
+        <li>Курьер доставляет заказ на <strong>РЦ (транзитный склад)</strong>; сотрудник РЦ клеит ШК с номером накладной. Статус <span class="st">в пути</span>.</li>
+        <li>Заказ движется по транспортной схеме.</li>
+        <li>Заказ поступает на <strong>РЦ Москвы</strong> — статус <span class="st">готов к выдаче</span>.</li>
+        <li>Заказ поступает на <strong>склад, с которого идёт доставка на наш склад</strong>, включается в <span class="doc-token">акт возврата</span> и доставляется на склад возвратов интернет-магазина. Статус <span class="st">Вручен</span> проставляется в момент доставки заказа нам на склад.</li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- 2 -->
+  <section class="channel" id="cdek-pvz">
+    <div class="ch-head">
+      <div class="ch-num">02</div>
+      <h2>СДЭК ПВЗ</h2>
+      <div class="ch-kind">Сдача в пункт выдачи</div>
+    </div>
+
+    <div class="stage">
+      <h3>Выгрузка заказа в ТК</h3>
+      <span class="warn"><b>Важно.</b> Поля и пример — по заказам, выгруженным вручную. При интеграции состав может измениться, сверяться с документацией ТК по интеграции.</span>
+      <p style="margin:0 0 8px;font-size:14px;color:var(--muted)">Пример выгрузки с обязательными полями</p>
+      <a class="reglink" href="https://docs.google.com/spreadsheets/d/1H5y2PwdJFWKy-rbGOzxzQtk6s5zRgYLlWqb4L9yW9uw/edit?gid=798640396#gid=798640396" target="_blank" rel="noopener">Реестры, передаваемые в ТК <span class="tag">Google&nbsp;Sheets</span></a>
+    </div>
+
+    <div class="stage">
+      <h3>Инициация возврата</h3>
+      <p><strong>Сотрудник 12 STOREEZ выгружает заказ в систему ТК</strong> — оформляется накладная со статусом <span class="st">создано</span>.</p>
+      <p>Далее <strong>трек-номера по СДЭК загружаются в 1С</strong>, после чего из <strong>СРМ клиенту на почту отправляется номер накладной</strong> — по нему клиент сдаёт груз на ПВЗ.</p>
+    </div>
+
+    <div class="stage">
+      <h3>Приём товара от клиента</h3>
+      <p>Клиент приносит заказ в ПВЗ.</p>
+      <dl class="rows">
+        <dt>Основание приёма</dt>
+        <dd>Сотрудник ПВЗ принимает заказ по накладной / ШК — накладная и ШК являются одной сущностью, номер накладной равен номеру ШК.</dd>
+        <dt>Подтверждение клиенту</dt>
+        <dd>Не выдаётся. Клиент может отслеживать движение возврата на сайте ТК.</dd>
+        <dt>Упаковка / маркировка</dt>
+        <dd>ШК <strong>формируется в момент выгрузки заказа в систему ТК</strong>. Физически на короб его наносит сотрудник ПВЗ при приёме у клиента.</dd>
+        <dt>Статус после приёма</dt>
+        <dd><span class="st">в Пути</span></dd>
+      </dl>
+    </div>
+
+    <div class="stage">
+      <h3>Перемещение</h3>
+      <ol class="flow">
+        <li>Заказ движется по транспортной схеме.</li>
+        <li>Заказ поступает на <strong>РЦ Москвы</strong> — статус <span class="st">готов к выдаче</span>.</li>
+        <li>Заказ поступает на <strong>склад, с которого идёт доставка на наш склад</strong>, включается в <span class="doc-token">акт возврата</span> и доставляется на склад возвратов интернет-магазина. Статус <span class="st">Вручен</span> проставляется в момент доставки заказа нам на склад.</li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- 3 -->
+  <section class="channel" id="fivepost">
+    <div class="ch-head">
+      <div class="ch-num">03</div>
+      <h2>5Post постомат</h2>
+      <div class="ch-kind">Сдача в магазине</div>
+    </div>
+
+    <div class="stage">
+      <h3>Выгрузка заказа в ТК</h3>
+      <span class="warn"><b>Важно.</b> Поля и пример — по заказам, выгруженным вручную. При интеграции состав может измениться, сверяться с документацией ТК по интеграции.</span>
+      <p style="margin:0 0 8px;font-size:14px;color:var(--muted)">Пример выгрузки с обязательными полями</p>
+      <a class="reglink" href="https://docs.google.com/spreadsheets/d/1H5y2PwdJFWKy-rbGOzxzQtk6s5zRgYLlWqb4L9yW9uw/edit?gid=798640396#gid=798640396" target="_blank" rel="noopener">Реестры, передаваемые в ТК <span class="tag">Google&nbsp;Sheets</span></a>
+    </div>
+
+    <div class="stage">
+      <h3>Инициация возврата</h3>
+      <p><strong>Сотрудник 12 STOREEZ выгружает заказ в систему ТК</strong> (ЛК).</p>
+      <dl class="rows">
+        <dt>Уведомление клиента</dt>
+        <dd>Клиенту приходит СМС с кодом для сдачи и QR-кодом для сдачи.</dd>
+        <dt>Статус в системе ТК</dt>
+        <dd><span class="st">Подтвержден</span></dd>
+      </dl>
+    </div>
+
+    <div class="stage">
+      <h3>Приём товара от клиента</h3>
+      <p>Клиент приходит в магазин «Пятёрочка» или «Перекрёсток» — любой на его выбор. Схема для «Пятёрочки» и «Перекрёстка» не отличается. Далее возможны два пути.</p>
+
+      <div class="paths">
+        <div class="path">
+          <h4>Путь 1 — сдача в постомат</h4>
+          <span class="cond">Основной сценарий</span>
+          <ul>
+            <li>Клиент вводит код или сканирует QR на постомате.</li>
+            <li>Постомат выдаёт ШК, который клиент сам клеит на короб.</li>
+            <li>Клиент кладёт короб в ячейку.</li>
+          </ul>
+          <div class="rule">Правило: <strong>1 заказ — 1 ячейка</strong>.</div>
+        </div>
+        <div class="path">
+          <h4>Путь 2 — сдача на кассе</h4>
+          <span class="cond">Если в постомате нет свободных ячеек или короб большой</span>
+          <ul>
+            <li>Клиент проходит на кассу, показывает QR на кассе или называет код.</li>
+            <li>Сотрудник кассы забирает короб и наклеивает ШК.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="note"><span><b>Нештатная ситуация.</b> Если постомат не выдал ШК или не принял код — клиент обращается в поддержку.</span></div>
+
+      <dl class="rows">
+        <dt>Статус после сдачи</dt>
+        <dd><span class="st">Готов к изъятию из пункта выдачи</span> и номер пункта</dd>
+        <dt>Проверка товара при сдаче</dt>
+        <dd>Не проводится.</dd>
+        <dt>Упаковка / маркировка</dt>
+        <dd>ШК <strong>формируется в момент сдачи заказа</strong> — в постомат или на кассе. До сдачи ШК не существует: клиент приходит в магазин с кодом и QR-кодом из СМС.</dd>
+      </dl>
+    </div>
+
+    <div class="stage">
+      <h3>Перемещение</h3>
+      <ol class="flow">
+        <li>Курьер приезжает в пункт выдачи и забирает заказы — статус <span class="st">Изъят из пункта выдачи 25945-Пятерочка</span>. Забор одинаковый для обоих путей: курьер забирает и заказы из постомата, и заказы, принятые на кассе.</li>
+        <li>Заказ едет по транспортной схеме по ШК, который был наклеен клиентом или на кассе — статус <span class="st">Отгружено с 13126-Пятерочка</span>.</li>
+        <li>Заказ поступает на <strong>ХАБ в Москве</strong> и консолидируется в возврат — статусы <span class="st">Скомплектован на РЦ Возвраты Боброво ХАБ</span>, затем <span class="st">Готов к отгрузке с РЦ Возвраты Боброво ХАБ</span>.</li>
+        <li>Заказ отгружают <strong>к нам на склад</strong> — статус <span class="st">Отгружен партнеру</span>.</li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- 4 -->
+  <section class="channel" id="dalli">
+    <div class="ch-head">
+      <div class="ch-num">04</div>
+      <h2>Далли Сервис курьер</h2>
+      <div class="ch-kind">Забор у клиента</div>
+    </div>
+
+    <div class="stage">
+      <h3>Выгрузка заказа в ТК</h3>
+      <span class="warn"><b>Важно.</b> Поля и пример — по заказам, выгруженным вручную. При интеграции состав может измениться, сверяться с документацией ТК по интеграции.</span>
+      <p style="margin:0 0 8px;font-size:14px;color:var(--muted)">Пример выгрузки с обязательными полями</p>
+      <a class="reglink" href="https://docs.google.com/spreadsheets/d/1H5y2PwdJFWKy-rbGOzxzQtk6s5zRgYLlWqb4L9yW9uw/edit?gid=798640396#gid=798640396" target="_blank" rel="noopener">Реестры, передаваемые в ТК <span class="tag">Google&nbsp;Sheets</span></a>
+    </div>
+
+    <div class="stage">
+      <h3>Инициация возврата</h3>
+      <p><strong>Сотрудник 12 STOREEZ выгружает заказ в систему ТК</strong> — оформляется вызов курьера, статус <span class="st">Новый</span>.</p>
+    </div>
+
+    <div class="stage">
+      <h3>Приём товара от клиента</h3>
+      <dl class="rows">
+        <dt>Назначение курьера</dt>
+        <dd>В день приезда курьер назначается — статус <span class="st">Выдан курьеру на доставку</span>.</dd>
+        <dt>Основание забора</dt>
+        <dd>Курьер забирает возврат по заявке из приложения.</dd>
+        <dt>Документы при приёме</dt>
+        <dd>Бумажной накладной нет.</dd>
+        <dt>Проверка товара курьером</dt>
+        <dd>Не проводится.</dd>
+        <dt>Упаковка / маркировка</dt>
+        <dd>ШК <strong>формируется на складе Далли — в момент, когда курьер сдаёт туда посылку</strong>. При заборе у клиента ШК не формируется и не наклеивается; на участке «клиент → склад Далли» заказ идентифицируется по заданию, которое отображено у курьера в приложении.</dd>
+        <dt>Статус после приёма</dt>
+        <dd><span class="st">Доставлен предварительно</span> и <span class="st">Доставлен</span> — идут подряд.</dd>
+      </dl>
+    </div>
+
+    <div class="stage">
+      <h3>Перемещение</h3>
+      <ol class="flow">
+        <li>Курьер привёз посылку на склад Далли.</li>
+        <li>Склад отработал посылку: наклеил ШК и отсканировал его.</li>
+        <li>Склад сформировал <span class="doc-token">акт на возврат</span> и включил туда этот заказ — статус <span class="st">Планируется возврат остатков</span>.</li>
+        <li>Склад отгрузил возврат на доставку на наш склад — статус <span class="st">Остаток возвращен</span>.</li>
+      </ol>
+    </div>
+  </section>
+
+  <footer class="doc">
+    <span>Источник: «Физ.сценарии КЛ.В.xlsx» + уточнения владельца процесса</span>
+    <span>Обновлено 02.09.2026</span>
+  </footer>
+
+</div>
+
+</body>
+</html>

@@ -4,6 +4,8 @@
 **Статус:** DRAFT · **Дата:** 07.09.2026
 **Результат шага:** приложение получило карточку заказа с позициями, признаками возможности возврата и действием «Оформить возврат». В базе ничего не меняется.
 
+> **Обновлено 12.09.2026.** iOS-клиент подтверждает: `positions[].can_be_returned` и `return.is_bank_data_required` читаются как есть (`OrderItem.canBeReturned`, `OrderDetail.Return.isBankDataRequired` в `Classes/Models/Response/Order.swift`/`OrderDetail.swift`) и **никак не пересчитываются на клиенте** — единственная дата-арифметика в карточке заказа (`MyOrderDetailVC.calculateRemainingMinutes(from:)`) считает обратный отсчёт до отмены неоплаченного заказа и к сроку возврата отношения не имеет. Подробнее — [12storeez-ios_структура.md, §4.5](../../reference/12storeez-ios_структура.md).
+
 ---
 
 ## 1. Пользовательский сценарий

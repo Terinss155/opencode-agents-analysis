@@ -37,7 +37,7 @@
 | Агент | mode | Скиллы |
 |---|---|---|
 | `product-owner` | primary | `user-story`, `backlog-prioritization`, `business-case`, `product-roadmap`, `stakeholder-map`, `adr` |
-| `business-analyst` | primary | `business-process-bpmn`, `brd`, `use-case`, `screen-spec`, `traceability-matrix`, `brs`, `adr` |
+| `business-analyst` | primary | `business-process-bpmn`, `brd`, `use-case`, `screen-spec`, `traceability-matrix`, `gap-analysis`, `brs`, `adr` |
 | `system-analyst` | primary | `backend-logic`, `erd-model`, `sequence-diagram`, `openapi-spec`, `asyncapi-spec`, `nfr-requirements`, `adr` |
 | `repository-researcher` | primary | — (опц. `sequence-diagram` для C4 / sequence-схем) |
 | `security-reviewer` | subagent | `security-review-checklist` |
@@ -51,6 +51,7 @@ requirements/
 ├── index.md          ← точка входа: вкладки, порядок чтения, версия и статус бандла
 ├── brd.md            ← вкладка 00. BRD (skill/brd)
 ├── traceability.md   ← вкладка 03. Матрица трассируемости (skill/traceability-matrix)
+├── gap-analysis.md   ← Gap-анализ: сверка с исходным BRD, реестр вне зоны BA/SA (skill/gap-analysis)
 ├── business-case.md      ← продуктовый, один (skill/business-case)
 ├── backlog-priority.md   ← продуктовый, один (skill/backlog-prioritization)
 ├── user-story/     ← вкладка 01: user-story*.md + Acceptance Criteria (skill/user-story)
@@ -68,7 +69,7 @@ requirements/
 └── reference/      ← сквозные справочники (см. «Разделение контекстов»)
 ```
 
-- **Правило размещения:** тип артефакта, у которого может быть больше одного файла (user story, use case, спецификация экрана, задачи для бэка, sequence, AS-IS-шаги), всегда лежит в своей подпапке — даже если сейчас файл один. В корне `requirements/` — только `index.md`, `brd.md`, `traceability.md` и продуктовые `business-case.md` / `backlog-priority.md`.
+- **Правило размещения:** тип артефакта, у которого может быть больше одного файла (user story, use case, спецификация экрана, задачи для бэка, sequence, AS-IS-шаги), всегда лежит в своей подпапке — даже если сейчас файл один. В корне `requirements/` — только `index.md`, `brd.md`, `traceability.md`, `gap-analysis.md` и продуктовые `business-case.md` / `backlog-priority.md`.
 - **ADR:** хранится в `requirements/adr/` и объясняет причину значимого выбора, альтернативы и последствия. ADR не является новым уровнем требований и не добавляется отдельным звеном в цепочку трассировки.
 - **Первичные транскрибации:** неизменённые исходные записи встреч хранятся в `requirements/drafts/transcriptions/`. Обработанное резюме и ADR не заменяют первичную транскрибацию.
 - Связь между вкладками — только по стабильным ID (см. «Легенда ID-префиксов») и markdown-ссылкам. Содержимое между вкладками не копируется.
@@ -88,6 +89,7 @@ requirements/
 | Спецификации экранов | [screen-spec/](./screen-spec/) | Экраны восприятия | ... |
 | ADR | [adr/](./adr/) | Обоснование значимых решений, альтернативы и последствия | ... |
 | 03. Трассируемость | [traceability.md](./traceability.md) | BO → BR → US → UC → тех. артефакты | ... |
+| Gap-анализ | [gap-analysis.md](./gap-analysis.md) | Сверка с исходным BRD, реестр требований вне зоны BA/SA | ... |
 | Продуктовые | [business-case.md](./business-case.md), [backlog-priority.md](./backlog-priority.md) | ROI, приоритеты | ... |
 
 Порядок чтения: 00 → 01 → (02 по ссылкам из историй).
@@ -153,7 +155,7 @@ requirements/
 - Ревью/отчёты: папка `reports/` (создать, если нет); `security-reviewer` → `{артефакт}_security_review.md`, `system-analyst` (по явному запросу) → `{артефакт}_review_report.md`.
 
 ## Рабочий процесс
-- PO → ценность и приоритеты (RICE/WSJF/MoSCoW), User Story. BA → процессы AS-IS/TO-BE, BRD, Use Case, матрица трассируемости, Gap-анализ; передаёт SA.
+- PO → ценность и приоритеты (RICE/WSJF/MoSCoW), User Story. BA → процессы AS-IS/TO-BE, BRD, Use Case, матрица трассируемости, Gap-анализ (сверка с исходным BRD и реестр требований вне зоны BA/SA — `skill/gap-analysis`); передаёт SA.
 - SA → технические артефакты: backend-логика, ERD, Sequence, OpenAPI, AsyncAPI, NFR; обеспечивает совместимость с User Story/Use Case.
 - Значимые решения фиксируются через `skill/adr`: PO — продуктовые, BA — процессные и бизнес-правила, SA — архитектурные, интеграционные и системные.
 - `repository-researcher` → разбор кодовой базы `12storeez-master`, карта интеграций, справочники `requirements/*_структура.md`; к нему обращаются BA/SA, когда нужно понять, где и как работает логика в монолите.

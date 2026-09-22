@@ -4,7 +4,7 @@
 **Статус:** DRAFT · **Дата:** 07.09.2026
 **Результат шага:** в приложении зафиксирован город (название, идентификаторы города и региона, ISO-код страны). В базе ничего не меняется.
 
-> Оговорка та же, что в [шаге 02](02-select-return-items.md): клиент недоступен, поведение восстановлено по контракту гео-API и по параметрам запросов способов и реквизитов возврата.
+> **Обновлено 12.09.2026.** iOS-клиент подтверждает набор геополей: модель `ConfirmedGeo` (`Classes/Models/Response/ConfirmedGeo.swift`) содержит `city, cityGeoId, cityFias, country, countryIso, countryFullTitle, region, regionGeoId, timezone` — из неё строится `ReturnOrderMethodsEndpoint.Payload` (запрос списка способов, шаг [05](05-select-return-method.md)) и `ReturnOrderDetailsEndpoint.Payload` (запрос реквизитов возврата, шаг [06](06-confirm-return-details.md)). Экран выбора города в разборе iOS-кода отдельно не идентифицирован (используется общий гео-модуль `SelectCityVC`/`SearchAddressVC`, вызываемый из `ReturnOrderMethodVC`) — остальные пункты ниже сохранены как ранее восстановленные по контракту API.
 
 ---
 

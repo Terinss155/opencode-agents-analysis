@@ -2,7 +2,7 @@
 
 **Назначение документа:** карта-справочник по кодовой базе `12storeez-master` (Yii2 PHP-монолит интернет-магазина 12Storeez) для быстрого поиска информации при анализе требований и разработке.
 
-**Дата актуализации:** 2026-09-06
+**Дата актуализации:** 2026-09-06 (раздел 5.1 дополнен 12.09.2026 по итогам сверки с реальным iOS-клиентом)
 **Примечание:** структура описана по фактическому содержимому папок; назначение модулей — по названиям и ключевым классам.
 
 ---
@@ -206,7 +206,8 @@ Validators/      — валидаторы (OrderRefundValidator, CreateOrderCart
 | Модель заказа (updateReturnStatus, статусы) | `modules/orders/models/Order.php` |
 | Причины возврата | `modules/orders/models/ReturnReason.php`, `ReturnReasonGroup.php`, `repositories/OrderReturnReasonRepository.php`, `OrderReturnReasonGroupRepository.php` |
 | Возврат из 1С (inbox) | `src/Modules/Order/Services/Inbox/OrderUpdateService.php` (handleReturnPositions), `modules/orders/models/OrderReturnPosition.php` |
-| Мобильный возврат | `src/Modules/Mobile/Controllers/OrdersController.php` (actionReturnPositions, actionReturnDetails, actionReturnMethodList) |
+| Мобильный возврат | `src/Modules/Mobile/Controllers/OrdersController.php` (actionReturnPositions, actionReturnDetails, actionReturnMethodList) — маршрутизируются кастомным `src/Modules/Mobile/Rules/UrlRule.php` (regex по `orders/{id}/return[-details\|-method-list]`) |
+| Мобильный возврат — способ/детали, **новое API (не найдено)** | Реальный iOS-клиент (`12storeez-ios-develop`) запрашивает способ/детали возврата по `v1/delivery/{orderId}/return-method-list` и `v1/delivery/{orderId}/return-details` (хост `mobile.12stz.com`, `BASE_URL_NEW`) — **такого маршрута в этом репозитории нет**: модуль `deliveryV2` (`config/modules.php`, `Application\Modules\Delivery\Module`) разрешает только контроллеры `geo`/`pickup`/`webhooks`; модуль `return` (тот же класс) содержит только `ReturnDetailsBackendController` — админку конфигурации способов возврата, без публичного API. Официальная спека (`docs/mobileApi/openapi.yml`) тоже знает только старый путь `/orders/{orderId}/return-method-list`. См. `requirements/reference/12storeez-ios_структура.md`, §4.3 |
 | Чеки возврата (АТОЛ) | `src/Modules/Receipt/` (OrderReceiptService, RefundPrepayment, RefundFullpayment, OrderPositionRefund) |
 | Обновление заказа (updateOrder) | `src/Modules/Order/Services/OrderService.php` |
 | Проверка возможности возврата | `src/Modules/Order/Helpers/OrderHelper.php` (canBeReturned, canPositionBeReturned, isReturned) |
