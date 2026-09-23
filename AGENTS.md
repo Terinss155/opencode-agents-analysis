@@ -132,8 +132,12 @@ requirements/
 |---|---|---|
 | `BO-<n>` | Business Objective — бизнес-цель | вкладка 00 (BRD), «Бизнес-цели» |
 | `PP-<n>` | Pain Point — болевая точка AS-IS | вкладка 00 (BRD), «Предпосылки и контекст (AS-IS)» |
-| `BR-<n>` | Business Requirement — бизнес-требование | вкладка 00 (BRD), «Бизнес-требования» |
-| `US-<n>` | User Story — пользовательское требование (в репозитории один процесс, код `<ТЕМА>` в US опущен) | вкладка 01 (User Stories) |
+| `BR-NN` | Business Requirement — бизнес-требование | вкладка 00 (BRD), §7.1 «Бизнес-требования» |
+| `RULE-NN` | Business Rule — бизнес-правило | вкладка 00 (BRD), §7.2 «Бизнес-правила» |
+| `FR-NN` | Functional Requirement — функциональное требование | вкладка 00 (BRD), §7.3 «Функциональные требования» |
+| `NFR-NN` | Non-functional Requirement — нефункциональное требование раздела BRD | вкладка 00 (BRD), §7.4 «Нефункциональные требования» |
+| `INT-NN` | Integration / Technical Requirement — интеграционное требование | вкладка 00 (BRD), §7.5 «Интеграционные / технические требования» |
+| `US-CR-NN`, `US-VW-NN`, `US-LC-NN`, `US-CH-NN` | User Story — пользовательское требование по теме: CR — оформление, VW — просмотр, LC — жизненный цикл, CH — каналы (в репозитории один процесс, код `<ТЕМА>` в US опущен) | вкладка 01 (User Stories) |
 | `UC-<ТЕМА>-<n>` | Use Case — сценарий / ветка внутри User Story | вкладка 02 (Use Cases) |
 | `BL-<ТЕМА>-<...>` | backend-логика | `backend/*.md` (`skill/backend-logic`) |
 | `TASK-<ТЕМА>-<...>` | задача проектирования БД / модели данных | `backend/*.md` (`skill/backend-logic`, `skill/erd-model`) |
@@ -141,7 +145,7 @@ requirements/
 | `API-<...>` | API-контракт / метод | `*_openapi.yaml` или `requirements/reference/api/{web,mobile}/` (AS-IS-разбор эндпоинта по каналу, сквозной — не привязан к одному бандлу; `skill/openapi-spec`) |
 | `SEQ-<ТЕМА>-<...>` | sequence-диаграмма | `as-is/sequence/*.plantuml` для AS-IS, `sequence/*.plantuml` для TO-BE (`skill/sequence-diagram`) |
 | `SCR-<ТЕМА>-<n>` | спецификация экрана восприятия | `screen-spec/` (`skill/screen-spec`) |
-| `NFR-<КАТ>-<n>` | нефункциональное требование | `nfr/nfr.md` (`skill/nfr-requirements`) |
+| `NFR-<КАТ>-<n>` | нефункциональное требование отдельного NFR-артефакта (не путать с `NFR-NN` раздела 7.4 BRD) | `nfr/nfr.md` (`skill/nfr-requirements`) |
 | `TC-<...>` | тест-кейс QA (если ведётся отдельным артефактом) | QA |
 | `ADR-<ТЕМА>-<n>` | запись о значимом продуктовом, процессном или архитектурном решении | `adr/ADR-<ТЕМА>-<n>-*.md` (`skill/adr`) |
 

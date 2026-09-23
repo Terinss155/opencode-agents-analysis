@@ -66,8 +66,8 @@
 
 ## Связанные артефакты
 
-- `BR-31` — [выбор точки передачи](../brd.md#7-бизнес-требования-business-requirements).
-- `US-103` — [выбор способа](../user-story/user-story-creation.md#us-103-определение-города-и-списка-доступных-способов-возврата); `US-203`, `US-204`, `US-205` — [канальные истории](../user-story/user-story-channels.md).
+- `RULE-18`, `FR-16`, `FR-17` — [выбор точки передачи](../brd.md#7-требования).
+- `US-CR-03` — [выбор способа](../user-story/user-story-creation.md#us-cr-03); `US-CH-05`, `US-CH-07`, `US-CH-09` — [канальные истории](../user-story/user-story-channels.md).
 - `OQ-38` — источник перечня ПВЗ, принимающих возвраты.
 - `ADR-RET-001` — [запрет редактирования заявки](./ADR-RET-001-no-edit-return-request.md).
 

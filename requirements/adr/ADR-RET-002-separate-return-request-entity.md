@@ -70,7 +70,7 @@
 
 - [BRD «Возвраты 2.0»](../brd.md) — глоссарий и целевое состояние.
 - `TASK-RET-DATA` — [модель данных отдельной сущности возврата](../backend/return-entity_data-model_task.md).
-- `US-105` — [создание возврата](../user-story/user-story-creation.md); `US-110`, `US-112` — [просмотр возврата](../user-story/user-story-view.md).
+- `US-CR-05` — [создание возврата](../user-story/user-story-creation.md#us-cr-05); `US-VW-01`, `US-VW-04` — [просмотр возврата](../user-story/user-story-view.md).
 - `OQ-1`, `OQ-19`, `OQ-34` — открытые вопросы по статусам, мастер-системе и идентификатору.
 
 ## История изменений
