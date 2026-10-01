@@ -1,0 +1,296 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Возвраты 2.0 — карта систем</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+/* Layout: schema-first — the diagram leads, then flow register, object matrix, open questions */
+:root{
+  --bg:#f5f6f4; --paper:#ffffff; --fg:#1d2320; --muted:#66706b; --line:#d6dbd7;
+  --flow:#0f6b5c; --asis:#8a938e; --warn:#b86e00;
+  --site:#e4eefb; --site-b:#3d6fb6;
+  --crm:#efe7f8; --crm-b:#7a4fb0;
+  --ka:#fbf1d6; --ka-b:#a57a0b;
+  --rt:#fbf6e8; --ext:#eceeed; --ext-b:#8a938e;
+  --font:"Golos Text",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#141816; --paper:#1c211f; --fg:#e6ebe8; --muted:#9aa49f; --line:#333b37;
+  --flow:#4cc2ad; --asis:#7d8782; --warn:#e5a23c;
+  --site:#1d2a3c; --site-b:#7aa5e6; --crm:#2a2238; --crm-b:#b58ee6;
+  --ka:#332a14; --ka-b:#e0b84a; --rt:#2a2517; --ext:#252a28; --ext-b:#7d8782;
+  color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#141816; --paper:#1c211f; --fg:#e6ebe8; --muted:#9aa49f; --line:#333b37;
+  --flow:#4cc2ad; --asis:#7d8782; --warn:#e5a23c;
+  --site:#1d2a3c; --site-b:#7aa5e6; --crm:#2a2238; --crm-b:#b58ee6;
+  --ka:#332a14; --ka-b:#e0b84a; --rt:#2a2517; --ext:#252a28; --ext-b:#7d8782;
+  color-scheme:dark}
+body{background:var(--bg);color:var(--fg);font-family:var(--font);font-size:15px;line-height:1.5}
+.wrap{max-width:1240px;margin:0 auto;padding-inline:20px;padding-block:28px 56px;display:grid;gap:36px}
+header{display:grid;gap:6px}
+.eyebrow{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+h1{font-size:28px;line-height:1.2;margin:0;font-weight:700;text-wrap:balance}
+h2{font-size:19px;margin:0 0 12px;font-weight:600}
+.lead{color:var(--muted);max-width:75ch;margin:0}
+.legend{display:flex;flex-wrap:wrap;gap:8px 22px;font-size:13px;color:var(--muted);margin-top:6px}
+.legend span{display:inline-flex;align-items:center;gap:8px}
+.legend svg{flex:none}
+.diagram{background:var(--paper);border:1px solid var(--line);border-radius:10px;overflow-x:auto}
+.diagram svg{display:block;width:100%;min-width:980px;height:auto}
+svg text{font-family:var(--font);fill:var(--fg)}
+.t-title{font-size:15px;font-weight:600}
+.t-sub{font-size:11.5px;fill:var(--muted)}
+.t-item{font-size:12px}
+.t-lbl{font-size:12px;font-weight:500}
+.t-sm{font-size:11px;fill:var(--muted)}
+.t-num{font-family:var(--mono);font-size:11px;font-weight:500;fill:var(--paper)}
+.f-new{stroke:var(--flow);fill:none;stroke-width:1.8}
+.f-asis{stroke:var(--asis);fill:none;stroke-width:1.6;stroke-dasharray:6 5}
+.f-warn{stroke:var(--warn);fill:none;stroke-width:1.8;stroke-dasharray:7 5}
+.b-new{fill:var(--flow)} .b-asis{fill:var(--asis)} .b-warn{fill:var(--warn)}
+.tbl{overflow-x:auto;background:var(--paper);border:1px solid var(--line);border-radius:10px}
+table{border-collapse:collapse;width:100%;font-size:13.5px;min-width:760px}
+th,td{text-align:left;vertical-align:top;padding:10px 12px;border-bottom:1px solid var(--line)}
+th{font-size:12px;font-weight:600;color:var(--muted);letter-spacing:.04em;text-transform:uppercase;background:var(--bg)}
+tr:last-child td{border-bottom:none}
+td.n{font-family:var(--mono);font-variant-numeric:tabular-nums;width:34px}
+.pill{display:inline-block;font-size:11.5px;padding:1px 8px;border-radius:999px;white-space:nowrap;border:1px solid currentColor}
+.p-new{color:var(--flow)} .p-asis{color:var(--asis)} .p-warn{color:var(--warn)}
+.m td{font-size:13px}
+.m td:first-child{font-weight:500}
+.role{font-weight:600}
+.muted{color:var(--muted)}
+.qs{display:grid;gap:10px;margin:0;padding-left:20px;max-width:90ch}
+.src{font-size:12.5px;color:var(--muted)}
+</style>
+
+<div class="wrap">
+<header>
+  <div class="eyebrow">Возвраты 2.0 · Шаг №1 «Отказ от бумаги» · по BRD от 16.09.2026</div>
+  <h1>Взаимодействие систем при возврате интернет-заказа</h1>
+  <p class="lead">Сайт / приложение, Retail CRM, 1С: КА («Маркетинг») и 1С: Розница — какие объекты где живут и какие данные между системами передаются в целевом процессе шага №1.</p>
+  <div class="legend">
+    <span><svg width="36" height="10"><line x1="0" y1="5" x2="36" y2="5" class="f-new"/></svg>Новый поток / доработка</span>
+    <span><svg width="36" height="10"><line x1="0" y1="5" x2="36" y2="5" class="f-asis"/></svg>Как сейчас (as-is)</span>
+    <span><svg width="36" height="10"><line x1="0" y1="5" x2="36" y2="5" class="f-warn"/></svg>Под вопросом</span>
+  </div>
+</header>
+
+<section class="diagram" aria-label="Схема потоков данных">
+<svg viewBox="0 0 1200 770" role="img">
+  <defs>
+    <marker id="a-new" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" style="fill:var(--flow)"/></marker>
+    <marker id="a-asis" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" style="fill:var(--asis)"/></marker>
+    <marker id="a-warn" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" style="fill:var(--warn)"/></marker>
+  </defs>
+
+  <!-- peripheral actors -->
+  <rect x="450" y="16" width="300" height="36" rx="18" style="fill:var(--ext);stroke:var(--ext-b)"/>
+  <text x="600" y="39" text-anchor="middle" class="t-item">Интеграции ТК · 5POST · СДЭК · Почта</text>
+  <rect x="910" y="16" width="220" height="36" rx="18" style="fill:var(--ext);stroke:var(--ext-b)"/>
+  <text x="1020" y="39" text-anchor="middle" class="t-item">Логисты → перевозчики</text>
+  <rect x="100" y="150" width="200" height="40" rx="20" style="fill:var(--ext);stroke:var(--ext-b)"/>
+  <text x="200" y="175" text-anchor="middle" class="t-item">Клиент</text>
+  <rect x="100" y="520" width="200" height="40" rx="20" style="fill:var(--ext);stroke:var(--ext-b)"/>
+  <text x="200" y="545" text-anchor="middle" class="t-item">Сотрудник магазина (РМ)</text>
+  <rect x="490" y="712" width="180" height="36" rx="18" style="fill:var(--ext);stroke:var(--ext-b)"/>
+  <text x="580" y="735" text-anchor="middle" class="t-item">Бухгалтерия</text>
+
+  <!-- Site / App : hub -->
+  <rect x="440" y="90" width="320" height="200" rx="10" style="fill:var(--site);stroke:var(--site-b);stroke-width:2"/>
+  <text x="458" y="118" class="t-title">Сайт / Мобильное приложение</text>
+  <text x="458" y="136" class="t-sub">ЛК клиента · узел обмена RCRM ⇄ 1С</text>
+  <text x="458" y="164" class="t-item">• Оформление и отмена возврата</text>
+  <text x="458" y="184" class="t-item">• Раздел «Возвраты», статусы</text>
+  <text x="458" y="204" class="t-item">• Электронное заявление</text>
+  <text x="470" y="220" class="t-sm">формируется и хранится в базе сайта</text>
+  <text x="458" y="242" class="t-item">• QR-код возврата (канал «магазин»)</text>
+  <text x="458" y="264" class="t-item">• Трансляция данных RCRM ⇄ 1С: КА</text>
+
+  <!-- RCRM -->
+  <rect x="880" y="90" width="280" height="200" rx="10" style="fill:var(--crm);stroke:var(--crm-b);stroke-width:1.5"/>
+  <text x="898" y="118" class="t-title">Retail CRM</text>
+  <text x="898" y="136" class="t-sub">Отдел «Дружба» и логисты</text>
+  <text x="898" y="164" class="t-item">• Карточка возврата</text>
+  <text x="898" y="184" class="t-item">• Ручное оформление</text>
+  <text x="910" y="200" class="t-sm">по обращению клиента</text>
+  <text x="898" y="222" class="t-item">• Реквизиты из закрытого канала</text>
+  <text x="898" y="242" class="t-item">• Комментарий «Дружбы»</text>
+  <text x="898" y="262" class="t-item">• Выгрузка реестров</text>
+
+  <!-- 1C KA -->
+  <rect x="400" y="420" width="360" height="230" rx="10" style="fill:var(--ka);stroke:var(--ka-b);stroke-width:1.8"/>
+  <text x="418" y="448" class="t-title">1С: Комплексная автоматизация</text>
+  <text x="418" y="466" class="t-sub">«Маркетинг» · мастер заказа и возврата</text>
+  <text x="418" y="494" class="t-item">• Заказ интернет-магазина</text>
+  <text x="418" y="514" class="t-item">• <tspan font-weight="600">Заявка на возврат</tspan> — новая сущность</text>
+  <text x="430" y="530" class="t-sm">свой номер, статусы, реквизиты, комментарий</text>
+  <text x="418" y="552" class="t-item">• АРМ «Возврат онлайн-заказов»</text>
+  <text x="430" y="568" class="t-sm">скан QR, предзаполнение, скан КМ</text>
+  <text x="418" y="590" class="t-item">• Приходный ордер</text>
+  <text x="418" y="612" class="t-item">• Отчёт по возвратам</text>
+  <text x="430" y="630" class="t-sm">единый источник для возврата ДС</text>
+
+  <!-- 1C Retail -->
+  <rect x="40" y="620" width="300" height="120" rx="10" style="fill:var(--rt);stroke:var(--ka-b);stroke-width:1.3;stroke-dasharray:5 4"/>
+  <text x="58" y="647" class="t-title">1С: Розница</text>
+  <text x="58" y="665" class="t-sub">Вне объёма шага №1</text>
+  <text x="58" y="690" class="t-item">• Возвраты по офлайн-чекам — as-is</text>
+  <text x="58" y="710" class="t-item">• Обработки возврата интернет-</text>
+  <text x="70" y="727" class="t-item">заказов здесь нет (только в КА)</text>
+
+  <!-- Betta Pro -->
+  <rect x="900" y="560" width="260" height="100" rx="10" style="fill:var(--ext);stroke:var(--ext-b);stroke-width:1.3"/>
+  <text x="918" y="588" class="t-title">Бетта Про (WMS)</text>
+  <text x="918" y="606" class="t-sub">Склад партнёра, Подольск</text>
+  <text x="918" y="630" class="t-item">Приёмка, экспертиза, манифесты</text>
+
+  <!-- no direct KA <-> RCRM -->
+  <path d="M760 470 L905 305" stroke="var(--line)" stroke-width="1.5" stroke-dasharray="3 5" fill="none"/>
+  <g transform="translate(832 388)">
+    <circle r="11" style="fill:var(--paper);stroke:var(--muted)"/>
+    <path d="M-5 -5 L5 5 M5 -5 L-5 5" style="stroke:var(--muted);stroke-width:1.6"/>
+  </g>
+  <text x="850" y="410" class="t-sm">прямого обмена</text>
+  <text x="850" y="424" class="t-sm">по возвратам нет</text>
+
+  <!-- 1: TK -> site -->
+  <path d="M600 52 V88" class="f-new" marker-end="url(#a-new)"/>
+  <circle cx="600" cy="70" r="10" class="b-new"/><text x="600" y="74" text-anchor="middle" class="t-num">1</text>
+  <text x="616" y="75" class="t-sm">способы возврата по регионам</text>
+
+  <!-- client <-> site -->
+  <path d="M302 170 H438" class="f-new" marker-start="url(#a-new)" marker-end="url(#a-new)"/>
+  <text x="370" y="160" text-anchor="middle" class="t-sm">оформляет,</text>
+  <text x="370" y="188" text-anchor="middle" class="t-sm">получает QR</text>
+
+  <!-- 2: site -> RCRM -->
+  <path d="M760 150 H878" class="f-new" marker-end="url(#a-new)"/>
+  <circle cx="820" cy="150" r="10" class="b-new"/><text x="820" y="154" text-anchor="middle" class="t-num">2</text>
+  <text x="820" y="134" text-anchor="middle" class="t-sm">заявка из ЛК,</text>
+  <text x="820" y="172" text-anchor="middle" class="t-sm">статусы из 1С</text>
+
+  <!-- 3: RCRM -> site -->
+  <path d="M880 235 H762" class="f-new" marker-end="url(#a-new)"/>
+  <circle cx="820" cy="235" r="10" class="b-new"/><text x="820" y="239" text-anchor="middle" class="t-num">3</text>
+  <text x="820" y="219" text-anchor="middle" class="t-sm">правки, комментарий,</text>
+  <text x="820" y="258" text-anchor="middle" class="t-sm">реквизиты</text>
+
+  <!-- 4: site -> KA -->
+  <path d="M490 290 V418" class="f-new" marker-end="url(#a-new)"/>
+  <circle cx="490" cy="350" r="10" class="b-new"/><text x="490" y="354" text-anchor="middle" class="t-num">4</text>
+  <text x="476" y="338" text-anchor="end" class="t-lbl">Заявка на возврат</text>
+  <text x="476" y="354" text-anchor="end" class="t-sm">из ЛК и из RCRM, правки,</text>
+  <text x="476" y="369" text-anchor="end" class="t-sm">отмена, комментарий, реквизиты</text>
+
+  <!-- 5: KA -> site statuses -->
+  <path d="M600 420 V292" class="f-new" marker-end="url(#a-new)"/>
+  <circle cx="600" cy="350" r="10" class="b-new"/><text x="600" y="354" text-anchor="middle" class="t-num">5</text>
+  <text x="614" y="346" class="t-lbl">Статусы</text>
+  <text x="614" y="361" class="t-sm">создан · завершён</text>
+  <text x="614" y="376" class="t-sm">· отменён</text>
+
+  <!-- 7: KA -> site store-created request -->
+  <path d="M720 420 V292" class="f-new" marker-end="url(#a-new)"/>
+  <circle cx="720" cy="350" r="10" class="b-new"/><text x="720" y="354" text-anchor="middle" class="t-num">7</text>
+  <text x="734" y="346" class="t-lbl">Заявка из АРМ</text>
+  <text x="734" y="361" class="t-sm">создаётся в КА</text>
+  <text x="734" y="376" class="t-sm">автоматически</text>
+
+  <!-- 6: QR via client -> store staff -> ARM -->
+  <path d="M200 190 V518" class="f-new" stroke-dasharray="2 4" marker-end="url(#a-new)"/>
+  <circle cx="200" cy="350" r="10" class="b-new"/><text x="200" y="354" text-anchor="middle" class="t-num">6</text>
+  <text x="216" y="346" class="t-sm">предъявляет QR</text>
+  <text x="216" y="361" class="t-sm">с экрана</text>
+  <path d="M300 540 H398" class="f-new" marker-end="url(#a-new)"/>
+  <text x="349" y="531" text-anchor="middle" class="t-sm">скан QR, КМ</text>
+
+  <!-- 8: RCRM -> logistics -->
+  <path d="M1020 90 V54" class="f-asis" marker-end="url(#a-asis)"/>
+  <circle cx="1020" cy="71" r="10" class="b-asis"/><text x="1020" y="75" text-anchor="middle" class="t-num">8</text>
+  <text x="1036" y="76" class="t-sm">реестр 2 раза в день</text>
+
+  <!-- 9: KA -> Betta -->
+  <path d="M760 585 H898" class="f-warn" marker-end="url(#a-warn)"/>
+  <circle cx="830" cy="585" r="10" class="b-warn"/><text x="830" y="589" text-anchor="middle" class="t-num">9</text>
+  <text x="830" y="572" text-anchor="middle" class="t-sm">плановый возврат</text>
+
+  <!-- 10: Betta -> KA -->
+  <path d="M900 620 H762" class="f-asis" marker-end="url(#a-asis)"/>
+  <circle cx="830" cy="620" r="10" class="b-asis"/><text x="830" y="624" text-anchor="middle" class="t-num">10</text>
+  <text x="830" y="646" text-anchor="middle" class="t-sm">факт приёмки, кондиция</text>
+
+  <!-- 11: KA -> accounting -->
+  <path d="M580 650 V710" class="f-new" marker-end="url(#a-new)"/>
+  <circle cx="580" cy="680" r="10" class="b-new"/><text x="580" y="684" text-anchor="middle" class="t-num">11</text>
+  <text x="596" y="685" class="t-sm">отчёт по возвратам</text>
+
+  <!-- store staff -> Retail (as-is) -->
+  <path d="M200 562 V618" class="f-asis" marker-end="url(#a-asis)"/>
+  <text x="212" y="588" class="t-sm">as-is: возвраты</text>
+  <text x="212" y="603" class="t-sm">по розничным чекам</text>
+</svg>
+</section>
+
+<section>
+  <h2>Потоки данных</h2>
+  <div class="tbl"><table>
+    <thead><tr><th>№</th><th>Откуда → куда</th><th>Объект и состав данных</th><th>Когда</th><th>Изменение</th></tr></thead>
+    <tbody>
+    <tr><td class="n">1</td><td>Интеграции ТК → Сайт/МП</td><td>Актуальные способы и точки возврата по регионам (курьер, 5POST, СДЭК, Почта России)</td><td>Постоянно</td><td><span class="pill p-new">доработка</span></td></tr>
+    <tr><td class="n">2</td><td>Сайт/МП → Retail CRM</td><td><b>Заявка на возврат из ЛК</b>: № возврата, заказ, изделия, причины, канал сдачи, способ возврата ДС, реквизиты, ссылка на электронное заявление. Отмена клиентом. <b>Статусы из 1С</b> и заявки, созданные в АРМ магазина (транзитом из потоков 5 и 7)</td><td>При оформлении, отмене, смене статуса</td><td><span class="pill p-new">доработка обмена</span></td></tr>
+    <tr><td class="n">3</td><td>Retail CRM → Сайт/МП</td><td><b>Возврат, оформленный «Дружбой»</b> вручную, и правки оператора (адрес, дата и интервал забора, ТК), <b>комментарий «Дружбы»</b>, реквизиты из закрытого канала. Возврат появляется у клиента в ЛК</td><td>После проверки или оформления оператором</td><td><span class="pill p-new">новое</span></td></tr>
+    <tr><td class="n">4</td><td>Сайт/МП → 1С: КА</td><td><b>Заявка на возврат</b> в полном составе: данные из ЛК и данные из RCRM (правки, комментарий «Дружбы», реквизиты), отмена. На её основании в КА создаётся сущность «Заявка на возврат»</td><td>После потоков 2–3</td><td><span class="pill p-new">новое</span></td></tr>
+    <tr><td class="n">5</td><td>1С: КА → Сайт/МП</td><td><b>Статус возврата</b>: создан → завершён (ДС возвращены), отменён. Сайт показывает статус в ЛК и передаёт его в RCRM (поток 2). Мастер статуса — 1С</td><td>При смене статуса</td><td><span class="pill p-new">новое</span></td></tr>
+    <tr><td class="n">6</td><td>Сайт/МП → клиент → АРМ 1С: КА</td><td><b>QR-код возврата</b> с идентификатором возврата. АРМ открывает по нему возврат, уже полученный потоком 4: клиент, заказ, изделия, причины, способ возврата ДС, реквизиты. Резерв — поиск по ФИО, телефону, № заказа</td><td>Клиент приходит в магазин</td><td><span class="pill p-new">новое</span></td></tr>
+    <tr><td class="n">7</td><td>1С: КА → Сайт/МП</td><td><b>Заявка на возврат из АРМ</b> (клиент пришёл без QR и без заявки): сотрудник оформляет возврат в АРМ, в КА автоматически создаётся заявка и передаётся на сайт/в приложение. В RCRM заявка попадает через сайт (поток 2). Подтверждение клиентом в ЛК не требуется</td><td>Оформление в магазине</td><td><span class="pill p-new">новое</span></td></tr>
+    <tr><td class="n">8</td><td>Retail CRM → Логисты</td><td><b>Реестр возвратов</b> для передачи перевозчикам. Логисты загружают манифесты в заявки на возврат, чтобы склад видел ожидаемые позиции</td><td>2 раза в день</td><td><span class="pill p-asis">как сейчас</span></td></tr>
+    <tr><td class="n">9</td><td>1С: КА → Бетта Про</td><td><b>Плановый возврат</b> вместо бумажного заявления в коробке: № возврата и заказа, артикул, размер, количество, КМ, плановая дата прихода, канал сдачи. Отправление на складе идентифицируется по № заявки на возврат</td><td>Возврат создан</td><td><span class="pill p-warn">под вопросом</span></td></tr>
+    <tr><td class="n">10</td><td>Бетта Про → 1С: КА</td><td><b>Факт приёмки</b>, фактический состав, кондиция (брак, недостача). Сопоставление с плановым возвратом по № заявки на возврат</td><td>При приёмке на складе</td><td><span class="pill p-asis">как сейчас</span></td></tr>
+    <tr><td class="n">11</td><td>1С: КА → Бухгалтерия</td><td><b>Отчёт по возвратам</b>: реквизиты, способ оплаты и возврата ДС, приходный ордер, комментарий «Дружбы» (обязательно — обменные заказы). Вместо сканов и RCRM</td><td>Для возврата ДС вручную</td><td><span class="pill p-new">новое</span></td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section>
+  <h2>Объекты по системам</h2>
+  <div class="tbl"><table class="m">
+    <thead><tr><th>Объект</th><th>Сайт / МП</th><th>Retail CRM</th><th>1С: КА</th><th>1С: Розница</th></tr></thead>
+    <tbody>
+    <tr><td>Заказ интернет-магазина</td><td>Отображение в ЛК, способ оплаты</td><td>Копия, работа «Дружбы»</td><td class="role">Мастер</td><td class="muted">—</td></tr>
+    <tr><td>Заявка на возврат («Возврат»)</td><td class="role">Создаёт клиент, отменяет; транслирует между RCRM и КА</td><td>Создаёт и правит «Дружба»</td><td class="role">Мастер: номер, статусы; создаёт АРМ</td><td class="muted">—</td></tr>
+    <tr><td>Электронное заявление</td><td class="role">Формирует и хранит, версии</td><td>Ссылка</td><td>Ссылка; печать по требованию</td><td class="muted">—</td></tr>
+    <tr><td>QR-код возврата</td><td class="role">Генерирует (канал «магазин»)</td><td class="muted">—</td><td>Сканирует АРМ</td><td class="muted">—</td></tr>
+    <tr><td>Способ возврата ДС, реквизиты</td><td>Ввод клиентом (оплата курьеру); транзит из RCRM</td><td>Ввод и смена «Дружбой»</td><td class="role">Хранит, выводит в отчёт</td><td class="muted">—</td></tr>
+    <tr><td>Комментарий «Дружбы»</td><td>Транзит в КА</td><td class="role">Создаёт</td><td>Получает, выводит в отчёт</td><td class="muted">—</td></tr>
+    <tr><td>Статус возврата</td><td>Отображает, транслирует в RCRM</td><td>Отображает</td><td class="role">Мастер</td><td class="muted">—</td></tr>
+    <tr><td>Плановый возврат → Бетта Про</td><td class="muted">—</td><td class="muted">—</td><td class="role">Формирует</td><td class="muted">—</td></tr>
+    <tr><td>Приёмка, приходный ордер, КМ</td><td class="muted">—</td><td class="muted">—</td><td class="role">Склад: от Бетта; магазин: АРМ</td><td class="muted">—</td></tr>
+    <tr><td>Реестр курьерских возвратов</td><td class="muted">—</td><td class="role">Выгрузка логистами</td><td class="muted">—</td><td class="muted">—</td></tr>
+    <tr><td>Отчёт по возвратам</td><td class="muted">—</td><td class="muted">—</td><td class="role">Формирует</td><td class="muted">—</td></tr>
+    <tr><td>Возврат по розничному чеку</td><td class="muted">—</td><td class="muted">—</td><td class="muted">—</td><td class="role">As-is, следующий этап</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section>
+  <h2>Что нужно решить до ТЗ</h2>
+  <ol class="qs">
+    <li><b>Сайт как узел обмена.</b> Возвраты идут между RCRM и 1С: КА только через сайт/МП. Нужно закрепить, что сайт гарантирует доставку, не создаёт дублей и разрешает коллизии (отмена клиентом одновременно с правкой «Дружбы»). В BRD (FR-6.3) пока записан маршрут сайт → RCRM → 1С — его надо поправить.</li>
+    <li><b>Текущий обмен заказами RCRM ⇄ 1С</b> сохраняется или по возвратным данным отключается, чтобы не было двух источников.</li>
+    <li><b>Магазин при недоступности сайта</b> (NFR-8): как АРМ оформит возврат и как данные дойдут до RCRM позже.</li>
+    <li><b>Плановый возврат в Бетта Про</b> (поток 9): примет ли склад документ, в каком формате, можно ли передавать плановую дату прихода.</li>
+    <li><b>Куда логисты грузят манифесты</b> — в RCRM или в 1С — и как это связано с плановым возвратом.</li>
+    <li><b>Формат QR</b> и чтение его сканером кассы в АРМ КА.</li>
+    <li><b>Хранение электронного заявления</b>: мастер-система и срок (ориентир — 5 лет).</li>
+    <li><b>Бумажный сценарий в магазине.</b> Из п. 5.5 убраны подтверждение в ЛК и бумажное заявление для незарегистрированных клиентов. Нужно решить, как оформляется возврат для клиента без аккаунта и считается ли ещё метрика ≤ 15% бумажных заявлений.</li>
+    <li><b>Ключ идентификации на складе.</b> В п. 5.6 — № заявки на возврат, в п. 5.8 — «№ заказа/возврата», в п. 5.7 — неисправленное «заявки на возвратзаказа». Нужно выровнять формулировки.</li>
+    <li><b>Роль 1С: Розница.</b> В документе не упоминается: возврат интернет-заказа в магазине идёт через АРМ КА. Розница подключится на этапе возвратов по офлайн-чекам.</li>
+  </ol>
+</section>
+
+<p class="src">Источник: BRD «Шаг №1. Отказ от бумаги» (16.09.2026) с правками от 30.09, разделы 3 и 5. Маршрут обмена RCRM ⇄ 1С: КА через сайт/МП — по решению команды. Роль 1С: Розница — из встречи по рознице 08.09.</p>
+</div>
+
+</body></html>
