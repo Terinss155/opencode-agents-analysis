@@ -30,7 +30,7 @@
 ## Разделение контекстов
 - **Бизнес-контекст (код):** `12storeez-master/` — внешний репозиторий (Yii2-монолит 12Storeez). Только для чтения при анализе; **запрещено изменять** (см. раздел «Запрет на изменение `12storeez-master/`») и **запрещено добавлять в git**.
 - **Артефакты аналитики (описывают работу):** `requirements/` — **бандл требований** процесса «Возвраты 2.0» (в репозитории один процесс, поэтому бандл разложен прямо в корне `requirements/`): все документы требований, диаграммы, черновики, справочники. Создавать и сохранять артефакты только здесь. Файлы разных уровней не сваливаются в одну папку — см. «Бандл требований».
-  - `requirements/reference/` — сквозные справочники, не привязанные к одному бандлу процесса: `architecture/` (AS-IS архитектура монолита целиком — backend, БД, API, фронтенд, инфраструктура, интеграции, подводные камни; ведёт `repository-researcher`), `{репозиторий}_структура.md` (карта репозитория; ведёт `repository-researcher`) и `api/{web,mobile}/` (AS-IS API-контракты по каналу — маппинг эндпоинта на код и БД; ведёт `system-analyst`, см. `skill/openapi-spec`). Не путать с `requirements/*_структура.md` ниже — это разбор кода одного конкретного процесса, а не всей базы.
+  - `requirements/reference/` — сквозные справочники, не привязанные к одному бандлу процесса: `architecture/` (AS-IS архитектура монолита целиком — backend, БД, API, фронтенд, инфраструктура, интеграции, подводные камни; ведёт `repository-researcher`), `{репозиторий}_структура.md` (карта репозитория; ведёт `repository-researcher`) `database/` (справочники значений из БД монолита — статусы заказа, позиций, маппинг Mindbox, WMS; выгрузки предоставляет команда, ведёт `system-analyst`) и `api/{web,mobile}/` (AS-IS API-контракты по каналу — маппинг эндпоинта на код и БД; ведёт `system-analyst`, см. `skill/openapi-spec`). Не путать с `requirements/*_структура.md` ниже — это разбор кода одного конкретного процесса, а не всей базы.
   - `requirements/drafts/` — исходные бизнес-материалы (транскрибации встреч, резюме, ТЗ и бизнес-процессы от бизнеса/продукта, присланные файлы). **Первоисточник, доступен только для чтения — менять, дополнять или переписывать запрещено** (см. «Запрет на изменение `requirements/drafts/`»). Обработка и переосмысление этих материалов оформляется как новый артефакт аналитики в `requirements/`, а не правкой файла-источника.
   - `requirements/*_структура.md` — точечные справочники по коду одного процесса (например `order-view_структура.md`; пути, строки, ключевые факты; ведёт `repository-researcher`).
 - **Отчёты:** `reports/` — ревью и отчёты о качестве по бандлу требований (создать, если нет). Не версионируются в git (см. `.gitignore`) — это локальные рабочие артефакты, а не часть бандла требований.
@@ -43,7 +43,7 @@
 |---|---|---|
 | `product-owner` | primary | `user-story`, `backlog-prioritization`, `business-case`, `product-roadmap`, `stakeholder-map`, `adr` |
 | `business-analyst` | primary | `business-process-bpmn`, `brd`, `use-case`, `screen-spec`, `traceability-matrix`, `gap-analysis`, `brs`, `adr` |
-| `system-analyst` | primary | `backend-logic`, `erd-model`, `sequence-diagram`, `openapi-spec`, `asyncapi-spec`, `nfr-requirements`, `adr` |
+| `system-analyst` | primary | `backend-logic`, `backend-task`, `srs`, `erd-model`, `sequence-diagram`, `openapi-spec`, `asyncapi-spec`, `nfr-requirements`, `adr` |
 | `repository-researcher` | primary | — (опц. `sequence-diagram` для C4 / sequence-схем) |
 | `security-reviewer` | subagent | `security-review-checklist` |
 
@@ -64,7 +64,7 @@ requirements/
 ├── adr/            ← [ГГГГ-ММ-ДД ЧЧ-ММ] ADR-<ТЕМА>-<NNN>-<решение>-vN.md, значимые решения и компромиссы с версиями (skill/adr)
 ├── as-is/          ← пошаговый AS-IS + as-is.bpmn.md (skill/business-process-bpmn)
 ├── to-be/          ← to-be.bpmn.md, если есть
-├── backend/        ← задачи для бэка (SIS)
+├── backend/        ← задачи для бэка (SIS): логика (skill/backend-logic) и черновики задач в трекер (skill/backend-task)
 ├── diagrams/       ← все диаграммы: diagrams/<тип>/<as-is|to-be>/<объект>_<тип>.<ext>
 │   ├── sequence/   ← sequence-диаграммы (skill/sequence-diagram)
 │   ├── erd/        ← модели данных / ERD (skill/erd-model)
@@ -170,7 +170,7 @@ requirements/
 
 ## Конвенция имён файлов
 - `business-analyst`: `index.md`, `brd.md`, `traceability.md`, `as-is.bpmn.md`, `to-be.bpmn.md`, `use-case.md`, `screen-spec.md`, `gap-analysis.md`, `brs.md`, `[ГГГГ-ММ-ДД ЧЧ-ММ] ADR-<ТЕМА>-<NNN>-<решение>-vN.md`
-- `system-analyst`: `backend.md`, `<объект>_erd.*` + `sql.sql`, `<объект>_sequence.plantuml`, `<объект>_state.md` (в `diagrams/<тип>/<as-is|to-be>/`), `openapi.yaml`, `asyncapi.yaml`, `nfr.md`, `[ГГГГ-ММ-ДД ЧЧ-ММ] ADR-<ТЕМА>-<NNN>-<решение>-vN.md`
+- `system-analyst`: `backend.md`, `backend/US-NN/<теги> <объект>_task.md` (задача на бэк, `skill/backend-task`; папка — User Story из Трекера, например `[B][Mobile API] order-card-return_task.md`), `<объект>_erd.*` + `sql.sql`, `<объект>_sequence.plantuml`, `<объект>_state.md` (в `diagrams/<тип>/<as-is|to-be>/`), `openapi.yaml`, `asyncapi.yaml`, `nfr.md`, `[ГГГГ-ММ-ДД ЧЧ-ММ] ADR-<ТЕМА>-<NNN>-<решение>-vN.md`
 - `product-owner`: `user-story.md`, `backlog-priority.md`, `business-case.md`, `roadmap.md`, `stakeholder-map.md`, `[ГГГГ-ММ-ДД ЧЧ-ММ] ADR-<ТЕМА>-<NNN>-<решение>-vN.md`
 - `repository-researcher`: `requirements/*_структура.md`
 - Ревью/отчёты: папка `reports/` (создать, если нет); `security-reviewer` → `{артефакт}_security_review.md`, `system-analyst` (по явному запросу) → `{артефакт}_review_report.md`.

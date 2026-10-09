@@ -173,7 +173,7 @@ Content-Type: application/json
 
 ```json
 {
-  "status": "error", "success": false, "code": "INVALID_REQUEST",
+  "status": "error", "success": false, "code": "40000",
   "data": {
     "method_return": "courier", "city_return": "Москва",
     "index_return": "12", "address_return": "…", "date_return": "2026-09-10",

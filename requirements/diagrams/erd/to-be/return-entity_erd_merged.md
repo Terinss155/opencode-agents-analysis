@@ -26,7 +26,7 @@
 |---|---|---|---|
 | 1 | `cms_return_tk`, `cms_returns.return_tk_id` | Таблицы нет. В заявке `return_method_id` → `cms_return_method.id` и `delivery_tk_id` → `cms_delivery_tk.id` | Таблица зачёркнута на схеме с доски; службы уже есть в `cms_delivery_tk` |
 | 2 | `cms_return_tk.rcrm_tk_id` | `cms_return_method.rcrm_tk_id` (новое поле) | Коды RetailCRM сейчас зашиты по способу возврата в `ReturnMethodEnum` (13 курьер, 567 СДЭК, 55 5Post) |
-| 3 | `cms_return_tk_city` | Таблицы нет. Покрытие по существующей `cms_delivery_city` + новый признак `is_return_available` | Так уже работает `DeliveryCityRepository::findReturnVariantTypesByGeoIds` |
+| 3 | `cms_return_tk_city` | Таблицы нет. Покрытие по существующей `cms_delivery_city` + новый признак `for_returns` | Так уже работает `DeliveryCityRepository::findReturnVariantTypesByGeoIds` |
 | 4 | `cms_return_status_history` | Таблицы нет. Переходы статусов - строки `cms_return_changes` | Таблица зачёркнута на схеме с доски; одна лента изменений вместо двух |
 | 5 | `cms_return_changes`: строка = одно поле | Строка = одно событие: `diff` + полный `snapshot` заявки | Решение: хранить в изменениях заявки всё и собирать PDF на лету |
 | 6 | Заявление формируется из текущих данных заявки | Заявление формируется из `snapshot` своей версии своим шаблоном (`template_version`) | Версии и «аннулировано» при отмене (BRD 5.3); данные заказа, причины и шаблон со временем меняются |
@@ -128,7 +128,7 @@ erDiagram
         int(3) delivery_method "NULL, IDX: служба доставки (лог.)"
         varchar(255) delivery_slug "NULL: копия cms_delivery_tk.slug"
         tinyint(1) payment_method "NULL: способ оплаты (лог.)"
-        smallint(6) store_code "unsigned NULL: магазин самовывоза (лог.)"
+        smallint(6) store_code "unsigned NULL: магазин сборки заказа C&C / экспресс (лог.)"
         varchar(255) country "NULL: страна"
         varchar(255) state "NULL: регион"
         varchar(255) city "NULL: город"
@@ -230,7 +230,7 @@ erDiagram
         varchar(255) city "NULL, IDX"
         varchar(255) geo_id "NULL, без индекса: ФИАС / Google Place ID"
         tinyint(3) _state "NOT NULL 0: активность"
-        tinyint(1) is_return_available "НОВОЕ, NOT NULL 1: служба принимает возвраты"
+        tinyint(1) for_returns "НОВОЕ, NOT NULL 0: служба принимает возвраты"
     }
 
     %% Зачем: магазины; список магазинов, принимающих возвраты, и слепок адреса в заявке
@@ -605,7 +605,7 @@ erDiagram
 | 6 | `delivery_method` | `int(3)` | FK (лог.), IDX | Да | `NULL` | Служба доставки заказа.<br>Связь: `cms_orders.delivery_method = cms_delivery_tk.id` |
 | 7 | `delivery_slug` | `varchar(255)` | | Да | `NULL` | Копия `cms_delivery_tk.slug` на момент заказа |
 | 8 | `payment_method` | `tinyint(1)` | FK (лог.) | Да | `NULL` | Способ оплаты.<br>Связь: `cms_orders.payment_method = cms_payment_types.internal_id` |
-| 9 | `store_code` | `smallint(6) unsigned` | FK (лог.) | Да | `NULL` | Магазин самовывоза. Для автовыбора магазина возврата.<br>Связь: `cms_orders.store_code = cms_catalog_stock.store_code` |
+| 9 | `store_code` | `smallint(6) unsigned` | FK (лог.) | Да | `NULL` | Магазин, из которого собирается заказ: магазин с наибольшим остатком для Click&Collect, магазин экспресс-самовывоза. У заказов со склада сайта пусто или `100` (`Stock::SITE_STORE_CODE`, может проставить 1С). **Не магазин самовывоза:** магазин самовывоза определяется по службе доставки — `cms_orders.delivery_method` → `cms_delivery_tk.store_code` → `cms_catalog_stock.store_code`.<br>Связь: `cms_orders.store_code = cms_catalog_stock.store_code` |
 | 10 | `country` | `varchar(255)` | | Да | `NULL` | Страна доставки |
 | 11 | `state` | `varchar(255)` | | Да | `NULL` | Регион доставки |
 | 12 | `city` | `varchar(255)` | | Да | `NULL` | Город доставки |
@@ -724,7 +724,7 @@ erDiagram
 | 5 | `city` | `varchar(255)` | IDX | Да | `NULL` | Город |
 | 6 | `geo_id` | `varchar(255)` | | Да | `NULL` | ФИАС GUID для РФ, Google Place ID для других стран. Сравнивается с `cms_orders.city_fias` / `cms_returns.city_fias`. **Индекса нет** - добавить |
 | 7 | `_state` | `tinyint(3)` | | Нет | `0` | Активность записи |
-| 8 | `is_return_available` | `tinyint(1)` | | Нет | `1` | **Новое поле.** Служба принимает возвраты в этом городе. По умолчанию `1`: покрытие возвратов совпадает с покрытием доставки |
+| 8 | `for_returns` | `tinyint(1)` | | Нет | `0` | **Новое поле.** Служба принимает возвраты в этом городе. По умолчанию `0`: возвраты включаются явно |
 
 ### 4.11. `cms_catalog_stock` - магазины и склады
 
@@ -761,7 +761,7 @@ erDiagram
 
 ### 4.13. `cms_giftcard_use` - списания сертификатов
 
-**Зачем нужна:** сколько по заказу списано с подарочных сертификатов. Нужна для расчёта строки `certificate` в `cms_return_refunds` (по комментариям к BRD деньги возвращаются на сертификат).
+**Зачем нужна:** сколько по заказу списано с подарочных сертификатов. Нужна для расчёта строки `certificate` в `cms_return_refunds` (в MVP деньги на сертификат не возвращаются: оплаченная сертификатом сумма возвращается по реквизитам — `RULE-37`, `ADR-RET-046`; возврат на сертификат — Post-MVP).
 
 | # | Атрибут | Тип | Ключ | NULL | По умолчанию | Описание |
 |---|---|---|---|---|---|---|
@@ -1059,7 +1059,7 @@ erDiagram
 9. Статус «деньги возвращены» (`cms_return_refunds.refunded_at`): откуда приходит (1С или RetailCRM) и ставится ли «Возврат завершён» только после него.
 10. Мастер-система для заявки: RetailCRM или 1С. От этого зависит, чьё изменение побеждает при конфликте в `cms_return_changes`.
 11. Где хранится ключ шифрования реквизитов и кто в админке видит их расшифрованными.
-12. Нужен ли `is_return_available` в `cms_delivery_city` в MVP или хватит текущего покрытия доставки.
+12. Нужен ли `for_returns` в `cms_delivery_city` в MVP или хватит текущего покрытия доставки.
 13. Срок для F&F: 30 дней (доска) или 31 (комментарий к BRD).
 14. Что приходит в `cms_orders.return_store` из RetailCRM: `store_code` магазина или его ID в RetailCRM.
 15. Сделать ли `cms_delivery_types.internal_id` уникальным (сейчас только индекс), чтобы у `cms_return_method_delivery_type` появился настоящий FK.

@@ -86,6 +86,14 @@
 | Карточка заказа | `OrdersEndpoint.orderDetail(id:)` | GET | `orders/\(id)` | легаси |
 | Отмена заказа | `OrdersEndpoint.cancel(id:)` | DELETE | `orders` (тело: `{order_id}`) | легаси |
 
+> **✅ Обновлено 07.10.2026 — сваггер нового шлюза.** Команда МП прислала сваггер Mobile API Gateway (`mobile.12stz.com/api`): [`api/mobile/mobile-gateway_swagger.yaml`](./api/mobile/mobile-gateway_swagger.yaml) (Swagger 2.0, «Mobile API Gateway», v1.0). Он закрывает открытый вопрос ниже о маршрутах `v1/delivery/...`:
+> - `GET /api/v1/delivery/{order_id}/return-method-list` — «Proxy to http mobile/orders/{order_id}/return-method-list» → монолит, `Mobile\OrdersController::actionReturnMethodList()`;
+> - `POST /api/v1/delivery/{order_id}/return-details` — «Proxy to http mobile/orders/{order_id}/return-details» → монолит, `Mobile\OrdersController::actionReturnDetails()`.
+>
+> Отдельного сервиса для возврата нет. Новый шлюз только меняет внешнюю форму пути и проксирует запрос в те же обработчики монолита, что описаны в `docs/mobileApi/openapi.yml`. Остальных методов возврата и заказа из таблицы (`orders/{id}/return`, `orders/v2/return-reasons`, `GET orders/{id}`, `GET orders`, `DELETE orders`) в сваггере нового шлюза нет: из заказов там только `POST /api/v1/orders` (создание) и `POST /api/v2/orders/{order_id}/change-payment-method`. Значит, эти методы обслуживает старый шлюз `core.12stz.com/api`. Его сваггер доступен только на сайте и в репозиторий не выгружен, поэтому проксирование старого шлюза по-прежнему подтверждено только по коду монолита.
+>
+> Дефект сваггера: у `return-method-list` параметры `country_iso` и `region` объявлены как `in: path`, хотя в шаблоне пути их нет. iOS-клиент передаёт их в query.
+>
 > **✅ Сверено с бэкендом (`12storeez-master`), 12.09.2026.** Реальные хосты подтверждены конфигом сборки iOS (`TwelveStoreez/Resources/Configuration/*.xcconfig`): легаси `BASE_URL` = **`core.12stz.com/api`** (прод) / `core.12stz.dev/api` (dev); новый `BASE_URL_NEW` = **`mobile.12stz.com/api`** (прод) / `mobile.12stz.dev/api` (dev). Ни одна из этих двух строк нигде не встречается в коде монолита `12storeez-master` (маршрутизация доменов — на уровне инфраструктуры/шлюза, вне обоих репозиториев) — поэтому окончательно, к какому бэкенду ведёт каждый домен, можно подтвердить только логами трафика или конфигурацией шлюза, не исходным кодом.
 >
 > **По путям — подтверждено на уровне кода:**
@@ -129,3 +137,4 @@
 |--------|----------------|-------|--------------------|
 | 1.0 | 12.09.2026 | Системный аналитик | Первичное создание документа на основе анализа реального iOS-клиента (`12storeez-ios-develop`); зафиксировано расхождение реального эндпоинта возврата (`POST orders/{id}/return`) с ранее задокументированным предположением (`POST /mobile/orders/return-positions`) |
 | 1.1 | 12.09.2026 | Системный аналитик | Сверено с кодом бэкенда (`12storeez-master`): подтверждено, что `POST orders/{id}/return` маршрутизируется в `Mobile\OrdersController::actionReturnPositions()` (через `Mobile\Rules\UrlRule.php`); подтверждено, что `v1/delivery/{id}/return-method-list` и `v1/delivery/{id}/return-details` — пути, которых **нет** ни в одном маршруте монолита (модуль `deliveryV2` не имеет контроллера заказов/возврата) и нет в официальной openapi-спеке Mobile API |
+| 1.2 | 07.10.2026 | Системный аналитик | §4.3: по сваггеру нового шлюза (`api/mobile/mobile-gateway_swagger.yaml`) закрыт вопрос о маршрутах `v1/delivery/{id}/return-method-list` и `return-details` — шлюз проксирует их в `mobile/orders/{id}/...` монолита; зафиксировано, что остальные методы возврата и заказа идут через старый шлюз `core` |

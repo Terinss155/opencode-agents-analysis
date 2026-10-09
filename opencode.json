@@ -11,6 +11,8 @@
     "skill": {
       "*": "deny",
       "backend-logic": "allow",
+      "backend-task": "allow",
+      "srs": "allow",
       "erd-model": "allow",
       "sequence-diagram": "allow",
       "openapi-spec": "allow",
