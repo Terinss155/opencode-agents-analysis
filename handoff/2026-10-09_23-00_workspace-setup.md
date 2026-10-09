@@ -39,6 +39,14 @@ Claude Code с одинаковыми инструкциями и огранич
 - iOS: заменить копию `new/12storeez-ios-develop` клоном в `12stz` (после проверки пользователем).
 - Права на запись в `12stz_sandbox`/`12stz_fix` у пользователя БД — оставить или попросить снять.
 
+## Новое (10.10.2026): в 12stz добавлены два репозитория
+- `esb-monorepo` — NestJS/Nx (TypeScript): `apps/mobile-api`, `apps/usedesk-gate`, libs (orders, cart, geo, gateway-1c, stores…); `master`, `beba6e61`.
+- `mobile-monorepo-go` — Mobile API на Go (`cmd/mobile_api`); `master`, `f302aeb`.
+- PhpStorm открыт на корне `12stz` (своя `.idea`, `12stz_staging` — read-only, тот же uuid).
+- Следующие шаги (после коммита): `repository-researcher` — `knowledge/esb-monorepo/repo-map.md`,
+  `knowledge/mobile-monorepo-go/repo-map.md`, добавить их в `knowledge/README.md`; найти реализацию
+  `v1/delivery/{orderId}/return-method-list` и `return-details` (в монолите их нет — см. `knowledge/12storeez-ios/repo-map.md`).
+
 ## Что прочитать новой сессии
 - `AGENTS.md` — правила и структура; `CLAUDE.md`.
 - `knowledge/README.md` — навигатор по коду.
