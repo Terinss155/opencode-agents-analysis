@@ -10,7 +10,7 @@
 > **Проксирование (шлюз/API-gateway):** внешний запрос `GET /api/orders/{order_id}` проксируется на внутренний путь монолита `GET /mobile/orders/{order_id}`.
 > Внутри монолита Yii2 UrlManager (правило `src/Modules/Mobile/Rules/UrlRule.php`, строка 87-89) разбирает pathInfo `mobile/orders/{id}` и возвращает маршрут (route) `mobile/orders` с параметром `id` — это **внутренняя маршрутизация Yii2, а не HTTP-вызов**.
 > Далее маршрут `mobile/orders` диспатчится на `Mobile\OrdersController::actionIndex()`, который читает `id` из query-параметра (`Yii::$app->request->get('id')`).
-> **Важно:** в swagger (`docs/mobileApi/openapi.yml`, строка 1653) просмотр заказа описан как `GET /mobile/orders/{orderId}` (`operationId: getOrderById`). Пути `/orders/{orderId}/...` существуют только для операций возврата (return-details, return-method-list).
+> **Важно:** в swagger (`docs/openapi/mobile.yml`, строка 5433; сверено 09.10.2026) просмотр заказа описан как `GET /mobile/orders/{orderId}` (`operationId: getOrderById`). Пути `/orders/{orderId}/...` существуют только для операций возврата (return-details, return-method-list).
 
 ---
 

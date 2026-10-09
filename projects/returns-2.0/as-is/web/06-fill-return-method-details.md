@@ -99,8 +99,6 @@ sequenceDiagram
 | Подсказки улиц / домов / деталей адреса | гео-эндпоинты сайта: `GET /api/v1/delivery/geo/countries/{countryIso}/addresses`, `.../addresses/{geo_id}/details` |
 | Доступные даты | список `available_dates_return` из ответа шага 05 (расчёт описан там же) |
 
-Существующие карточки: [`api/web/geo/get-addresses.md`](../../reference/api/web/geo/get-addresses.md), [`api/web/geo/get-address-details.md`](../../reference/api/web/geo/get-address-details.md).
-
 ### 2.2 Как система собирает данные
 
 На этом шаге сервер процесса возврата не вызывается (обращения идут только к гео-подсказкам). Даты уже получены на шаге 05.

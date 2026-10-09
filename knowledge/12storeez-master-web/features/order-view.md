@@ -37,12 +37,12 @@ OrderMobileTransformer::transformForMobile($order) → JSON
 
 | Что | Файл | Где именно |
 |-----|------|------------|
-| Контроллер (обработчик) | `src/Modules/Mobile/Controllers/OrdersController.php` | `actionIndex()` — строка **278**; чтение `id` из query — строка **287** (`Yii::$app->request->get('id')`); `getOrders()` — строка **622** |
+| Контроллер (обработчик) | `src/Modules/Mobile/Controllers/OrdersController.php` | `actionIndex()` — строка **200**; чтение `id` из query — строка **209** (`Yii::$app->request->get('id')`); `getOrders()` — строка **544** (сверено 09.10.2026) |
 | Правило маршрутизации | `src/Modules/Mobile/Rules/UrlRule.php` | строка **87-89**: regex `/orders\/\d+/` → route `mobile/orders` + `['id' => ...]` |
 | Трансформер ответа | `src/Modules/Order/Transformer/OrderMobileTransformer.php` | `transformForMobile($order, full=true)` |
 | Репозиторий | `src/Modules/Order/Repository/OrderRepository.php` | `findOneByIdAndUserId($orderId, $userId)` |
 | Базовый контроллер Mobile | `src/Modules/Mobile/Controllers/ApiBaseController.php` | авторизация, ответы |
-| **Swagger (источник правды по путям)** | `docs/mobileApi/openapi.yml` | строка **1653**: `GET /mobile/orders/{orderId}` (`operationId: getOrderById`) — просмотр заказа; строка **950**: `GET /mobile/orders` — список; параметр `orderId` — строка **6487** |
+| **Swagger (источник правды по путям)** | `docs/openapi/mobile.yml` | строка **5433** (сверено 09.10.2026): `GET /mobile/orders/{orderId}` (`operationId: getOrderById`) — просмотр заказа; строка **950**: `GET /mobile/orders` — список; параметр `orderId` — строка **6487** |
 
 ## 1.3. Аутентификация Mobile
 
@@ -110,7 +110,7 @@ UserOrderExtractor::extract($orderDto) → server-side HTML (render 'base')
 
 | # | Факт | Подробности |
 |---|------|-------------|
-| 1 | **Mobile: путь в swagger — `/mobile/orders/{orderId}`, а НЕ `/orders/{orderId}`** | `docs/mobileApi/openapi.yml:1653` (`getOrderById`). Пути `/orders/{orderId}/...` в swagger есть только для return-details (строка 1270) и return-method-list (строка 1818) |
+| 1 | **Mobile: путь в swagger — `/mobile/orders/{orderId}`, а НЕ `/orders/{orderId}`** | `docs/openapi/mobile.yml:5433` (`getOrderById`). Пути `/orders/{orderId}/...` в swagger есть только для return-details (строка 1270) и return-method-list (строка 1818) |
 | 2 | **`mobile/orders (id в query)` — это НЕ третий сетевой вызов** | Это внутренняя маршрутизация Yii2: `UrlRule::parseRequest()` извлекает `id` из pathInfo и кладёт в query-параметры, затем диспатчит на `actionIndex()` |
 | 3 | **Web НЕ ходит через API Gateway** | `GET /profile/view/{id}` → напрямую в монолит (`config/url.php:23`). Gateway участвует только в Mobile-канале |
 | 4 | **Web-аутентификация — cookie `_identity`, НЕ JWT Bearer** | `config/web.php:104-110` (enableAutoLogin, identityCookie). `AuthRequiredBehavior` проверяет `isGuest` |
@@ -141,7 +141,7 @@ UserOrderExtractor::extract($orderDto) → server-side HTML (render 'base')
 # 6. Быстрый чек-лист при новой задаче «просмотр заказа»
 
 1. Определи канал: **Mobile** (через gateway) или **Web** (напрямую)?
-2. Mobile → открой `docs/mobileApi/openapi.yml` (путь), `OrdersController.php` (логика), `OrderMobileTransformer.php` (формат ответа).
+2. Mobile → открой `docs/openapi/mobile.yml` (путь), `OrdersController.php` (логика), `OrderMobileTransformer.php` (формат ответа).
 3. Web → открой `config/url.php` (маршрут), `ProfileController.php` (логика), `UserOrderExtractor.php` + `UserOrderPositionExtractor.php` (формат ответа).
 4. Таблицы БД → раздел 3 этого справочника.
 5. Сверься с ключевыми фактами (раздел 4) — там собраны все ранее найденные «грабли».

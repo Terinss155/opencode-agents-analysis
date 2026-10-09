@@ -2,7 +2,7 @@
 
 > Единый словарь имён полей запросов и ответов. Задача: один смысл — одно имя во всех новых и дорабатываемых методах,
 > на сайте, в Mobile API и на Gate. Собран по примерам задач (`../examples/`), AS-IS процесса возврата
-> (`requirements/as-is/`) и AS-IS-контрактам (`requirements/reference/api/`), 03.10.2026.
+> (`projects/returns-2.0/as-is/`) и AS-IS-контрактам (`knowledge/12storeez-master-web/api/`, `projects/returns-2.0/as-is/api/`), 03.10.2026.
 
 ## Правила
 

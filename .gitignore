@@ -53,3 +53,9 @@ build/
 *.min.js
 *.min.css
 
+
+# Claude Code: ссылка (junction) на skill/ — не дублировать скиллы в git
+/.claude/skills
+# Claude Code: локальные настройки и служебные файлы
+/.claude/settings.local.json
+/.claude/scheduled_tasks.lock

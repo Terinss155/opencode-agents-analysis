@@ -101,7 +101,7 @@ sequenceDiagram
    - `result.current_datetime` — московское время в формате «ГГГГ-ММ-ДД ЧЧ:ММ:СС»;
    - `result.available_dates_return` — список доступных дат для способа «Курьер» (расчёт как на шаге [05](05-select-return-method.md), с учётом мобильного флага способа `is_enabled_mobile`).
 
-Аналог в core-контуре — `GET /api/orders/v2/return-reasons` ([`api/core/orders/get-return-reasons.md`](../../reference/api/core/orders/get-return-reasons.md); в официальном gateway-описании метод отсутствует).
+Аналог в core-контуре — `GET /api/orders/v2/return-reasons` (в официальном gateway-описании метод отсутствует).
 
 Выбор причины по позиции сервер на этом шаге не принимает — соответствие «`code` ↔ причина» проверяется на шаге 07 (перебирает `code` из запроса по `cms_return_reasons`).
 

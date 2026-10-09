@@ -1,0 +1,18 @@
+{
+  "agent": "system-analyst",
+  "permissions": {
+    "additionalDirectories": [
+      "C:\\Users\\RobotComp.ru\\Desktop\\12stz"
+    ],
+    "allow": [
+      "Bash(pwd)",
+      "Bash(ls *)",
+      "Bash(find *)",
+      "Bash(cat *)"
+    ],
+    "ask": [
+      "Bash(git commit *)",
+      "Bash(git push *)"
+    ]
+  }
+}

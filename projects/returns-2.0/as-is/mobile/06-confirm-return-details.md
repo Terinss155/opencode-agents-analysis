@@ -102,8 +102,6 @@ sequenceDiagram
 6. **Отправляет заказ в RetailCRM** (в очередь).
 7. Ответ: `{ "success": true, "result": {} }`.
 
-Карточка: [`api/mobile/delivery/post-return-details.md`](../../reference/api/mobile/delivery/post-return-details.md).
-
 ### 2.3 Обмен по API
 
 ```http

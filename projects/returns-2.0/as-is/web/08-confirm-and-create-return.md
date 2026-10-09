@@ -198,8 +198,6 @@ Content-Type: application/json
 { "data": [], "errorCode": null, "errors": [], "message": "success", "success": true }
 ```
 
-Существующие карточки: [`api/web/orders/post-return-details.md`](../../reference/api/web/orders/post-return-details.md), [`api/web/orders/post-save-reason.md`](../../reference/api/web/orders/post-save-reason.md).
-
 ### 2.4 Что использует сайт
 
 | Данные | Использование |

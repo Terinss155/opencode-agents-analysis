@@ -285,9 +285,9 @@ Symfony Serializer используется ограниченно — для р
 
 | Файл | База | Путей | Операций | `operationId` | Область |
 |---|---|---|---|---|---|
-| `docs/mobileApi/openapi.yml` | `https://12storeez.com/mobile` | 113 | 138 | 138 | Mobile v1 и v2 |
-| `docs/frontend/openapi.yml` | `https://12storeez.com/` | 144 | 152 | 114 | Web: авторизация, корзина, каталог |
-| `docs/ssr/openapi.yml` | `https://12storeez.com/ssr/api/` | 21 | 21 | 5 | Авторизация, вишлист, меню |
+| `docs/openapi/mobile.yml` | `https://12storeez.com/mobile` | 113 | 138 | 138 | Mobile v1 и v2 |
+| `docs/openapi/frontend.yml` | `https://12storeez.com/` | 144 | 152 | 114 | Web: авторизация, корзина, каталог |
+| ~~`docs/ssr/openapi.yml`~~ (удалён 16.09.2026) | `https://12storeez.com/ssr/api/` | 21 | 21 | 5 | Авторизация, вишлист, меню |
 
 У `frontend` и `ssr` спецификаций часть операций не имеет `operationId` — на подсчёт покрытия
 это не влияет, так как проверка ниже вообще не использует `operationId`.

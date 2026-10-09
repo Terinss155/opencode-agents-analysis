@@ -108,7 +108,7 @@ sequenceDiagram
 
 ### 2.3 Обмен по API
 
-**Запрос:** `GET /mobile/orders/{order_id}` с авторизацией мобильной сессии. В core-контуре тот же смысл имеет `GET /api/orders/{order_id}` (карточка: [`api/core/orders/get-order.md`](../../reference/api/core/orders/get-order.md)).
+**Запрос:** `GET /mobile/orders/{order_id}` с авторизацией мобильной сессии. В core-контуре тот же смысл имеет `GET /api/orders/{order_id}`.
 
 **Ответ** (сокращённо, значимые для возврата поля):
 

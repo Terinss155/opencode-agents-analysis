@@ -29,6 +29,8 @@
       "business-process-bpmn": "allow",
       "brd": "allow",
       "traceability-matrix": "allow",
+      "gap-analysis": "allow",
+      "handoff": "allow",
       "adr": "allow",
       "security-review-checklist": "allow"
     }

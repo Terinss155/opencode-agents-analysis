@@ -16,13 +16,13 @@
 
 ### 1.2 Что система отображает / данные
 
-Поле или экран выбора страны и города. Данные — из мобильного гео-API. **Маршруты ниже в этом репозитории отсутствуют** — они относятся к мобильному шлюзу и взяты из его официального swagger-описания (см. `api/index.md`):
+Поле или экран выбора страны и города. Данные — из мобильного гео-API. **Маршруты ниже в этом репозитории отсутствуют** — они относятся к мобильному шлюзу и взяты из его официального swagger-описания (см. [`mobile-gateway_swagger.yaml`](../../../../knowledge/12storeez-master-web/api/mobile/mobile-gateway_swagger.yaml)):
 
-| Назначение | Эндпоинт (шлюз) | Карточка |
-|---|---|---|
-| Страны | `GET /api/v1/geo/countries` | [`api/mobile/geo/get-countries.md`](../../reference/api/mobile/geo/get-countries.md) |
-| Города страны / поиск | `GET /api/v1/geo/countries/{country_iso_code}/cities` | [`api/mobile/geo/get-cities.md`](../../reference/api/mobile/geo/get-cities.md) |
-| Детали города по идентификатору | `GET /api/v1/geo/countries/{country_iso_code}/cities/{geo_id}/details` | [`api/mobile/geo/get-city-details.md`](../../reference/api/mobile/geo/get-city-details.md) |
+| Назначение | Эндпоинт (шлюз) |
+|---|---|
+| Страны | `GET /api/v1/geo/countries` |
+| Города страны / поиск | `GET /api/v1/geo/countries/{country_iso_code}/cities` |
+| Детали города по идентификатору | `GET /api/v1/geo/countries/{country_iso_code}/cities/{geo_id}/details` |
 
 ### 1.3 Действия пользователя
 

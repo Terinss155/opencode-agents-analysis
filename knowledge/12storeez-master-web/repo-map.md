@@ -25,7 +25,7 @@
 | `modules/` | Модули Yii2 (старый слой): контроллеры, модели, репозитории, сервисы, views |
 | `src/` | Новый слой кода (namespace `Application\`): сервисы, DTO, репозитории, фасады |
 | `config/` | Конфигурация приложения (common, web, console, url, modules, events, log, i18n) |
-| `migrations/` | Миграции БД (~197 файлов) |
+| `migrations/` | Миграции БД (208 файлов на 09.10.2026) |
 | `components/` | Компоненты: `goqr/`, `mindbox/`, `rabbitmq/` |
 | `coreExtends/` | Расширения ядра (исключения, логирование) |
 | `di/` | DI-контейнер (определения сервисов) |
@@ -54,7 +54,7 @@
 
 ---
 
-## 3. `modules/` — старый слой (65 модулей)
+## 3. `modules/` — старый слой (64 модуля на 09.10.2026)
 
 ### 3.1. Ключевые бизнес-модули
 
@@ -263,9 +263,9 @@ Validators/      — валидаторы (OrderRefundValidator, CreateOrderCart
 
 | Файл | Назначение |
 |---|---|
-| `docs/mobileApi/openapi.yml` | OpenAPI мобильного API |
-| `docs/frontend/openapi.yml`, `docs/frontend/entry-architecture.md` | OpenAPI и архитектура фронтенда |
-| `docs/ssr/openapi.yml` | OpenAPI SSR |
+| `docs/openapi/mobile.yml` | OpenAPI мобильного API (до 16.09.2026 — `docs/mobileApi/openapi.yml`) |
+| `docs/openapi/frontend.yml`, `docs/frontend/entry-architecture.md` | OpenAPI и архитектура фронтенда |
+| ~~`docs/ssr/openapi.yml`~~ | OpenAPI SSR — удалён 16.09.2026 |
 | `docs/diagrams/bnpl/abstractPayement.mmd` | Mermaid-диаграмма BNPL |
 | `docs/diagrams/elastic/*.mmd` | Mermaid-диаграммы Elasticsearch |
 | `docs/diagrams/yandex-split/*.mmd` | Mermaid-диаграммы Yandex Split |

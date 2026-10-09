@@ -136,8 +136,6 @@ UserRefund[bank_name]=...&UserRefund[bank_inn]=...&UserRefund[bank_bic]=...
 }
 ```
 
-Существующая карточка: [`api/web/user/post-check-bank-details.md`](../../reference/api/web/user/post-check-bank-details.md).
-
 ### 2.4 Что использует сайт
 
 | Данные | Использование |

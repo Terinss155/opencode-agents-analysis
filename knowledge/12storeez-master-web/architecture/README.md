@@ -63,7 +63,7 @@ API и статусной моделью. Артефакты TO-BE будут с
 | Современные модули (`src/Modules/`) | 43 |
 | Контроллеры (всего / админских) | 388 / 127 |
 | ActiveRecord-модели с `tableName()` | 240 |
-| Миграции | 196 (апрель 2025 — август 2026) |
+| Миграции | 208 (апрель 2025 — сентябрь 2026; сверено 09.10.2026) |
 | Модули фронтенда / entry points | 58 / 95 |
 | Консольные команды | 94 |
 | Строк в DI-контейнере | 1516 |
@@ -78,4 +78,4 @@ API и статусной моделью. Артефакты TO-BE будут с
 - изменился способ сборки фронтенда или связка PHP↔Vue.
 
 Описание отдельных фич живёт рядом по теме — например, [docs/sale/categories-sale.md](../../../../12stz/12storeez-master-web/docs/sale/categories-sale.md).
-Контракты API — в `docs/frontend/openapi.yml`, `docs/mobileApi/openapi.yml`, `docs/ssr/openapi.yml`.
+Контракты API — в `docs/openapi/frontend.yml` и `docs/openapi/mobile.yml` (с 16.09.2026; SSR-спека удалена).

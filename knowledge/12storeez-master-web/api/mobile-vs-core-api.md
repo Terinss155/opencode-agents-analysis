@@ -11,9 +11,9 @@
 
 | # | Спека | Файл | Потребитель | Base URL | Эндпоинтов |
 |---|---|---|---|---|---|
-| 1 | **Mobile API** | `docs/mobileApi/openapi.yml` | iOS/Android приложения | `/mobile` | **113** |
-| 2 | **Frontend (Web)** | `docs/frontend/openapi.yml` | Браузерный сайт | `/` | **144** |
-| 3 | **SSR** | `docs/ssr/openapi.yml` | SSR-фронтенд | `/ssr/api/` | **21** |
+| 1 | **Mobile API** | `docs/openapi/mobile.yml` (до 16.09.2026 — `docs/mobileApi/openapi.yml`) | iOS/Android приложения | `/mobile` | **113** |
+| 2 | **Frontend (Web)** | `docs/openapi/frontend.yml` (до 16.09.2026 — `docs/frontend/openapi.yml`) | Браузерный сайт | `/` | **144** |
+| 3 | **SSR** | ~~`docs/ssr/openapi.yml`~~ — удалён 16.09.2026 (коммит `79806a5167`) | SSR-фронтенд | `/ssr/api/` | **21** |
 
 **Все три спеки обслуживаются одним монолитом** (Yii2-приложение), различаются только URL-префиксами.
 
@@ -243,7 +243,7 @@ public function actionList() { ... }
 
 | Вопрос | Ответ |
 |---|---|
-| Есть ли в проекте спека Mobile API? | ✅ Да — `docs/mobileApi/openapi.yml` (113 эндпоинтов) |
+| Есть ли в проекте спека Mobile API? | ✅ Да — `docs/openapi/mobile.yml` (113 эндпоинтов на 09.2026) |
 | Есть ли в проекте спека Core API? | ❌ Нет — `core.12stz.dev` живёт в другом репозитории |
 | Mobile и Core — разные сервисы? | Да. Монолит (mobile + frontend + SSR) и отдельный микросервис (core) |
 | Есть ли отдельный API Gateway-сервис? | Нет. Gateway = инфраструктура (Istio/Nginx), не PHP-компонент |

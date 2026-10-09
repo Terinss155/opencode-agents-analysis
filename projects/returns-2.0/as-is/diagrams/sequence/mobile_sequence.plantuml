@@ -11,9 +11,9 @@ title "Процесс возврата товара: создание заявк
 '   и v1/delivery/{id}/return-details (новый хост mobile.12stz.com) — ТАКИХ маршрутов в монолите
 '   12storeez-master НЕТ (модуль deliveryV2 не имеет контроллера заказов; официальная openapi-спека
 '   Mobile API тоже знает только старый путь .../orders/{id}/return-method-list). Открытый вопрос:
-'   либо отдельный сервис (см. mobile-core-api-research.md), либо спека/маршруты монолита устарели.
-' Детали см. requirements/reference/12storeez-ios_структура.md, §4.3
-' и requirements/as-is/mobile/05-07*.md.
+'   либо отдельный сервис (см. knowledge/12storeez-master-web/api/mobile-vs-core-api.md), либо спека/маршруты монолита устарели.
+' Детали см. knowledge/12storeez-ios/repo-map.md, §4.3
+' и projects/returns-2.0/as-is/mobile/05-07*.md.
 
 ' ============================================================
 ' УЧАСТНИКИ
