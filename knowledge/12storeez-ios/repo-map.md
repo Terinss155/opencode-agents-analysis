@@ -1,133 +1,206 @@
-# Структура репозитория 12storeez-ios-develop
+# Структура репозитория 12storeez-ios
 
-**Назначение документа:** карта-справочник по кодовой базе iOS-приложения 12Storeez (`12storeez-ios-develop`) для быстрого поиска информации при анализе требований и разработке.
+**Назначение документа:** карта-справочник по кодовой базе iOS-приложения 12Storeez: где что лежит, какие запросы приложение шлёт, через какой шлюз и куда они уходят дальше. Для быстрого поиска при анализе требований.
 
-**Дата актуализации:** 2026-09-12
-**Примечание:** папка с исходным кодом (`12storeez-ios-develop/`) — сторонний/внешний код, добавлена в `.gitignore` и не должна попадать в этот git-репозиторий (по аналогии с `12storeez-master/`). Структура описана по фактическому содержимому папок.
+**Дата актуализации:** 10.10.2026
+**Сверено с кодом:** ветка `develop`, коммит `a6de858b` (`a6de858beed5c32b8c92fcebf270293681e08894`, 05.10.2026, «Merge tag '1.86.1' into develop»)
+**Код:** `C:\Users\RobotComp.ru\Desktop\12stz\12storeez-ios\` (только чтение; remote `gitlab.12storeez.com/mobile/ios/12storeez-ios`)
+**Схема цепочки вызовов:** [../architecture/call-chain.html](../architecture/call-chain.html) — iOS → шлюз → монолит → внешние системы, по каждому вызову.
+**Примечание:** пути ниже — от корня репозитория. `Business/` = `TwelveStoreez/Classes/Business/`, `Endpoints/` = `Business/Network/Endpoints/`. Где вывод сделан по названию, а не по коду, — помечено.
 
 ---
 
 ## 1. Общая архитектура
 
-- **Тип:** нативное iOS-приложение (Swift), единый Xcode-проект/workspace `TwelveStoreez.xcodeproj` / `TwelveStoreez.xcworkspace`. Локальных SPM-модулей нет (`Package.swift` в репозитории отсутствует), `Frameworks/` содержит только сторонние бинарные фреймворки (Crashlytics, TMX Profiling).
-- **Управление зависимостями:** CocoaPods (`Podfile`, `Podfile.lock`), + Mint/Brewfile/fastlane для тулинга.
-- **Паттерн:** Storyboard-driven **MVC** со слоем Manager/Service и лёгким DI-контейнером (**Dip**). Это **не** MVVM/VIPER/Clean Swift/TCA — классов `ViewModel`/`Interactor`/`Presenter` (в бизнес-смысле) в кодовой базе нет; навигационного Coordinator-паттерна тоже нет (переходы — через `UIStoryboardSegue`).
-- **Всего файлов `.swift`:** 1071 (включая сгенерированный код, тесты и таргет `NotificationService`).
-- **Два поколения бэкенд-API:** легаси `baseURL` (протокол `RequestTarget`) и новый `baseURLNew` (протокол `RequestTargetNew`) — читаются из `Info.plist` (SwiftGen), с переключателем хоста через `UserDefaults` в non-release сборках. Есть также отдельный `digineticaURL` (аналитика/рекомендации, `RequestTargetDiginetica`).
+- **Тип:** нативное iOS-приложение на Swift, UIKit + Storyboard. Workspace `TwelveStoreez.xcworkspace`, проект `TwelveStoreez.xcodeproj`, таргеты: приложение, `NotificationService` (rich push), `TwelveStoreezTests`.
+- **Паттерн:** MVC со слоем Manager/Service и DI-контейнером **Dip** (`Business/Factories/ManagersAssembly.swift`, `VCAssembly.swift`). ViewModel/Interactor/Coordinator нет, переходы — `UIStoryboardSegue`.
+- **Зависимости:** библиотеки — **Swift Package Manager** (`TwelveStoreez.xcworkspace/xcshareddata/swiftpm/Package.resolved`); CocoaPods (`Podfile`) — только тулинг SwiftGen и SwiftLint. Плюс Mint, Brewfile, fastlane. Бинарные `Frameworks/`: Crashlytics, TMX Profiling.
+- **Сеть:** Alamofire. Два своих хоста (см. §5): `core.12stz.com/api` — старый шлюз (`12stz/esb-monorepo`) и `mobile.12stz.com/api` — новый шлюз (`12stz/mobile-monorepo-go`). Оба почти всё проксируют в монолит `12stz/12storeez-master-web`. Третий хост — трекинг Diginetica.
+- **Локальное хранение:** заказы, корзина, возвраты — только в памяти. CoreData — только история push (`NotificationEntity+*.swift` в корне). Токены — `AuthTokenHolderManager` (Keychain, `keychainaccess`).
 
 ---
 
 ## 2. Корневые папки
 
-| Папка | Назначение |
+| Папка / файл | Назначение |
 |---|---|
-| `TwelveStoreez/Classes/` | Весь исходный код приложения (см. §3) |
-| `TwelveStoreez/Resources/` | Storyboard'ы, ассеты, локализация (`L10n`), plist-файлы |
+| `TwelveStoreez/Classes/` | Весь код приложения (§3) |
+| `TwelveStoreez/Resources/` | Storyboard'ы, ассеты, локализация (`L10n`), plist; `Configuration/*.xcconfig` — хосты (§5) |
 | `TwelveStoreezTests/` | Юнит-тесты |
-| `NotificationService/` | Отдельный таргет — Notification Service Extension (rich push), к заказам/возвратам не относится |
-| `Patch/` | `xcode_16_patch.diff` — патч тулинга сборки, не бизнес-логика |
-| `Frameworks/` | Crashlytics + TMX Profiling (антифрод/фингерпринтинг устройства) — бинарные фреймворки |
-| `NotificationEntity+CoreDataClass.swift`, `+CoreDataProperties.swift` (корень) | CoreData-модель истории push-уведомлений (`UserNotificationsManager`, `Modules/NotificationsHistory/`). **К заказам/возвратам не относится** — единственная CoreData-модель в проекте, заказы и возвраты хранятся только в памяти (см. §4.5) |
-| `ci_scripts/`, `fastlane/`, `hooks/` | CI/сборка |
-| `.bartycrouch.toml`, `.swiftformat`, `.swiftlint.yml` | Конфигурация линтеров/локализации |
+| `NotificationService/` | Notification Service Extension: скачивает картинку push (`NotificationService.swift`) |
+| `Frameworks/` | Crashlytics, TMX Profiling (антифрод, отпечаток устройства) |
+| `Patch/` | Патч тулинга Xcode 16 |
+| `ci_scripts/`, `fastlane/`, `hooks/`, `Makefile` | CI и сборка (Bitrise — `fastlane/bitrise.yml`), `make bootstrap` |
+| `.swiftlint.yml`, `.swiftformat`, `swiftgen.yml`, `.bartycrouch.toml` | Линтеры, генерация кода, локализация |
 
 ---
 
-## 3. `TwelveStoreez/Classes/` — по слоям
+## 3. `TwelveStoreez/Classes/` по слоям
 
 | Папка | Назначение |
 |---|---|
-| `Modules/<Feature>/` | ~80 папок — по одной на экран/фичу (`ReturnOrder/`, `MyOrders/`, `MyOrderDetail/`, `Checkout/`, `Cart/`, ...). Внутри — `XxxVC.swift` (UIViewController), ячейки, вспомогательные extension-файлы |
-| `Business/Network/` | Ядро сетевого слоя: `RequestDescription.swift`, `RequestTarget.swift`/`RequestTargetNew.swift`, `RequestProvider.swift` (на базе **Alamofire**), `RequestProviderProtocol.swift`, `Models/SuccessDataResult.swift` (конверты ответа), `Errors/` (`ServerError`, `MessageError`, `RequestProviderError`) |
-| `Business/Network/Endpoints/` | Один файл — один эндпоинт/группа эндпоинтов: `enum ... : RequestTarget` (легаси API) или `struct ... : RequestTargetNew` (новое API). Профильные для заказов/возврата: `OrdersEndpoint.swift`, `ReturnOrderEndpoint.swift`, `ReturnOrderDetailsEndpoint.swift`, `ReturnOrderMethodsEndpoint.swift`, `CreateOrderEndpoint.swift`, `ChangePaymentTypeEndpoint.swift`, `PaymentTypesEndpoint.swift` |
-| `Business/Managers/` | По-фиче классы `XxxManager` (держат состояние, оркестрируют вызовы Service) — ближайший аналог ViewModel. Для возврата: `Managers/ReturnOrder/ReturnOrderManager.swift`, `ReturnOrderData.swift`, `ReturnAddressData.swift` |
-| `Business/Services/` | Тонкие обёртки над `RequestProvider`, маппят `RequestTarget` → типизированный ответ (аналог Repository/DataSource). Для возврата: `Services/ReturnOrderService.swift` |
-| `Business/Factories/` | DI-контейнер (библиотека **Dip**): `ManagersAssembly.swift`, `VCAssembly.swift` — регистрация Manager/Service/VC |
-| `Business/Constants/`, `Business/Helpers/` | Константы, хелперы |
-| `Models/` | Общие Codable-модели |
-| `Models/Response/` | Модели ответов сервера: `Order.swift` (`OrderItem`), `OrderDetail.swift` (в т.ч. `Return.isBankDataRequired`), `ReturnOrderMethod.swift`, `ReturnOrderReasons.swift`, `CreateOrderResponse.swift`, `ConfirmedGeo.swift` и др. |
-| `UIKit/` | Переиспользуемые UI-компоненты (кнопки, ячейки, текстовые поля) |
-| `Generated/` | Код SwiftGen: `Plist.swift` (типизированный доступ к `Info.plist`, в т.ч. `baseURL`/`baseURLNew`), `StoryboardScenes.swift`, `StoryboardSegue.swift`, `Strings.swift` (L10n) |
+| `Modules/<Фича>/` | ~95 папок, по одной на экран или фичу: `Home`, `Catalog`, `Product`, `Search`, `Cart`, `Checkout`, `MyOrders`, `MyOrderDetail`, `ReturnOrder`, `GiftCard`, `MyGiftCards`, `CreateReservation`, `Bonuses`, `Profile`, `Auth`, `Polls`, `Flomni` и др. Внутри — `XxxVC.swift`, ячейки, extension-файлы |
+| `Business/Network/` | Сетевой слой: `RequestTarget.swift` (хост `core`), `RequestTargetNew.swift` (хост `mobile`), `RequestTargetDiginetica.swift`, `RequestDescription.swift` (сборка URL), `RequestProvider.swift` (Alamofire), `AuthRequestAdapter.swift` (JWT и его обновление), `BackendListService.swift` / `BackendListItemsService.swift` (пагинация), `Models/` (конверты ответа), `Errors/` |
+| `Business/Network/Endpoints/` | Один файл — эндпоинт или группа. `enum … : RequestTarget` — хост `core`; `struct … : RequestTargetNew` — хост `mobile`. `CheckoutEndpoints/` — новый чекаут |
+| `Business/Managers/` | `XxxManager` — состояние фичи и оркестрация вызовов. Папки: `Checkout/`, `Payment/`, `ReturnOrder/`, `Reservation/`, `Polls/`, `Analytics/`, `ABManagers/`, `Dresscode/`, `DebugManagers/` (переключатель хоста) |
+| `Business/Services/` | Тонкие обёртки над `RequestProvider`: endpoint → типизированный ответ |
+| `Business/Factories/` | DI (Dip): `ManagersAssembly.swift`, `VCAssembly.swift` |
+| `Business/Constants/`, `Business/Helpers/` | Константы, хелперы (`DeviceIDGenerator.swift` — `x-device-id`) |
+| `Models/` | Codable-модели; `Response/` — ответы, `Payload/` — тела запросов |
+| `UIKit/` | Переиспользуемые UI-компоненты |
+| `Generated/` | SwiftGen: `Plist.swift` (`baseURL`, `baseURLNew`, `digineticaURL`), сцены, сегвеи, `Strings.swift` |
 
 ---
 
-## 4. Ключевые точки для поиска: процесс возврата товара (клиент, iOS)
+## 4. Возврат товара (клиент, iOS)
 
 ### 4.1. Экраны (`Classes/Modules/ReturnOrder/`), в порядке навигации
 
 | Экран | Файл | Назначение |
 |---|---|---|
-| Карточка заказа (точка входа) | `MyOrderDetail/MyOrderDetailVC.swift` | `didTapReturnedButton` → segue `returnOrder` в `ReturnOrderItemsVC`; передаёт `activeItemsForReturn`/`inactiveItemsForReturn` (фильтр по серверному `OrderItem.canBeReturned` — **никакой клиентской арифметики «N дней» нет**) |
-| Выбор позиций | `ReturnOrderItems/ReturnOrderItemsVC.swift` | Устанавливает `returnOrderManager.orderId` и **`returnOrderManager.needBankData = orderDetail?.return?.isBankDataRequired ?? true`** — клиентское зеркало серверного `is_bank_data_required` |
-| Выбор причины (по каждой позиции) | `ReturnOrderReasons/ReturnOrderReasonsVC.swift`, `ReturnOrderSelectReasonGroupVC.swift` | Грузит причины (GET), собирает payload `items: [{barcode, reasonId}]` |
-| Способ/город/дата/реквизиты | `ReturnOrderMethod/ReturnOrderMethodVC.swift` (+ extensions `+Section/+Delegates/+Layouts/+UICollectionViewDataSource/+UICollectionViewDelegate`) | Секция `.address` — только если `methodType == .courier`; `.requisites` — только если `needBankData`. `confirmReturn()` → `isFulfilledData()` → `returnOrderDetails` (POST) → `returnOrder` (POST) |
-| Предупреждение о дате | `ReturnOrderMethod/ReturnOrderDateWarningVC.swift` | Показывается при отклонении сервером выбранной даты (код ошибки `20110`, `errorTarget == .returnOrderDate` / `date_return`) |
-| Банковские реквизиты | `ReturnOrderUserRequisites/ReturnOrderUserRequisitesVC.swift` | Поля: фамилия/имя/отчество, БИК (9 цифр), название банка, ИНН банка (10 цифр), счёт (20 цифр), номер карты (16 цифр, маска `#### #### #### ####`) |
-| Финал | `ReturnOrderFinishVC.swift` | Модалка подтверждения (`L10n.RetutnOrderFinish.*` — опечатка `Retutn` так в коде/локализации) |
+| Карточка заказа (точка входа) | `MyOrderDetail/MyOrderDetailVC.swift` | `didTapReturnedButton` → segue `returnOrder` в `ReturnOrderItemsVC`; передаёт `activeItemsForReturn`/`inactiveItemsForReturn` (фильтр по серверному `OrderItem.canBeReturned`, клиентской арифметики «N дней» нет) |
+| Выбор позиций | `ReturnOrderItems/ReturnOrderItemsVC.swift` | `returnOrderManager.orderId`; `needBankData = orderDetail?.return?.isBankDataRequired ?? true` |
+| Причина по каждой позиции | `ReturnOrderReasons/ReturnOrderReasonsVC.swift`, `ReturnOrderSelectReasonGroupVC.swift` | Грузит причины, собирает `items: [{barcode, reasonId}]` |
+| Способ, город, дата, реквизиты | `ReturnOrderMethod/ReturnOrderMethodVC.swift` (+ extensions) | Секция `.address` — только при `methodType == .courier`; `.requisites` — только при `needBankData`. `confirmReturn()` → `returnOrderDetails` (POST) → `returnOrder` (POST) |
+| Предупреждение о дате | `ReturnOrderMethod/ReturnOrderDateWarningVC.swift` | При отказе сервера по дате: код `20110`, `errorTarget == .returnOrderDate` (`date_return`) |
+| Банковские реквизиты | `ReturnOrderUserRequisites/ReturnOrderUserRequisitesVC.swift` | ФИО, БИК (9), банк, ИНН банка (10), счёт (20), карта (16, маска) |
+| Финал | `ReturnOrderFinishVC.swift` | Модалка подтверждения (`L10n.RetutnOrderFinish.*` — опечатка в коде) |
 
-### 4.2. Manager/Service (аналог ViewModel/Repository)
+### 4.2. Manager/Service
 
 | Класс | Файл | Роль |
 |---|---|---|
-| `ReturnOrderManagerProtocol` / `ReturnOrderManager` | `Business/Managers/ReturnOrder/ReturnOrderManager.swift` | Синглтон (регистрация в `ManagersAssembly.swift`). Методы: `returnOrder`, `returnOrderDetails`, `loadReasons`, `loadAvailableMethods`, `updateSelectedItems`, `updateItemsData`, `updateReturnOrderPayload`, `updateReturnItemsPayload`, `updateReturnAddressData`, `updateSelectedMethod`, `getSelectedReason(index:)`, `flush()` |
-| `ReturnOrderData` | `Business/Managers/ReturnOrder/ReturnOrderData.swift` | Состояние: `reasons`, `availableDates`, `selectedDate`, `selectedItems`, `itemsData`, `payload`, `returnAddressData`, `methods`, `selectedMethod` |
-| `ReturnAddressData` | `Business/Managers/ReturnOrder/ReturnAddressData.swift` | Валидация адреса: `isFulfilledCity`, `isFulfilledHouse`, `isFulfilledIndex` (индекс ≥ 6 цифр для стран НЕ из `["RU","AE","KZ","BY"]`, иначе просто непусто) |
-| `ReturnOrderServiceProtocol` / `ReturnOrderService` | `Business/Services/ReturnOrderService.swift` | Тонкий проброс в `requestProvider.make(...)` по каждому из 4 эндпоинтов |
+| `ReturnOrderManager` | `Business/Managers/ReturnOrder/ReturnOrderManager.swift` | Синглтон: `returnOrder`, `returnOrderDetails`, `loadReasons`, `loadAvailableMethods`, `update*`, `flush()` |
+| `ReturnOrderData`, `ReturnAddressData` | `Business/Managers/ReturnOrder/` | Состояние флоу; валидация адреса (индекс ≥ 6 цифр для стран не из `RU, AE, KZ, BY`) |
+| `ReturnOrderService` | `Business/Services/ReturnOrderService.swift` | Проброс в `requestProvider` по 4 эндпоинтам |
 
-### 4.3. Эндпоинты возврата, подтверждённые из кода (реальные строки путей)
+### 4.3. Эндпоинты возврата и заказа — полная цепочка
 
-| Назначение | Класс | Метод | Путь (буквально из кода) | API-поколение |
+| Назначение | iOS (endpoint) | Хост и путь | Шлюз | Монолит |
 |---|---|---|---|---|
-| Отправить возврат | `ReturnOrderEndpoint.returnOrder(orderId:payload:)` | POST | `orders/\(orderId)/return` | легаси (`baseURL`) |
-| Причины возврата | `ReturnOrderEndpoint.loadReasons` | GET | `orders/v2/return-reasons` | легаси (`baseURL`) |
-| Адрес/дата/способ возврата | `ReturnOrderDetailsEndpoint` | POST | `v1/delivery/\(orderId)/return-details` | новое (`baseURLNew`) |
-| Доступные способы возврата по городу | `ReturnOrderMethodsEndpoint` | GET | `v1/delivery/\(orderId)/return-method-list` (query: `country_iso, city, city_id, city_fias, region, region_id`) | новое (`baseURLNew`) |
-| Список заказов | `OrdersEndpoint.orders(page:)` | GET | `orders` | легаси |
-| Карточка заказа | `OrdersEndpoint.orderDetail(id:)` | GET | `orders/\(id)` | легаси |
-| Отмена заказа | `OrdersEndpoint.cancel(id:)` | DELETE | `orders` (тело: `{order_id}`) | легаси |
+| Создать возврат (позиции + реквизиты) | `ReturnOrderEndpoint.returnOrder` | `core` POST `orders/{id}/return` | esb `libs/orders/controllers/src/lib/orders.controller.ts:254` | `mobile/orders/{id}/return` → `Mobile\Rules\UrlRule` → `src/Modules/Mobile/Controllers/OrdersController::actionReturnPositions` |
+| Причины возврата | `ReturnOrderEndpoint.loadReasons` | `core` GET `orders/v2/return-reasons` | esb `orders.controller.ts:204` | `mobile/v2/orders/return-reasons` → `modules/mobilev2/controllers/OrdersController::actionReturnReasons` |
+| Способы возврата по городу | `ReturnOrderMethodsEndpoint` | `mobile` GET `v1/delivery/{id}/return-method-list` | Go `internal/app/service/delivery.go:166` | `mobile/orders/{id}/return-method-list` → `OrdersController::actionReturnMethodList` (`:1327`) |
+| Адрес, дата, способ возврата | `ReturnOrderDetailsEndpoint` | `mobile` POST `v1/delivery/{id}/return-details` | Go `delivery.go:112` | `mobile/orders/{id}/return-details` → `OrdersController::actionReturnDetails` (`:1258`) → `OrderService::updateOrderReturnDetails` → outbox RetailCRM |
+| Список заказов | `OrdersEndpoint.orders` | `core` GET `orders` | esb `orders.controller.ts:54` + gRPC feedbacks `canBeSaved` | `mobile/orders` → `OrdersController::actionIndex` |
+| Карточка заказа | `OrdersEndpoint.orderDetail` | `core` GET `orders/{id}` | esb `orders.controller.ts:227` + gRPC feedbacks | `mobile/orders/{id}` → `OrdersController::actionIndex` |
+| Отмена заказа | `OrdersEndpoint.cancel` | `core` DELETE `orders` (тело `{order_id}`) | esb `orders.controller.ts:272` | `POST mobile/orders/cancel` → `OrdersController::actionCancel` |
 
-> **✅ Обновлено 07.10.2026 — сваггер нового шлюза.** Команда МП прислала сваггер Mobile API Gateway (`mobile.12stz.com/api`): [`api/mobile/mobile-gateway_swagger.yaml`](../12storeez-master-web/api/mobile/mobile-gateway_swagger.yaml) (Swagger 2.0, «Mobile API Gateway», v1.0). Он закрывает открытый вопрос ниже о маршрутах `v1/delivery/...`:
-> - `GET /api/v1/delivery/{order_id}/return-method-list` — «Proxy to http mobile/orders/{order_id}/return-method-list» → монолит, `Mobile\OrdersController::actionReturnMethodList()`;
-> - `POST /api/v1/delivery/{order_id}/return-details` — «Proxy to http mobile/orders/{order_id}/return-details» → монолит, `Mobile\OrdersController::actionReturnDetails()`.
->
-> Отдельного сервиса для возврата нет. Новый шлюз только меняет внешнюю форму пути и проксирует запрос в те же обработчики монолита, что описаны в `docs/mobileApi/openapi.yml`. Остальных методов возврата и заказа из таблицы (`orders/{id}/return`, `orders/v2/return-reasons`, `GET orders/{id}`, `GET orders`, `DELETE orders`) в сваггере нового шлюза нет: из заказов там только `POST /api/v1/orders` (создание) и `POST /api/v2/orders/{order_id}/change-payment-method`. Значит, эти методы обслуживает старый шлюз `core.12stz.com/api`. Его сваггер доступен только на сайте и в репозиторий не выгружен, поэтому проксирование старого шлюза по-прежнему подтверждено только по коду монолита.
->
-> Дефект сваггера: у `return-method-list` параметры `country_iso` и `region` объявлены как `in: path`, хотя в шаблоне пути их нет. iOS-клиент передаёт их в query.
->
-> **✅ Сверено с бэкендом (`12storeez-master`), 12.09.2026.** Реальные хосты подтверждены конфигом сборки iOS (`TwelveStoreez/Resources/Configuration/*.xcconfig`): легаси `BASE_URL` = **`core.12stz.com/api`** (прод) / `core.12stz.dev/api` (dev); новый `BASE_URL_NEW` = **`mobile.12stz.com/api`** (прод) / `mobile.12stz.dev/api` (dev). Ни одна из этих двух строк нигде не встречается в коде монолита `12storeez-master` (маршрутизация доменов — на уровне инфраструктуры/шлюза, вне обоих репозиториев) — поэтому окончательно, к какому бэкенду ведёт каждый домен, можно подтвердить только логами трафика или конфигурацией шлюза, не исходным кодом.
->
-> **По путям — подтверждено на уровне кода:**
-> - `POST orders/{orderId}/return` (легаси, `core.12stz.com`) — в монолите есть кастомное правило `src/Modules/Mobile/Rules/UrlRule.php:82-85`: regex `/orders\/\d+\/return/` (без `-details`/`-method-list`) → маршрут `mobile/orders/return-positions` (id — из пути) → `src/Modules/Mobile/Controllers/OrdersController.php::actionReturnPositions()`. По аналогии с уже подтверждённым проксированием `GET /api/orders/{id}` → `GET /mobile/orders/{id}` (см. `reference/api/mobile/order-view_mobile.md`) это, по всей видимости, **тот же самый эндпоинт**, что и `POST /mobile/orders/return-positions?id=`, ранее описанный в `as-is/mobile/07-create-return.md` — просто другая внешняя форма пути. Путь `/mobile/orders/return-positions` в коде iOS-клиента буквально не встречается, но это ожидаемо: клиент обращается по внешнему REST-пути, а не по внутреннему маршруту Yii2.
-> - **`v1/delivery/{orderId}/return-method-list` и `v1/delivery/{orderId}/return-details`** (новое API, `mobile.12stz.com`) — **в монолите `12storeez-master` нет ни одного маршрута с такой формой пути.** Модуль `deliveryV2` (`config/modules.php`, класс `Application\Modules\Delivery\Module`), на который заведены все `api/v1/delivery/...`-маршруты (`config/url.php:206-219`, гео/ПВЗ), разрешает только контроллеры `geo`, `pickup`, `webhooks` — **контроллера заказов/возврата там нет**. Второй модуль с тем же классом, id `return` (`config/modules.php:262-267`), содержит только `ReturnDetailsBackendController` — это **админка** конфигурации способов возврата (`return_details_config`, `return_method`), без единого публичного API-действия для мобильного клиента. Официальная спека Mobile API (`docs/mobileApi/openapi.yml`) тоже описывает эти два метода **по старому пути** — `/orders/{orderId}/return-method-list` и `/orders/{orderId}/return-details` (со словом «orders», как в легаси-модуле), а не `/v1/delivery/...`.
->   **Вывод:** запросы `return-method-list`/`return-details`, которые реально отправляет iOS-приложение, не совпадают ни с одним маршрутом в этом репозитории и не описаны в официальной openapi-спеке Mobile API. Либо это отдельный сервис (см. `mobile-core-api-research.md` в корне — там задокументирован факт существования внешнего Core-микросервиса `core.12stz.dev`, код которого не входит ни в один из имеющихся репозиториев), либо openapi-спека устарела относительно реальной версии бэкенда. Требует подтверждения через трафик/логи или у бэкенд-команды — из исходного кода это не разрешить.
+Подробнее о шлюзах: [esb-monorepo §8.1](../esb-monorepo/repo-map.md), [mobile-monorepo-go §5](../mobile-monorepo-go/repo-map.md).
 
-### 4.4. Модели данных (Codable), ключевые поля
+### 4.4. Модели данных
 
-- **`ReturnOrderEndpoint.Payload`** (тело `POST orders/{id}/return`): `surname`, `name`, `patronymic`, `bankBic`, `bankName`, `bankInn`, `userAccount`, `userCardNumber`, `items: [{barcode, reasonId: [String]}]`. Вычисляемое `isFulledBankData`: БИК=9 цифр, ИНН=10 цифр, карта=16 цифр, ФИО/банк/счёт непусты.
-- **`ReturnOrderDetailsEndpoint.Payload`** (тело `POST v1/delivery/{id}/return-details`): `methodReturn`, `addressReturn`, `cityReturn`, `dateReturn`, `indexReturn`.
-- **`ReturnOrderMethodsEndpoint.Payload`** (query `GET v1/delivery/{id}/return-method-list`): `countryIso`, `city`, `cityId`, `cityFias`, `region`, `regionId` (строится из `ConfirmedGeo`).
-- **`ReturnOrderMethod`** (ответ): `method`, `methodType` (`"pvz"`/`"courier"`), `title`, `description`, `activeMobile`, `availableDatesReturn`. Клиент **сам фильтрует**: `methods.filter { $0.availableDatesReturn.isNotEmpty && $0.activeMobile }`.
-- **`ReturnOrderReasons`**: `items: [{title, items: [{title, code, description}]}]` (группы причин).
-- **`OrderDetail.Return`**: `isBankDataRequired: Bool` — решение принимается **сервером**, клиент только читает.
-- **`OrderItem.canBeReturned: Bool?`** — тоже серверный флаг, без клиентской даты-арифметики.
+- **`ReturnOrderEndpoint.Payload`** (тело `POST orders/{id}/return`): `surname`, `name`, `patronymic`, `bankBic`, `bankName`, `bankInn`, `userAccount`, `userCardNumber`, `items: [{barcode, reasonId: [String]}]`.
+- **`ReturnOrderDetailsEndpoint.Payload`**: `methodReturn`, `addressReturn`, `cityReturn`, `dateReturn`, `indexReturn`. Go-шлюз пропускает в монолит только эти 5 полей.
+- **`ReturnOrderMethodsEndpoint.Payload`** (query): `countryIso`, `city`, `cityId`, `cityFias`, `region`, `regionId` (из `ConfirmedGeo`).
+- **`ReturnOrderMethod`**: `method`, `methodType` (`pvz`/`courier`), `title`, `description`, `activeMobile`, `availableDatesReturn`. Клиент фильтрует `availableDatesReturn.isNotEmpty && activeMobile`.
+- **`OrderDetail.Return.isBankDataRequired`**, **`OrderItem.canBeReturned`** — решения сервера, клиент только читает.
 
-### 4.5. Клиентская валидация / бизнес-логика
+### 4.5. Клиентская логика
 
-- Реквизиты обязательны только если `needBankData == true` (= `OrderDetail.return.isBankDataRequired`); адрес обязателен только если `selectedMethod.methodType == .courier` (`ReturnOrderMethodVC.isFulfilledData()`).
-- Никакой клиентской логики «вернуть можно в течение N дней» нет — `canBeReturned` и `isBankDataRequired` берутся из ответа сервера как есть. Единственная дата-арифметика в этой области экрана (`MyOrderDetailVC.calculateRemainingMinutes(from:)`) — обратный отсчёт до отмены **неоплаченного** заказа, к возврату отношения не имеет.
-- Обработка отказа сервера по дате возврата: код ошибки `20110` (`errorTarget == .returnOrderDate`, бэкенд-поле `date_return`) → клиент перезагружает доступные способы/даты и показывает `ReturnOrderDateWarningVC` вместо обычной ошибки.
-- Состояние возврата (`ReturnOrderManager`/`ReturnOrderData`) хранится **только в памяти** на время прохождения флоу и сбрасывается (`flush()`) при `deinit` `ReturnOrderItemsVC` — постоянного локального хранилища (CoreData/UserDefaults) для заказов/возврата нет.
+- Реквизиты обязательны только при `needBankData`; адрес — только для курьера (`ReturnOrderMethodVC.isFulfilledData()`).
+- Ошибка `20110` по `date_return` → перезагрузка способов и `ReturnOrderDateWarningVC`.
+- Состояние возврата живёт в памяти, `flush()` при `deinit` `ReturnOrderItemsVC`.
 
 ---
 
-## 5. Быстрые подсказки по поиску
+## 5. Сетевой слой: хосты, заголовки, авторизация
 
-1. **Экраны возврата:** `Classes/Modules/ReturnOrder/`.
-2. **Состояние возврата:** `Classes/Business/Managers/ReturnOrder/`.
-3. **Эндпоинты возврата:** `Classes/Business/Network/Endpoints/ReturnOrderEndpoint.swift`, `ReturnOrderDetailsEndpoint.swift`, `ReturnOrderMethodsEndpoint.swift`.
-4. **Модели заказа/возврата:** `Classes/Models/Response/Order.swift`, `OrderDetail.swift`, `ReturnOrderMethod.swift`, `ReturnOrderReasons.swift`.
-5. **DI-регистрация:** `Classes/Business/Factories/ManagersAssembly.swift` (искать `ReturnOrder`).
-6. **Коды ошибок возврата:** `Classes/Business/Network/Errors/MessageError.swift` (`ErrorTarget.returnOrderDate` → `date_return`).
+### 5.1. Хосты
+
+| Протокол endpoint | Info.plist / xcconfig | Release | Debug / Internal | Код шлюза |
+|---|---|---|---|---|
+| `RequestTarget` | `BaseURL` / `BASE_URL` | `core.12stz.com/api` | `core.12stz.dev/api` | `12stz/esb-monorepo` (NestJS) |
+| `RequestTargetNew` | `BaseURLNew` / `BASE_URL_NEW` | `mobile.12stz.com/api` | `mobile.12stz.dev/api` | `12stz/mobile-monorepo-go` (Go) |
+| `RequestTargetDiginetica` | `DigineticaURL` | `tracking-app.diginetica.net/event` | `tracking-dev.diginetica.net/event` | внешний сервис |
+
+- xcconfig: `TwelveStoreez/Resources/Configuration/{Base,Debug,Internal,Release}.xcconfig`; `https://` добавляется в `Business/Network/RequestDescription.swift:52-56`.
+- В не-release сборках хост берётся из `Business/Managers/DebugManagers/DebugServerHostManager.swift:64-80`: пресеты `default`, `mobiledev`, `dev`, `fix`, `sandbox`, `stg` (пары `core-<env>.12stz.dev` / `mobile-<env>.12stz.dev`) и произвольный.
+- Версия API — часть пути: у `core` пути в основном без версии (`products/v2/...` — внутри), у `mobile` — `v1/...`, `v2/...`.
+
+### 5.2. Заголовки
+
+| Заголовок | `core` | `mobile` | Где |
+|---|---|---|---|
+| Платформа | `x-platform: ios` | `X-Platform: ios` | `RequestTarget.swift`, `RequestTargetNew.swift` |
+| Версия приложения | `Version` | `X-Version` | то же; Go-шлюз без них отвечает 400 |
+| `Authorization: Bearer <JWT>` | да | да | `AuthRequestAdapter.swift`; кроме `PUT authorization/generate-token` и `v1/errors/waf` |
+| `x-device-id` | только `generate-token` и `login` | — | `DeviceIDGenerator.swift` (Mindbox UUID → `identifierForVendor` → UUID) |
+| `Canary: true` | при debug-флаге | при debug-флаге | `kCanaryAccessKey` |
+
+### 5.3. Авторизация
+
+- **Токен выдаёт только `core`.** iOS не вызывает `/api/v1/auth/*` Go-шлюза. Гостевой JWT — `PUT authorization/generate-token`; при 401 — `PUT authorization/session` с `refresh_token` и повтор запроса; при неудаче — снова гостевой токен (`AuthRequestAdapter.swift:105`, `:135`).
+- **Тот же JWT уходит на `mobile`.** esb подписывает HS256 ключом из кода (`esb-monorepo/libs/core/src/lib/constants.ts:7-9`), срок 14 дней, claims `device_id`, `refresh_token`, `session_token`, `user_id`. Go-шлюз проверяет HS256 с `JWT_SECRET` из Vault. Значит, ключи должны совпадать — смена в одном месте ломает все вызовы на `mobile` (вывод по коду, значения не сверялись).
+- Оба шлюза передают в монолит `session_token` из JWT заголовком `x-session-token` и свой сервисный `x-access-token`; монолит по нему находит пользователя.
+- `503` на `GET authorization/session` → экран техработ (`TechnicalWorkVC`).
+
+### 5.4. Ответы и ошибки
+
+- Конверты (`Network/Models/SuccessDataResult.swift`): `SuccessResult {success, update_flags?}`, `SuccessDataResult<T> {result, success, total?}`, `SuccessCollectionResult<T>`, `ListResponse<T> {result, total}`.
+- Ошибкой считается и тело с `success:false` при HTTP 2xx. Валидны только статусы 100–399.
+- Ошибка — `ServerError {success:false, result: MessageError}` (`Network/Errors/`). Go-шлюз добавляет `isErrorFromPHP: true` к ответам монолита с кодом ≠ 200.
+- WAF: HTML «Forbidden» на `authorization/login/by-phone` сохраняется (`RequestProvider.storeWafBlockIfNeeded`) и отправляется в `POST v1/errors/waf`.
+
+---
+
+## 6. Какие вызовы через какой шлюз идут
+
+Полный список (≈150 вызовов, с файлами шлюза и `Controller::action` монолита) — в [../architecture/call-chain.html](../architecture/call-chain.html). Здесь — раскладка по доменам.
+
+| Домен | Хост `core` (esb-monorepo) | Хост `mobile` (mobile-monorepo-go) |
+|---|---|---|
+| Авторизация, сессия | `authorization/*` (токен, сессия, логин по паролю и телефону, логаут), `profile/actions/restore-password` | `v1/settings`, `v1/users/device-session-token`, `v1/errors/waf` |
+| Профиль | `profile` (GET/PATCH/DELETE), `password`, `phone`, `addresses`, `icons`, `qr`, `wishlist` (добавить, удалить, ids), `subscriptions` | `v1/users/wishlist` (список), `v1/users/addresses/*` (новые адреса), `v1/users/permissions`, `v1/users/geo/confirmation` |
+| Лояльность | — | `v1/users/bonuses`, `bonuses/history` (gRPC Mindbox) |
+| Каталог, поиск | Карточка `products/v2/{id}`, остатки, образы, недавно просмотренные, подсказки, `catalog/filter`, отзывы о товаре | `v1/pages/home`, `v1/pages/catalog`, `v1/products` (листинг), `advanced-search`, `category`, рекомендации, наличие в магазинах, `for-cart`, `complete-set` |
+| Контент | `metadata/*` (FAQ, магазины, сторис, размеры, соцсети, «О компании»), `landings/v2`, `v2/ulink`, `geo/countries/phone-details` | `v1/metadata/splash-screen-image` |
+| Гео | — | `v1/geo/countries/*` (gRPC Geo) |
+| Корзина и чекаут | **Старый чекаут:** `cart/*`, `cart/delivery2` (+ Boxberry), `cart/delivery`, `PUT orders` | **Новый чекаут:** `v1/cart`, `v2/cart`, `v1/cart/*` (доставка, ПВЗ, интервал, адрес, оплата, получатель, бонусы, промокод, сертификат, позиции), `POST v1/orders`, `v1/delivery/intervals` (gRPC Logistics), `v1/pickup/*` (HTTP Logistics) |
+| Заказы | Список, карточка, отмена, офлайн-чеки (gRPC orders), Долями | `v2/payment-types`, `v2/orders/{id}/change-payment-method` |
+| Возвраты | `orders/{id}/return`, `orders/v2/return-reasons` | `v1/delivery/{id}/return-method-list`, `return-details` |
+| Платежи | — | `v1/payment/yookassa` (+ статус), `v1/payments/{order}/{system}` (+ `/info`) |
+| Сертификаты | — | `v1/giftcards/*`, `v1/timezones` |
+| Резервирование | — | `v1/reservation/*` |
+| Отзывы | `reviews/*` (часть — gRPC feedbacks) | `v1/reviews/offline-product` |
+| Уведомления, опросы | `notification/message`, `info`, `user-activities` | `v1/notification/polls` |
+
+Старый и новый чекаут живут одновременно: `CreateOrderManager` и `OrderManager` ходят в `core` (`cart/*`, `PUT orders`), `Managers/Checkout/*` — в `mobile` (`v1/cart/*`, `POST v1/orders`).
+
+---
+
+## 7. Внешние сервисы напрямую из приложения (мимо шлюзов)
+
+| Сервис | Где в коде | Назначение |
+|---|---|---|
+| Diginetica | `Endpoints/DigineticaEndpoint.swift`, `Managers/Analytics/Diginetica/DigineticaReporterProtocol.swift:70` | События поиска и рекомендаций; без авторизации, ответ не читается |
+| Dresscode.ai | `Managers/Dresscode/DresscodeManager.swift:104,129` | Виртуальная примерка: `api.dresscode.ai` + WebView `try-on.dresscode.ai` |
+| Mindbox SDK | `AppDelegate+Mindbox.swift` | Push, in-app; UUID устройства → `x-device-id` |
+| Платёжные SDK | `Managers/Payment/*` | YooKassa/YooMoney (токенизация), Долями, SberPay, Yandex Pay. Платёж создаётся через шлюз `mobile` |
+| Аналитика, крэши | `AppDelegate.swift` | AppsFlyer, AppMetrica + Varioqub (A/B), Firebase, Sentry (`sentry.12stz.dev`), KSCrash, Crashlytics |
+| Чат, сторис, карты | `Modules/Flomni/`, `AppDelegate+InAppStory.swift` | Flomni chat, InAppStory, Yandex MapKit |
+
+---
+
+## 8. Быстрые подсказки по поиску
+
+1. **Какой запрос шлёт экран:** `Modules/<Фича>/…VC.swift` → `Business/Managers/…Manager` → `Business/Services/…Service` → `Endpoints/…Endpoint.swift` (`path`, `method`).
+2. **Через какой шлюз:** endpoint `: RequestTarget` — `core` (esb-monorepo), `: RequestTargetNew` — `mobile` (mobile-monorepo-go).
+3. **Где метод в шлюзе:** `core` — `esb-monorepo/libs/<домен>/controllers/` (`@Controller` + `@Get/@Post`, итог `/api/<префикс>/<метод>`); `mobile` — `mobile-monorepo-go/cmd/mobile_api/mobile_api.go` (`set*Routes`) → `internal/app/service/<домен>.go`.
+4. **Во что превращается в монолите:** esb — `path` сервиса (`PHP_BASE_URL + 'mobile/' + path`); Go — `SITE_*_PATH` в `.deploy/helm/values.yaml`; затем `config/url.php` и `src/Modules/Mobile/Rules/UrlRule.php` монолита.
+5. **Модель ответа:** `Classes/Models/Response/`; тело запроса — вложенный `Payload` в файле endpoint'а или `Classes/Models/Payload/`.
+6. **DI:** `Business/Factories/ManagersAssembly.swift`.
+7. **Хост и окружение в тестовой сборке:** `DebugServerHostManager.swift`, экран `Modules/DebugMenu/`.
+
+---
+
+## 9. Неопределённости и вопросы
+
+- [ ] Объявлены, но не вызываются: `CheckAppVersionEndpoint` (`v1/version/check`), `MetadataEndpoint.address`, `MetadataEndpoint.home`.
+- [ ] `SplitPaymentManager.swift:43-44` проверяет статус Подели с `paymentId = orderId` — сверить с ожиданием монолита (`M1/PaymentController::actionInfo`).
+- [ ] Совпадение JWT-ключей esb и Go подтверждается только тем, что приложение работает; значения в коде и Vault не сверялись.
+- [ ] Пути с ведущим `/` (`/profile/wishlist/ids`, `/v1/giftcards`) склеиваются через `appendingPathComponent` — на работу не влияет, но выбивается из стиля.
+- [ ] Копия `new/12storeez-ios-develop/` (12.09.2026) устарела: по `AGENTS.md` после появления клона в `12stz` её нужно удалить.
 
 ---
 
@@ -135,7 +208,8 @@
 
 | Версия | Дата изменения | Автор | Описание изменений |
 |--------|----------------|-------|--------------------|
-| 1.0 | 12.09.2026 | Системный аналитик | Первичное создание документа на основе анализа реального iOS-клиента (`12storeez-ios-develop`); зафиксировано расхождение реального эндпоинта возврата (`POST orders/{id}/return`) с ранее задокументированным предположением (`POST /mobile/orders/return-positions`) |
-| 1.1 | 12.09.2026 | Системный аналитик | Сверено с кодом бэкенда (`12storeez-master`): подтверждено, что `POST orders/{id}/return` маршрутизируется в `Mobile\OrdersController::actionReturnPositions()` (через `Mobile\Rules\UrlRule.php`); подтверждено, что `v1/delivery/{id}/return-method-list` и `v1/delivery/{id}/return-details` — пути, которых **нет** ни в одном маршруте монолита (модуль `deliveryV2` не имеет контроллера заказов/возврата) и нет в официальной openapi-спеке Mobile API |
-| 1.2 | 07.10.2026 | Системный аналитик | §4.3: по сваггеру нового шлюза (`api/mobile/mobile-gateway_swagger.yaml`) закрыт вопрос о маршрутах `v1/delivery/{id}/return-method-list` и `return-details` — шлюз проксирует их в `mobile/orders/{id}/...` монолита; зафиксировано, что остальные методы возврата и заказа идут через старый шлюз `core` |
-| 1.3 | 10.10.2026 | Системный аналитик | Код шлюзов найден: `BASE_URL_NEW` (`mobile.12stz.com`) — `12stz/mobile-monorepo-go` ([карта](../mobile-monorepo-go/repo-map.md) §5), `BASE_URL` (`core.12stz.com`) — `12stz/esb-monorepo` ([карта](../esb-monorepo/repo-map.md) §8.1). Вывод §4.3 v1.1 «отдельный сервис» заменён |
+| 1.0 | 12.09.2026 | Системный аналитик | Первичное создание на основе копии `12storeez-ios-develop`; расхождение эндпоинта возврата (`POST orders/{id}/return`) с предположением `POST /mobile/orders/return-positions` |
+| 1.1 | 12.09.2026 | Системный аналитик | Сверено с `12storeez-master`: `POST orders/{id}/return` → `Mobile\OrdersController::actionReturnPositions()`; `v1/delivery/...` в монолите не найдены |
+| 1.2 | 07.10.2026 | Системный аналитик | По сваггеру нового шлюза закрыт вопрос о `v1/delivery/{id}/return-*` |
+| 1.3 | 10.10.2026 | Системный аналитик | Код шлюзов найден: `mobile` — `12stz/mobile-monorepo-go`, `core` — `12stz/esb-monorepo` |
+| 2.0 | 10.10.2026 | repository-researcher | Карта переписана по клону `12stz/12storeez-ios` (коммит `a6de858b`): структура, сетевой слой и авторизация (§5), раскладка всех вызовов по шлюзам (§6), внешние SDK (§7), подсказки по поиску; §4.3 — сквозная цепочка до контроллера монолита; исправлено: зависимости — SPM, а не CocoaPods. Добавлена схема [../architecture/call-chain.html](../architecture/call-chain.html) (общая для всех репозиториев) |

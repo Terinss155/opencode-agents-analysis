@@ -17,11 +17,12 @@ new/
 ├── skill/<имя>/SKILL.md    ← скиллы: каждый описывает только свой артефакт
 ├── knowledge/              ← ОБЩИЕ знания о системах из 12stz (не про один проект)
 │   ├── README.md           ← навигатор: вопрос → файл знаний → папка в коде
+│   ├── architecture/       ← сквозные схемы, касающиеся нескольких репозиториев (цепочка iOS → шлюзы → монолит)
 │   └── <репозиторий>/      ← зеркально папкам в C:\Users\RobotComp.ru\Desktop\12stz\
 └── projects/<проект>/      ← проекты аналитики, сейчас: returns-2.0 («Возвраты 2.0»)
 ```
 
-- Агенты: `mode: primary` — `business-analyst`, `system-analyst`, `product-owner`, `repository-researcher` (редактирование и bash — с подтверждением); `mode: subagent` — `security-reviewer` (пишет только в `projects/<проект>/reviews/security/`).
+- Агенты: `mode: primary` — `business-analyst`, `system-analyst`, `product-owner`, `repository-researcher` (редактирование и bash — с подтверждением); `mode: subagent` — `security-reviewer` (пишет только в `projects/<проект>/reviews/security/`), `ui-reviewer` (пишет только в `projects/<проект>/reviews/ui/`).
 - При правке агента меняй **оба** файла: `.opencode/agents/<имя>.md` и `.claude/agents/<имя>.md` — тексты должны совпадать.
 - Скиллы подгружаются по frontmatter `description`; в OpenCode — только из allow-списка `opencode.json` (`*` = deny). Зови скилл при запросе соответствующего артефакта.
 
@@ -78,6 +79,7 @@ new/
 | `system-analyst` | primary | `backend-logic`, `backend-task`, `srs`, `erd-model`, `sequence-diagram`, `openapi-spec`, `asyncapi-spec`, `nfr-requirements`, `adr` |
 | `repository-researcher` | primary | — (опц. `sequence-diagram` для sequence-схем) |
 | `security-reviewer` | subagent | `security-review-checklist` |
+| `ui-reviewer` | subagent | `ui-review-checklist` |
 
 Скилл `handoff` (передача дел между сессиями) доступен всем агентам.
 
@@ -111,6 +113,7 @@ projects/<проект>/
 ├── reviews/          ← ПРОВЕРКИ бандла (в git, с датой в имени)
 │   ├── gap/          ← gap-анализ, аудиты BRD (skill/gap-analysis)
 │   ├── security/     ← ревью ИБ (security-reviewer)
+│   ├── ui/           ← ревью макетов по требованиям (ui-reviewer)
 │   └── quality/      ← ревью качества (system-analyst по явному запросу)
 └── archive/          ← устаревшее (см. «Архив»)
 ```
@@ -214,7 +217,7 @@ projects/<проект>/
 - `system-analyst`: `requirements/backend/<объект>_backend.md`, `requirements/backend/US-NN/<теги> <объект>_task.md` (задача на бэк, `skill/backend-task`; папка — User Story из Трекера, например `[B][Mobile API] order-card-return_task.md`), `<объект>_erd.*` + `sql.sql`, `<объект>_sequence.plantuml`, `<объект>_state.md` (в `as-is/diagrams/<тип>/` или `requirements/diagrams/<тип>/`), `openapi.yaml`, `asyncapi.yaml`, `requirements/nfr/nfr.md`, ADR — как у BA
 - `product-owner`: `requirements/user-story/user-story.md`, `backlog-priority.md`, `business-case.md`, `roadmap.md`, `stakeholder-map.md`, ADR — как у BA
 - `repository-researcher`: `knowledge/<репозиторий>/repo-map.md`, `knowledge/<репозиторий>/features/<фича>.md`, `knowledge/<репозиторий>/architecture/*.md`
-- Ревью: `reviews/<тип>/[ГГГГ-ММ-ДД] <артефакт>_<тип>-review.md`; `security-reviewer` → `reviews/security/`, `system-analyst` (по явному запросу) → `reviews/quality/`. Устаревшее ревью переносится в `archive/`.
+- Ревью: `reviews/<тип>/[ГГГГ-ММ-ДД] <артефакт>_<тип>-review.md`; `security-reviewer` → `reviews/security/`, `ui-reviewer` → `reviews/ui/`, `system-analyst` (по явному запросу) → `reviews/quality/`. Устаревшее ревью переносится в `archive/`.
 
 ## Рабочий процесс
 - PO → ценность и приоритеты (RICE/WSJF/MoSCoW), User Story. BA → процессы AS-IS/TO-BE, BRD, Use Case, матрица трассируемости, Gap-анализ (сверка с исходным BRD и реестр требований вне зоны BA/SA — `skill/gap-analysis`); передаёт SA.
@@ -226,6 +229,7 @@ projects/<проект>/
   2. при изменении модели данных (ERD) с персональными или платёжными данными: что хранится, где, кто видит, сроки хранения, маскирование;
   3. перед отправкой версии бандла на бизнес-ревью — сквозная проверка интеграций, ролей, журналирования.
   Не вызывается для формулировок BRD, макетов без данных, ADR о сроках и процессах. Каждое замечание переносится в бандл: требование `NFR-SEC-<n>` (или `NFR-NN` в BRD) либо открытый вопрос `OQ-<n>`, и попадает в матрицу трассируемости; отчёт — `reviews/security/`.
+- `ui-reviewer` — сверка макетов из `sources/mockups/` с требованиями (спецификация экрана, критерии приёмки, Use Case). Вызывается по просьбе пользователя: при появлении или обновлении макетов и перед передачей экрана в разработку. Расхождения разбирает автор бандла: правка требования, вопрос дизайнеру или открытый вопрос; отчёт — `reviews/ui/`.
 - Перед фиксацией требований BA/PO синхронизируются по приоритетам; технические детали — только через SA.
 
 ## Язык и стиль
@@ -235,6 +239,18 @@ projects/<проект>/
 - Порядок: AS-IS до TO-BE; трассируемость от бизнес-цели до User Story и технического артефакта.
 - Факты не выдумывать: при нехватке вводных запросить уточнение, не додумывать.
 - Каждый артефакт — отдельный файл в своей подпапке проекта (см. «Структура проекта»).
+
+## Содержимое артефакта
+- Файл артефакта содержит только сам артефакт в формате своего скилла. Резюме, пояснения к проделанной работе, результаты самопроверки по чек-листу и «что передать дальше» пишутся в ответе пользователю, а не в файле.
+- В артефакт не пишутся:
+  - ход обсуждения и отсылки к переписке или прошлым сессиям («как договорились», «по замечанию», «в прошлой версии было»);
+  - пометки о правке самого документа («исправлено», «обновлено», «добавлено», «уточнено по итогам ревью»);
+  - обращения автора к читателю и пояснения, почему раздел выглядит так;
+  - подсказки и комментарии из шаблона (строки с `>`, `<!-- ... -->`, «Примечание: ...»).
+- Источник требования или решения указывается ссылкой на файл в `sources/` или на ID ADR, а не пересказом разговора.
+- История изменений ведётся только там, где она есть в формате артефакта: «История изменений» в ADR, версия бандла в `index.md`, таблица истории в BRS. В остальных артефактах её нет; прежние версии хранятся в git и `archive/`.
+- Неподтверждённое выносится в раздел «Открытые вопросы», если он есть в формате артефакта; иначе — в ответ пользователю.
+- Содержимое `handoff/` — рабочий контекст сессии; в артефакты из него ничего не переносится.
 
 ## Домен по умолчанию
 

@@ -1,0 +1,463 @@
+<title>Цепочка вызовов сайта</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&family=Unbounded:wght@500;700&display=swap">
+<style>
+/* Layout: как идёт запрос браузера — край сети → монолит (страница или AJAX) → дальше; затем сравнение с приложением, находки и справочник */
+:root{
+  --bg:#f3f5f4; --surface:#ffffff; --sunk:#e9eeec; --fg:#172024; --muted:#59666b; --line:#d3dbd8;
+  --web:#2f5fa8; --web-soft:#e0e9f6;
+  --edge:#7a5a14; --edge-soft:#f3ecdc;
+  --grpc:#634fa3; --grpc-soft:#ebe6f6;
+  --ext:#3d6e39; --ext-soft:#e3efe1;
+  --crit:#ffffff; --crit-bg:#b3261e;
+  --hi:#b3261e; --hi-soft:#fbe4e1; --mid:#9a6a00; --mid-soft:#fbf0d4; --lo:#59666b; --lo-soft:#e9eeec;
+  --f-display:"Unbounded","Golos Text",system-ui,sans-serif;
+  --f-body:"Golos Text",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,"Cascadia Mono",Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#111618; --surface:#182023; --sunk:#1f292c; --fg:#e4ebe9; --muted:#97a5a9; --line:#2d393c;
+  --web:#7fa8e6; --web-soft:#18263a; --edge:#d6b36a; --edge-soft:#2e2615;
+  --grpc:#a796e0; --grpc-soft:#272140; --ext:#86c27f; --ext-soft:#1d2e1c;
+  --crit:#1a0d0c; --crit-bg:#f08a80;
+  --hi:#f08a80; --hi-soft:#3a1d1b; --mid:#e6bb55; --mid-soft:#352b14; --lo:#97a5a9; --lo-soft:#1f292c;
+  color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#111618; --surface:#182023; --sunk:#1f292c; --fg:#e4ebe9; --muted:#97a5a9; --line:#2d393c;
+  --web:#7fa8e6; --web-soft:#18263a; --edge:#d6b36a; --edge-soft:#2e2615;
+  --grpc:#a796e0; --grpc-soft:#272140; --ext:#86c27f; --ext-soft:#1d2e1c;
+  --crit:#1a0d0c; --crit-bg:#f08a80;
+  --hi:#f08a80; --hi-soft:#3a1d1b; --mid:#e6bb55; --mid-soft:#352b14; --lo:#97a5a9; --lo-soft:#1f292c;
+  color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font:15px/1.55 var(--f-body);padding:0 16px}
+.wrap{max-width:1180px;margin:0 auto;padding-block:32px 64px;display:flex;flex-direction:column;gap:48px}
+h1,h2,h3{text-wrap:balance;margin:0}
+h1{font:700 clamp(26px,4vw,38px)/1.15 var(--f-display);letter-spacing:-.01em}
+h2{font:500 21px/1.25 var(--f-display)}
+h3{font:600 15px/1.3 var(--f-body)}
+p{margin:0;max-width:70ch}
+code{font-family:var(--f-mono);font-size:.86em}
+.eyebrow{font:600 11px/1 var(--f-body);letter-spacing:.09em;text-transform:uppercase;color:var(--muted)}
+section{display:flex;flex-direction:column;gap:18px}
+.lead{color:var(--muted);font-size:16px}
+header{display:flex;flex-direction:column;gap:14px}
+.snap{display:flex;flex-wrap:wrap;gap:8px}
+.snap span{font:12px/1.3 var(--f-mono);background:var(--sunk);border:1px solid var(--line);border-radius:6px;padding:5px 8px;color:var(--muted)}
+.snap b{color:var(--fg);font-weight:600}
+.snap a{color:var(--web)}
+
+.flow{display:grid;grid-template-columns:minmax(0,1fr) 22px minmax(0,1.1fr) 22px minmax(0,1.25fr) 22px minmax(0,1.35fr);gap:0}
+.lane{display:flex;flex-direction:column;gap:10px;min-width:0}
+.arrow{display:flex;align-items:center;justify-content:center;color:var(--muted);font:600 18px var(--f-body)}
+.node{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:12px 13px;display:flex;flex-direction:column;gap:6px;min-width:0}
+.node .t{font-weight:600}
+.node .s{font-size:12.5px;color:var(--muted);line-height:1.45}
+.node .s code{font-size:11.5px}
+.node.web{border-color:var(--web);box-shadow:inset 3px 0 0 var(--web)}
+.node.edge{border-color:var(--edge);box-shadow:inset 3px 0 0 var(--edge)}
+.node.grpc{border-color:var(--grpc)} .node.ext{border-color:var(--ext)}
+.tags{display:flex;flex-wrap:wrap;gap:5px}
+.tag{font:500 11.5px/1 var(--f-body);padding:4px 7px;border-radius:5px;background:var(--sunk);color:var(--fg);white-space:nowrap}
+.tag.g{background:var(--grpc-soft);color:var(--grpc)} .tag.e{background:var(--ext-soft);color:var(--ext)}
+.note{font-size:13px;color:var(--muted)}
+@media (max-width:860px){.flow{grid-template-columns:minmax(0,1fr)} .arrow{transform:rotate(90deg);height:26px}}
+
+.cmp{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.col{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px 15px;display:flex;flex-direction:column;gap:8px;min-width:0}
+.col ul{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:4px;font-size:13.5px}
+.col.both{border-top:3px solid var(--fg)} .col.webonly{border-top:3px solid var(--web)} .col.mob{border-top:3px solid var(--grpc)}
+@media (max-width:860px){.cmp{grid-template-columns:minmax(0,1fr)}}
+.auth{overflow-x:auto;border:1px solid var(--line);border-radius:10px;background:var(--surface)}
+.auth table{min-width:720px}
+
+.ends{display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:12px}
+.end{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px 15px;display:flex;flex-direction:column;gap:8px;min-width:0}
+.end ol{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:4px;font-size:13.5px}
+.end li::marker{color:var(--muted);font:12px var(--f-mono)}
+.mode{font:600 10.5px/1 var(--f-body);letter-spacing:.06em;text-transform:uppercase;padding:3px 6px;border-radius:4px;margin-left:4px;vertical-align:1px}
+.mode.sync{background:var(--sunk);color:var(--muted)} .mode.async{background:var(--grpc-soft);color:var(--grpc)}
+
+.finds{display:flex;flex-direction:column;gap:10px}
+.find{display:grid;grid-template-columns:100px minmax(0,1fr);gap:14px;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:13px 15px}
+.sev{font:600 11px/1 var(--f-body);letter-spacing:.06em;text-transform:uppercase;padding:6px 8px;border-radius:5px;align-self:start;text-align:center}
+.sev.crit{background:var(--crit-bg);color:var(--crit)}
+.sev.hi{background:var(--hi-soft);color:var(--hi)} .sev.mid{background:var(--mid-soft);color:var(--mid)} .sev.lo{background:var(--lo-soft);color:var(--lo)}
+.find .b{display:flex;flex-direction:column;gap:5px;min-width:0}
+.find p{font-size:14px}
+.find .where{font:12px/1.5 var(--f-mono);color:var(--muted);overflow-wrap:anywhere}
+.chk{font:600 11px/1 var(--f-body);padding:3px 6px;border-radius:4px;margin-left:6px;vertical-align:1px;background:var(--ext-soft);color:var(--ext)}
+@media (max-width:560px){.find{grid-template-columns:minmax(0,1fr)}}
+
+.controls{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{font:500 12.5px var(--f-body);border:1px solid var(--line);background:var(--surface);color:var(--fg);border-radius:999px;padding:5px 11px;cursor:pointer}
+.chip[aria-pressed="true"]{border-color:var(--fg);background:var(--fg);color:var(--bg)}
+.chip .c{font:11px var(--f-mono);opacity:.7;margin-left:4px}
+input[type=search]{font:14px var(--f-body);padding:8px 11px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--fg);min-width:0;flex:1 1 240px;max-width:380px}
+label.tg{display:inline-flex;gap:6px;align-items:center;font-size:13px;color:var(--muted);cursor:pointer}
+button:focus-visible,input:focus-visible{outline:2px solid var(--web);outline-offset:2px}
+.count{font:12.5px var(--f-mono);color:var(--muted)}
+.tbl{overflow-x:auto;border:1px solid var(--line);border-radius:10px;background:var(--surface)}
+table{border-collapse:collapse;width:100%;font-size:13px}
+.tbl table{min-width:1000px}
+th{position:sticky;top:0;background:var(--sunk);text-align:left;font:600 11px/1.2 var(--f-body);letter-spacing:.06em;text-transform:uppercase;color:var(--muted);padding:9px 10px;border-bottom:1px solid var(--line)}
+td{padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+tr:last-child td{border-bottom:0}
+tr.grp td{background:var(--bg);font:600 12.5px var(--f-body);padding:10px}
+.m{font:600 11px var(--f-mono);color:var(--muted);white-space:nowrap}
+.p{font:12.5px var(--f-mono);overflow-wrap:anywhere}
+.f{font:11.5px var(--f-mono);color:var(--muted);display:block;margin-top:2px;overflow-wrap:anywhere}
+.ctl{font:12px var(--f-mono);overflow-wrap:anywhere}
+.gen{font:600 10.5px/1 var(--f-mono);padding:4px 6px;border-radius:4px;background:var(--sunk);color:var(--muted);white-space:nowrap;display:inline-block}
+.gen.rest{background:var(--web-soft);color:var(--web)}
+.nt{font-size:12.5px;color:var(--muted)}
+.nt.w{color:var(--mid)} .nt.d{color:var(--hi);font-weight:500}
+.empty{padding:28px;text-align:center;color:var(--muted)}
+.pages td:first-child{font-weight:600;white-space:nowrap}
+.legend{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:8px 18px;font-size:13px}
+.legend div{display:flex;gap:8px;min-width:0}
+.legend code{color:var(--fg);flex:none}
+.legend span{color:var(--muted);overflow-wrap:anywhere}
+.third{columns:3 250px;column-gap:24px;margin:0;padding-left:18px;font-size:13.5px}
+.third li{break-inside:avoid;margin-bottom:4px}
+footer{font-size:13px;color:var(--muted);border-top:1px solid var(--line);padding-top:16px;display:flex;flex-direction:column;gap:6px}
+@media (prefers-reduced-motion:no-preference){.chip{transition:background .15s,color .15s}}
+</style>
+
+<div class="wrap">
+<header>
+  <span class="eyebrow">База знаний · 12storeez-master-web · AS-IS</span>
+  <h1>Цепочка вызовов сайта</h1>
+  <p class="lead">Как браузер покупателя работает с 12storeez.com: через что проходит запрос, какой контроллер монолита рисует страницу или отвечает на AJAX и какие системы монолит вызывает дальше. Шлюзов, как у приложения, здесь нет. Собрано по коду 10.10.2026.</p>
+  <div class="snap">
+    <span>12storeez-master-web <b>be3cd759d2</b> · develop · 07.10</span>
+    <span>Пара к приложению: <code>knowledge/architecture/call-chain.html</code></span>
+  </div>
+</header>
+
+<section aria-labelledby="s-map">
+  <span class="eyebrow">Обзор</span>
+  <h2 id="s-map">Путь запроса браузера</h2>
+  <p>Браузер ходит в монолит напрямую: ни BFF, ни отдельного SSR-сервиса нет. PHP рендерит HTML и кладёт данные первого экрана в <code>window._site</code>, затем Vue-бандл догружает остальное AJAX-запросами на тот же домен. Пользователя монолит узнаёт по cookie, JWT сайт не использует.</p>
+  <div class="flow">
+    <div class="lane">
+      <span class="eyebrow">Браузер</span>
+      <div class="node web"><span class="t">12storeez.com</span><span class="s">Vue 2 + Vuex, один экземпляр axios (<code>layouts/base/workspace/axios.js</code>), относительные URL, заголовок <code>X-Requested-With</code></span></div>
+      <div class="node web"><span class="t">Cookie</span><span class="s"><code>_identity</code> — вход (не HttpOnly)<br><code>PHPSESSID</code> — сессия Yii<br><code>sessionId</code> — гостевая корзина</span></div>
+      <div class="node ext"><span class="t">Напрямую из браузера</span><div class="tags"><span class="tag e">Diginetica</span><span class="tag e">Mindbox tracker</span><span class="tag e">YooKassa widget</span><span class="tag e">reCAPTCHA / SmartCaptcha</span><span class="tag e">Яндекс.Карты</span><span class="tag e">Boxberry</span><span class="tag e">Dresscode</span><span class="tag e">Garderobo</span></div></div>
+    </div>
+    <div class="arrow" aria-hidden="true">→</div>
+    <div class="lane">
+      <span class="eyebrow">Край сети</span>
+      <div class="node edge"><span class="t">ServicePipe / haproxy</span><span class="s">Анти-DDoS. Белый список IP на Ingress пускает только их, офис и VPN</span></div>
+      <div class="node edge"><span class="t">nginx Ingress или Istio</span><span class="s"><code>limit-rps 250</code>, страницы ошибок 5xx. Хосты: 12storeez.com, www, web, .ru → 301 на 12storeez.com</span></div>
+      <div class="node edge"><span class="t">nginx в поде</span><span class="s">Статика и бандлы из <code>www/build</code> (expires 7d), webp по <code>Accept</code>; всё остальное → <code>index.php</code> → php-fpm. Картинки — <code>static-image.12storeez.com</code> / CDN</span></div>
+    </div>
+    <div class="arrow" aria-hidden="true">→</div>
+    <div class="lane">
+      <span class="eyebrow">Монолит</span>
+      <div class="node"><span class="t">Страница (HTML)</span><span class="s"><code>FrontendController</code> → view → layout <code>themes/basic/views/layouts/base.php</code>: бандл по <code>controller-action</code> и <code>window._site</code> с данными и пользователем</span></div>
+      <div class="node"><span class="t">AJAX (JSON)</span><span class="s">Четыре поколения: явные правила <code>url.php</code>, общий <code>module/controller/action</code>, REST <code>/api/…</code> и «+json»: при AJAX <code>AbstractRestController</code> вызывает <code>action…Json</code></span></div>
+      <div class="node"><span class="t">Общие сервисы с приложением</span><span class="s">Корзина, заказ, оплата, доставка, сертификаты, каталог — те же классы, что за шлюзами приложения</span></div>
+    </div>
+    <div class="arrow" aria-hidden="true">→</div>
+    <div class="lane">
+      <span class="eyebrow">Дальше</span>
+      <div class="node"><span class="t">Хранилища</span><div class="tags"><span class="tag">MySQL</span><span class="tag">Redis</span><span class="tag">Elasticsearch</span><span class="tag">PHP-сессии (хранилище не задано)</span></div></div>
+      <div class="node"><span class="t">Синхронно через BFB MS</span><div class="tags"><span class="tag e">Mindbox: расчёт, рекомендации, коды сертификатов</span><span class="tag e">ПВЗ, гео, интервалы</span><span class="tag e">Billing: Подели, Сплит, Pay, СБП</span><span class="tag e">Giftcards MS</span></div></div>
+      <div class="node"><span class="t">Напрямую</span><div class="tags"><span class="tag e">Mindbox REST api.mindbox.ru</span><span class="tag e">YooKassa API</span><span class="tag e">Diginetica</span><span class="tag e">Долями billing</span><span class="tag g">gRPC Mindbox: SMS</span><span class="tag g">gRPC Feedbacks, Orders</span></div></div>
+      <div class="node grpc"><span class="t">Асинхронно: outbox → RabbitMQ</span><div class="tags"><span class="tag g">1С</span><span class="tag g">RetailCRM</span><span class="tag g">Mindbox</span><span class="tag g">Платёжные статусы</span><span class="tag g">Чеки ATOL</span></div></div>
+    </div>
+  </div>
+</section>
+
+<section aria-labelledby="s-cmp">
+  <span class="eyebrow">Сайт и приложение</span>
+  <h2 id="s-cmp">Где каналы сходятся и где расходятся</h2>
+  <p>Входные контроллеры у сайта свои, а бизнес-логика в основном общая. Поэтому изменение в корзине, заказе или оплате обычно затрагивает оба канала, даже если задача пришла только про один.</p>
+  <div class="auth"><table>
+    <thead><tr><th></th><th>Сайт</th><th>Приложение</th></tr></thead>
+    <tbody>
+      <tr><td><b>Путь до монолита</b></td><td>Браузер → ServicePipe → nginx → PHP</td><td>iOS → шлюз <code>core</code> (esb) или <code>mobile</code> (Go) → PHP</td></tr>
+      <tr><td><b>Кто пользователь</b></td><td>Cookie <code>_identity</code> + сессия Yii</td><td>JWT шлюза → <code>x-session-token</code> → <code>UserMobileSession</code></td></tr>
+      <tr><td><b>Гостевая корзина</b></td><td>Cookie <code>sessionId</code></td><td><code>x-session-token</code>; тот же <code>SessionService</code></td></tr>
+      <tr><td><b>SMS-код входа</b></td><td>Монолит → gRPC Mindbox</td><td>Шлюз → gRPC Mindbox, монолит не участвует</td></tr>
+      <tr><td><b>Бонусы в ЛК</b></td><td>Mindbox REST из монолита</td><td>gRPC Mindbox из Go-шлюза</td></tr>
+      <tr><td><b>Корзина → Mindbox</b></td><td>Синхронно <code>sendCartList</code> в api.mindbox.ru</td><td>RabbitMQ <code>mindbox.mobile-cart.send</code></td></tr>
+      <tr><td><b>Создание заказа</b></td><td><code>OrdersController::proceed</code> → <code>OrderService::createOrder</code>, 5 событий</td><td><code>CreateOrderServiceMobile</code>, 10 событий (старый <code>PUT orders</code> — 5)</td></tr>
+      <tr><td><b>Ссылка на оплату</b></td><td><code>PaymentProviderFactory</code> → редирект на <code>payment_url</code></td><td><code>Payment/System/*</code> → токен или URL в ответе</td></tr>
+      <tr><td><b>CSRF / капча</b></td><td>CSRF выключен; капча на входе и сбросе пароля</td><td>Не применимо; WAF на входе по телефону</td></tr>
+    </tbody>
+  </table></div>
+  <div class="cmp">
+    <div class="col both"><h3>Общее</h3><ul>
+      <li><code>CartServiceFactory</code>, <code>AbstractCartService</code>, <code>CartPaymentServiceFactory</code></li>
+      <li>Промокоды <code>ProcessingService</code>, расчёт Mindbox через BFB</li>
+      <li><code>OrderService::createOrder</code> / <code>updateOrder</code>, outbox и inbox</li>
+      <li><code>OrderCancelService</code>, <code>OrderRefundService</code></li>
+      <li><code>GiftcardsService</code>, <code>GiftcardCreateOrderService</code></li>
+      <li>Доставка, ПВЗ, гео, интервалы (BFB)</li>
+      <li>Elastic, Diginetica, рекомендации</li>
+      <li>Платёжные вебхуки, outbox платежей, чеки</li></ul></div>
+    <div class="col webonly"><h3>Только сайт</h3><ul>
+      <li><code>modules/orders/controllers/OrdersController</code>: proceed, payment, success</li>
+      <li><code>PaymentProviderFactory</code>, <code>setPaymentCredentials</code></li>
+      <li>Старая корзина <code>modules/cart</code> и прямой <code>sendCartList</code></li>
+      <li>ЛК <code>modules/users/*</code>, Mindbox REST за бонусами</li>
+      <li>Возвраты: <code>RefundController</code>, <code>UserRefundController</code></li>
+      <li>GA exchange, Roistat, письмо менеджеру</li>
+      <li>Редизайн корзины и <code>/checkout</code> — пока только админам</li></ul></div>
+    <div class="col mob"><h3>Только приложение</h3><ul>
+      <li><code>CreateOrderServiceMobile</code>, <code>CreateReservationServiceMobile</code></li>
+      <li>RabbitMQ <code>mindbox.mobile-cart.send</code> / <code>clear</code></li>
+      <li><code>Mobile\PaymentController</code>, <code>Payment/System/*</code></li>
+      <li><code>MobileSessionService</code></li>
+      <li>gRPC Mindbox для кодов и бонусов из шлюзов</li></ul></div>
+  </div>
+</section>
+
+<section aria-labelledby="s-pages">
+  <span class="eyebrow">Страницы</span>
+  <h2 id="s-pages">Кто рисует ключевые страницы</h2>
+  <p>Все страничные контроллеры наследуют <code>modules/cms/controllers/FrontendController.php</code>. Бандл выбирается в <code>themes/basic/assets/WebpackBundle.php</code>. View из <code>themes/basic/modules/*</code> перекрывает view модуля.</p>
+  <div class="tbl"><table class="pages">
+    <thead><tr><th>Страница</th><th>URL</th><th>Controller::action</th><th>Бандл</th><th>Данные</th></tr></thead>
+    <tbody>
+      <tr><td>Главная</td><td class="p">/</td><td class="ctl">src/Modules/Mainpage/Controllers/MainpageController::actionIndex</td><td class="p">home-index</td><td class="nt">3 блока в <code>_site</code> (Redis), остальное — <code>GET /home/new</code></td></tr>
+      <tr><td>Категория</td><td class="p">/catalog/&lt;slugs&gt;</td><td class="ctl">modules/product/controllers/ProductController::actionIndex</td><td class="p">catalog-category</td><td class="nt">Товары и фильтры сразу; дальше тот же URL по AJAX → <code>actionIndexJson</code></td></tr>
+      <tr><td>Карточка товара</td><td class="p">/catalog/{cat}/{gender}/{slug}</td><td class="ctl">ProductController::actionView</td><td class="p">catalog-product-index · -redesign</td><td class="nt">Полный DTO из кеша; редизайн по <code>?redesign=12stz</code> или A/B</td></tr>
+      <tr><td>Поиск</td><td class="p">/catalog/search</td><td class="ctl">ProductController::actionSearchProduct</td><td class="p">catalog-search</td><td class="nt">Diginetica, подсказки <code>/catalog/suggest</code></td></tr>
+      <tr><td>Корзина</td><td class="p">/cart</td><td class="ctl">modules/cart/controllers/CartController::actionIndex</td><td class="p">cart</td><td class="nt"><code>window.cartData</code>; синхронный ping Giftcards MS при рендере</td></tr>
+      <tr><td>Корзина (редизайн)</td><td class="p">/cart?redesign=12stz</td><td class="ctl">CartController::actionIndexRedesign</td><td class="p">cart-redesign</td><td class="nt">Только админы; данные через <code>/api/cart/*</code></td></tr>
+      <tr><td>Чекаут (новый)</td><td class="p">/checkout</td><td class="ctl">src/Modules/Checkout/Controllers/CheckoutController::actionIndex</td><td class="p">cart-checkout</td><td class="nt">Только админы, остальным 301 в корзину</td></tr>
+      <tr><td>Оформление</td><td class="p">POST /order/proceed-new</td><td class="ctl">modules/orders/controllers/OrdersController::actionProceedNew</td><td class="p">—</td><td class="nt">JSON; затем редирект на оплату</td></tr>
+      <tr><td>Оплата</td><td class="p">/order/payment/{hash} · /order/online-payment/{hash}</td><td class="ctl">OrdersController::actionPayment · actionOnlinePayment</td><td class="p">orders-payment · orders-online-payment</td><td class="nt">Редирект на <code>payment_url</code> или виджет YooKassa</td></tr>
+      <tr><td>Заказ оформлен</td><td class="p">/order/success/{id}?hash=</td><td class="ctl">OrdersController::actionSuccess</td><td class="p">orders-success</td><td class="nt">Доступ по хэшу заказа</td></tr>
+      <tr><td>ЛК и заказы</td><td class="p">/profile · /profile/orders · /profile/view/{id}</td><td class="ctl">modules/users/controllers/ProfileController</td><td class="p">profile-index · -orders · -view</td><td class="nt">Первая страница сразу, дальше <code>/profile/*-orders</code></td></tr>
+      <tr><td>Возврат</td><td class="p">внутри ЛК</td><td class="ctl">UserRefundController, RefundController, Api2\OrdersController</td><td class="p">—</td><td class="nt">Только AJAX</td></tr>
+      <tr><td>Сертификат</td><td class="p">/gift-certificate</td><td class="ctl">modules/home/controllers/LandingPageController::actionGiftCertificate</td><td class="p">gift-certificate</td><td class="nt">Покупка через <code>/giftcards/giftcards/*</code></td></tr>
+      <tr><td>Магазины</td><td class="p">/about/shops</td><td class="ctl">modules/content/controllers/ShowroomsController::actionIndex</td><td class="p">shops</td><td class="nt">Сразу; города и карточка по AJAX</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section aria-labelledby="s-ends">
+  <span class="eyebrow">Конец цепочки</span>
+  <h2 id="s-ends">Что монолит делает дальше для сайта</h2>
+  <div class="ends">
+    <div class="end"><h3>Каталог и поиск <span class="mode sync">синхронно</span></h3><ol>
+      <li>Листинг: Elasticsearch, если включён и не помечен сломанным, иначе MySQL</li>
+      <li>Карточка: Redis (<code>cachedProductsService</code>)</li>
+      <li>Поиск и подсказки: Diginetica, при ошибке свой поиск</li>
+      <li>Рекомендации: Mindbox через BFB по cookie <code>mindboxDeviceUUID</code></li></ol></div>
+    <div class="end"><h3>Корзина <span class="mode sync">синхронно</span></h3><ol>
+      <li>Сервис корзины из <code>CartServiceFactory</code>, MySQL</li>
+      <li>Скидки и бонусы: расчёт Mindbox через BFB с кешем</li>
+      <li>При каждом изменении — <code>sendCartList</code> прямо в api.mindbox.ru</li>
+      <li>Сертификат в корзине: Giftcards MS</li></ol></div>
+    <div class="end"><h3>Доставка и гео <span class="mode sync">синхронно</span></h3><ol>
+      <li>Варианты доставки: MySQL (<code>delivery_tk</code>, <code>delivery_city</code>) + кеш</li>
+      <li>ПВЗ, гео, интервалы: BFB MS + кеш Redis</li>
+      <li>Boxberry: статичный <code>/export_boxberry.json</code> из консольной выгрузки</li></ol></div>
+    <div class="end"><h3>Создание заказа <span class="mode sync">транзакция</span><span class="mode async">outbox</span></h3><ol>
+      <li>Блокировка корзины, бонусы Mindbox, блокировка сертификатов</li>
+      <li><code>OrderService::createOrder</code>: MySQL, commit, 5 событий</li>
+      <li>Outbox → 1С, RetailCRM, Mindbox через RabbitMQ</li>
+      <li>Синхронно: подписка, GA, письмо менеджеру, Roistat</li></ol></div>
+    <div class="end"><h3>Платежи <span class="mode sync">создание</span><span class="mode async">статусы</span></h3><ol>
+      <li>YooKassa: SDK напрямую; вебхук <code>/yandex/pay/proceed</code> полностью синхронный, чек предоплаты — через API YooKassa</li>
+      <li>Сплит, Pay, СБП, Подели: <code>BFB_MS_HOST/aggregate-billing</code></li>
+      <li>Долями: отдельный хост <code>AGGREGATE_BILLING_MS_URL</code>, вебхук <code>TinkoffController</code></li>
+      <li>Commit, cancel, refund — outbox; чеки — outbox → ATOL</li></ol></div>
+    <div class="end"><h3>ЛК, возвраты, отзывы <span class="mode sync">синхронно</span><span class="mode async">outbox</span></h3><ol>
+      <li>Заказы: MySQL; офлайн-чеки — gRPC Orders</li>
+      <li>Отмена и возврат: <code>OrderService::updateOrder</code> → outbox</li>
+      <li>Способы возврата: Redis-конфигурация, как у приложения</li>
+      <li>Отзыв о заказе: gRPC Feedbacks, затем Mindbox REST</li></ol></div>
+  </div>
+</section>
+
+<section aria-labelledby="s-find">
+  <span class="eyebrow">Находки</span>
+  <h2 id="s-find">Что стоит проверить</h2>
+  <p class="note">Метка «проверено» — место открыто и перечитано вручную после агента. Остальное собрано агентами по коду без ручной сверки.</p>
+  <div class="finds">
+    <div class="find"><span class="sev crit">Критично</span><div class="b"><h3>Смена способа оплаты чужого заказа без входа <span class="chk">проверено</span></h3><p>Веб-версия <code>PATCH /api/orders/{id}/change-payment-method</code> и <code>GET /api/payment-types?order_id=</code> не требует входа и не проверяет владельца: заказ ищется просто по номеру. Номера заказов идут подряд, поэтому можно перебором читать суммы чужих заказов и менять их способ оплаты. В мобильной версии того же контроллера есть и вход, и проверка владельца (<code>findOneByIdAndUserId</code>).</p><span class="where">src/Modules/Payment/Controller/ChangePaymentController.php:55-68, :103, :161 · сравнить: src/Modules/MobileV2/Controllers/ChangePaymentController.php:84-85, :130, :205</span></div></div>
+    <div class="find"><span class="sev hi">Высокий</span><div class="b"><h3>Кеш страниц может отдать чужие персональные данные <span class="chk">проверено</span></h3><p>Контент, блог и поддержка кешируются целиком вместе с <code>window._site.user</code>: имя, email, телефон. Ключ кеша различает только «вошёл или нет» и GET-параметры. Первый вошедший пользователь попадает в кеш, следующие вошедшие до часа видят его данные в исходнике страницы.</p><span class="where">config/web.php:313-320 · modules/cms/controllers/FrontendController.php:189-211 · ContentController.php:29, BlogController.php:87, SupportController.php:38 · modules/layout/service/BaseContextService.php:438-439, :567</span></div></div>
+    <div class="find"><span class="sev hi">Высокий</span><div class="b"><h3>Сбой после commit: заказ есть, клиент видит ошибку <span class="chk">проверено</span></h3><p>Outbox пишется после commit. Если событие или outbox падает, сайт ловит исключение, отвечает <code>orderFailed</code>, снимает блокировку с корзины и сертификатов. Заказ при этом уже в БД и не уходит в 1С, RetailCRM и Mindbox, а повторное нажатие создаёт дубль.</p><span class="where">src/Modules/Order/Services/OrderService.php:182 → :201 → :209 · modules/orders/controllers/OrdersController.php:293-323, :392-394</span></div></div>
+    <div class="find"><span class="sev hi">Высокий</span><div class="b"><h3>Зашитый в код ключ к странице «Заказ оформлен» <span class="chk">проверено</span></h3><p>Кроме хэша заказа <code>actionSuccess</code> принимает постоянную строку из кода. С ней открывается страница успеха любого заказа по номеру. Значение здесь не приводится.</p><span class="where">modules/orders/controllers/OrdersController.php:905-907</span></div></div>
+    <div class="find"><span class="sev mid">Средний</span><div class="b"><h3>Отмена заказа из ЛК без серверной проверки <span class="chk">проверено</span></h3><p>Веб-ЛК отменяет любой свой заказ: проверки «можно ли отменить» нет ни в контроллере, ни в <code>OrderCancelService</code>. Кнопку скрывает только интерфейс. В приложении такая проверка есть.</p><span class="where">modules/users/controllers/ProfileController.php:634-659 · src/Modules/Order/Services/OrderCancelService.php:26</span></div></div>
+    <div class="find"><span class="sev mid">Средний</span><div class="b"><h3>CSRF выключен, есть меняющие данные GET-запросы <span class="chk">проверено</span></h3><p>Проверка CSRF и подпись cookie выключены глобально, а cookie входа доступна из JS. При этом корзину меняют GET-запросы <code>/cart/add-item/…</code>, <code>reset-exclude-positions</code>, <code>send-cart-list</code>: их может вызвать любая сторонняя страница.</p><span class="where">config/web.php:96-97, :109</span></div></div>
+    <div class="find"><span class="sev mid">Средний</span><div class="b"><h3>Ещё два места без проверки владельца</h3><p><code>send-payment-link-to-email</code> требует вход, но не проверяет, чей заказ. <code>cart-certificate-use</code> берёт <code>cart_id</code> из тела запроса и применяет сертификат к любой корзине.</p><span class="where">modules/orders/controllers/OrdersController.php:994 · modules/giftcards/controllers/GiftcardsController.php:617-628</span></div></div>
+    <div class="find"><span class="sev mid">Средний</span><div class="b"><h3>Приватный JWT-ключ в git <span class="chk">проверено</span></h3><p><code>jwt_keys/jwtRS256.key</code> отслеживается git, хотя указан в <code>.gitignore</code>. Код его не читает (JWT сайта — ES256 из env), но ключ стоит удалить из истории и считать скомпрометированным.</p><span class="where">jwt_keys/jwtRS256.key, jwt_keys/jwtRS256.key.pub</span></div></div>
+    <div class="find"><span class="sev mid">Средний</span><div class="b"><h3>Хранилище PHP-сессий не настроено</h3><p>Компонент <code>session</code> не задан, в php.ini нет <code>save_handler</code>. Если сессии лежат в файлах пода, при трёх репликах без привязки к поду пользователь будет терять сессию. Проверить настройки базового образа <code>php8.2-monolith</code>.</p><span class="where">config/web.php · .deploy/helm/values.yaml:341-362</span></div></div>
+    <div class="find"><span class="sev lo">Низкий</span><div class="b"><h3>Ошибки маскируются под успех</h3><p>На AJAX-запросах <code>AbstractRestController</code> превращает любое исключение в <code>success: true</code> с кодом 200, поэтому фронт и мониторинг не видят сбоев.</p><span class="where">modules/common/controllers/AbstractRestController.php:76-85</span></div></div>
+    <div class="find"><span class="sev lo">Низкий</span><div class="b"><h3>Мёртвые вызовы и дубли</h3><p>Фронт шлёт запросы без маршрута: <code>check-passport</code>, <code>/lookbook/all-wear</code>, <code>order/proceed</code>, <code>/rfi/rfi/saved-card-proceed</code>, <code>/frontend-logger</code>. Две корзины, два гео-клиента, три пути подписки на рассылку, сертификаты <code>add</code> и <code>initiate</code>. <code>CreateOrderServiceSite</code> нигде не используется.</p><span class="where">frontend/src/modules/orders/services/OrderService.js:283 · cart/ancient/api/order.js:12 · src/Modules/Order/Services/CreateOrder/</span></div></div>
+    <div class="find"><span class="sev lo">Низкий</span><div class="b"><h3>База знаний расходится с кодом</h3><p>В <code>05-api.md</code> сказано, что сайт защищён JWT, а на деле cookie и сессия. В <code>03-business-domains.md</code> указан путь сайта через <code>CreateOrderServiceSite</code> и «26 обработчиков» — на деле контроллер вызывает <code>createOrder</code> сам с 5 событиями. В <code>07-infrastructure.md</code> не описаны ServicePipe, белый список, CDN и сессии. В <code>repo-map.md</code> фронт назван React, а это Vue 2.</p><span class="where">knowledge/12storeez-master-web/architecture/03, 05, 07 · repo-map.md</span></div></div>
+  </div>
+</section>
+
+<section aria-labelledby="s-ref">
+  <span class="eyebrow">Справочник</span>
+  <h2 id="s-ref">AJAX-запросы браузера</h2>
+  <p>Каждая строка — запрос из JS сайта: URL, файл фронта, контроллер монолита и поколение маршрута.</p>
+  <div class="controls">
+    <input type="search" id="q" placeholder="URL, файл, контроллер…" aria-label="Поиск по запросам">
+    <label class="tg"><input type="checkbox" id="flag"> Только с замечаниями</label>
+    <span class="count" id="count"></span>
+  </div>
+  <div class="chips" id="chips" role="group" aria-label="Домен"></div>
+  <div class="tbl"><table>
+    <thead><tr><th style="width:26%">Запрос · файл фронта</th><th style="width:30%">Controller::action</th><th style="width:70px">Маршрут</th><th>Заметка</th></tr></thead>
+    <tbody id="rows"></tbody>
+  </table></div>
+  <div class="legend">
+    <div><code>фронт</code><span>frontend/src/modules/…</span></div>
+    <div><code>ЧПУ</code><span>явное правило в config/url.php</span></div>
+    <div><code>MCA</code><span>общий module/controller/action (url.php:332-334)</span></div>
+    <div><code>REST</code><span>новые /api/… на сессии Yii</span></div>
+    <div><code>+json</code><span>AJAX вызывает action…Json (AbstractRestController:53)</span></div>
+  </div>
+</section>
+
+<section aria-labelledby="s-third">
+  <span class="eyebrow">Мимо монолита</span>
+  <h2 id="s-third">Куда браузер ходит сам</h2>
+  <ul class="third">
+    <li>Diginetica: скрипты <code>cdn.diginetica.net</code>, события <code>tracking-app.diginetica.net/event</code></li>
+    <li>Mindbox: <code>api.mindbox.ru/scripts/v1/tracker.js</code>, endpoint <code>12storeez</code></li>
+    <li>YooKassa: <code>yookassa.ru/checkout-widget/v1/checkout-widget.js</code></li>
+    <li>Капча: Google reCAPTCHA, Yandex SmartCaptcha</li>
+    <li>Карты: <code>api-maps.yandex.ru</code>, <code>maps.googleapis.com</code></li>
+    <li>Boxberry: <code>points.boxberry.ru/js/boxberry.js</code></li>
+    <li>Dresscode: <code>try-on.dresscode.ai</code>, <code>api.dresscode.ai</code></li>
+    <li>Garderobo: <code>widget.modatech.ru</code></li>
+    <li>Счётчики: GTM, Метрика, VK, Criteo, AdvCake, Roistat</li>
+    <li>Чат Flomni, Sentry <code>sentry.12stz.dev</code>, AppsFlyer Smart Script</li>
+    <li>SDK Долями, Сплит, SberPay в браузере нет — только редирект на <code>payment_url</code></li>
+  </ul>
+</section>
+
+<footer>
+  <span>Файл: <code>new/knowledge/architecture/web-call-chain.html</code>. Карта монолита: <code>knowledge/12storeez-master-web/repo-map.md</code>, фронтенд: <code>architecture/06-frontend.md</code>.</span>
+  <span>Собрано чтением кода, без трафика и логов. Prod-значения из Vault не проверялись.</span>
+</footer>
+</div>
+
+<script>
+const D={auth:"Вход и пользователь",prof:"ЛК и заказы",ret:"Возвраты",cat:"Каталог и поиск",cart:"Старая корзина",cartn:"Новая корзина",chk:"Оформление и доставка",pay:"Оплата",gift:"Сертификаты",rev:"Отзывы и опросы",sub:"Подписки и избранное",cont:"Контент"};
+// [домен, метод, URL, файл фронта, Controller::action, файл контроллера, поколение, заметка, 1=внимание 2=опасно]
+const R=[
+["auth","POST","/user/send-sms-code-ajax","user/services/UserService.js:139","UsersController::actionSendSmsCodeAjax","modules/users/controllers/UsersController.php","ЧПУ","капча; SMS через gRPC Mindbox"],
+["auth","POST","/user/check-sms-code-ajax","user/services/UserService.js:169, :183","UsersController::actionCheckSmsCodeAjax","modules/users/controllers/UsersController.php","ЧПУ","старый и новый метод на одном URL"],
+["auth","POST","/user/login-ajax","user/services/UserService.js:153","UsersController::actionLoginAjax","modules/users/controllers/UsersController.php","ЧПУ","капча, rate limit"],
+["auth","POST","/users/users/reset-password-ajax","user/services/UserService.js:223","UsersController::actionResetPasswordAjax","modules/users/controllers/UsersController.php","MCA","капча"],
+["auth","POST","/user/recovery-password-ajax/{token}","user/services/UserService.js:248","UsersController::actionRecoveryPasswordAjax","modules/users/controllers/UsersController.php","ЧПУ",""],
+["auth","POST","/user/get-marketing-data","user/services/UserService.js:112","UsersController::actionGetMarketingData","modules/users/controllers/UsersController.php","ЧПУ","на каждой странице; POST для чтения"],
+["auth","GET · POST","/users/geo/confirmation","geo/services/GeoService.js:75, :110","UserGeoController::actionConfirmation","src/Modules/User/Controller/UserGeoController.php","REST","на каждой странице; дубль мобильного"],
+["auth","GET · POST","/api/v1/notifications, /read, /read-all","user/services/NotificationService.js:25-60","FrontendNotificationController::actionList / Read / ReadAll","src/User/Notifications/Controller/FrontendNotificationController.php","REST","AuthRequiredBehavior по сессии"],
+["auth","POST","/ab-test/run-experiment","user/services/UserService.js:196","AbTestController::actionRunExperiment","modules/abTest/controllers/AbTestController.php","ЧПУ","нигде не вызывается",1],
+["prof","GET","/profile/bonuses","user/services/UserService.js:259","ProfileController::actionBonusesJson","modules/users/controllers/ProfileController.php","+json","Mindbox REST напрямую"],
+["prof","POST","/profile/edit, /profile/fill, /profile/change-password","user/services/UserService.js:291-337","ProfileController::actionEditJson / FillJson / ChangePasswordJson","modules/users/controllers/ProfileController.php","+json",""],
+["prof","GET","/users/profile/qr","user/services/UserService.js:344","ProfileController::actionQrJson","modules/users/controllers/ProfileController.php","MCA",""],
+["prof","GET","/profile/online-orders, /offline-orders, /seller-orders","orders/services/OrderService.js:49-107","ProfileController::actionOnlineOrdersJson / OfflineOrdersJson / SellerOrdersJson","modules/users/controllers/ProfileController.php","+json","офлайн — gRPC Orders"],
+["prof","GET","/profile/get-order-position","orders/services/OrderService.js:120","ProfileController::actionGetOrderPositionJson","modules/users/controllers/ProfileController.php","+json",""],
+["prof","POST","/profile/cancel-order","orders/services/OrderService.js:250","ProfileController::actionCancelOrderJson","modules/users/controllers/ProfileController.php","+json","нет серверной проверки «можно ли отменить»",1],
+["prof","GET","/profile/get-cancel-reasons","orders/services/OrderService.js:259","ProfileController::actionGetCancelReasonsJson","modules/users/controllers/ProfileController.php","+json",""],
+["prof","POST","/profile/add-feedback","orders/services/OrderService.js:166","ProfileController::actionAddFeedbackJson","modules/users/controllers/ProfileController.php","+json","gRPC Feedbacks, затем Mindbox REST"],
+["prof","GET","/api/payment-types?order_id=","orders/services/OrderService.js:86","ChangePaymentController::actionPaymentTypes","src/Modules/Payment/Controller/ChangePaymentController.php","REST","без входа и проверки владельца",2],
+["prof","PATCH","/api/orders/{id}/change-payment-method","orders/services/OrderService.js:28","ChangePaymentController::actionChangePaymentMethod","src/Modules/Payment/Controller/ChangePaymentController.php","REST","без входа и проверки владельца",2],
+["prof","POST","/orders/orders/send-payment-link-to-email","orders/services/OrderService.js:185","OrdersController::actionSendPaymentLinkToEmail","modules/orders/controllers/OrdersController.php:994","MCA","вход есть, владелец не проверяется",1],
+["ret","POST","/user/cabinet/return-item/ajax/check-reason","orders/services/OrderService.js:292","UserRefundController::actionReturnItemCheckReasonAjax","modules/users/controllers/UserRefundController.php","ЧПУ","prepareRefundPositionOrder, общий с приложением"],
+["ret","POST","/user/cabinet/return-item/ajax/check-bank-details","orders/services/OrderService.js:361","UserRefundController::actionReturnItemCheckBankDetailsAjax","modules/users/controllers/UserRefundController.php","ЧПУ",""],
+["ret","POST","/user/cabinet/return-item/ajax/check-passport","orders/services/OrderService.js:283","—","маршрута нет","—","мёртвый вызов",1],
+["ret","GET","/orders/refund/get-positions, /get-bank-data","orders/services/OrderService.js:382, :371","RefundController::actionGetPositionsJson / GetBankDataJson","modules/orders/controllers/RefundController.php","+json",""],
+["ret","POST","/orders/refund/save-reason","orders/services/OrderService.js:330","RefundController::actionSaveReasonJson","modules/orders/controllers/RefundController.php","+json",""],
+["ret","GET","/api/orders/{id}/return-method-list","orders/services/OrderService.js:408","Api2\\OrdersController::actionReturnMethodList","src/Modules/Api2/Controller/OrdersController.php","REST","вход и владелец проверяются"],
+["ret","POST","/api/orders/{id}/return-details","orders/services/OrderService.js:315","Api2\\OrdersController::actionReturnDetails","src/Modules/Api2/Controller/OrdersController.php","REST","outbox в RetailCRM"],
+["cat","GET","/catalog/… (тот же URL страницы)","catalog/services/CatalogService.js:22","ProductController::actionIndexJson","modules/product/controllers/ProductController.php","+json","Elastic или MySQL"],
+["cat","GET","/product/product/get-last-view, /get-lists, /get-items","catalog/services/CatalogService.js:36-72","ProductController::actionGetLastViewJson / GetListsJson / GetItemsJson","modules/product/controllers/ProductController.php","+json","get-lists — Diginetica"],
+["cat","GET","/catalog/category/get-popular, /catalog/category/search","catalog/services/CatalogService.js:61, :102","CategoryController::actionGetPopularJson / SearchJson","modules/product/controllers/CategoryController.php","+json",""],
+["cat","GET","/catalog/search","catalog/services/CatalogService.js:87","ProductController::actionSearchProductJson","modules/product/controllers/ProductController.php","+json","Diginetica"],
+["cat","GET","/catalog/suggest","catalog/services/CatalogService.js:116","ProductController::actionSuggestJson","modules/product/controllers/ProductController.php","+json","Diginetica autocomplete"],
+["cat","GET","/product/product/part-payment-info, /measurements, /product-cities/{id}, /table-sizes","catalog/services/ProductService.js:24-59","ProductController::action…Json","modules/product/controllers/ProductController.php","+json",""],
+["cat","GET","/product/product/recommendations","catalog/services/ProductService.js:73","ProductController::actionRecommendations","src/Modules/Product/Controller/ProductController.php","ЧПУ","Mindbox через BFB"],
+["cat","GET","/feedback/feedback-new/get-for-product/{id}","catalog/services/ProductService.js:41","FeedbackNewController::actionGetForProductJson","modules/feedback/controllers/FeedbackNewController.php","+json",""],
+["cart","GET","/cart/add-item/{sizeId}/1","cart/services/CartService.js:23, :33","CartController::actionAddItem","modules/cart/controllers/CartController.php","ЧПУ","GET меняет корзину",1],
+["cart","POST","/cart/add-preorder-item, /cart/add-shop-item","cart/services/CartService.js:44, :55","CartController::actionAddPreorderItem / AddShopItem","modules/cart/controllers/CartController.php","ЧПУ",""],
+["cart","DELETE","/cart/cart/clear","cart/services/CartService.js:65","CartController::actionClear","modules/cart/controllers/CartController.php","MCA",""],
+["cart","GET","/cart/cart?mode=express_delivery","cart/services/CartService.js:132","CartController::actionIndex → actionIndexAjax","modules/cart/controllers/CartController.php","MCA",""],
+["cart","POST","/cart/cart/update-items","cart/ancient/api/cart.js:179","CartController::actionUpdateItems","modules/cart/controllers/CartController.php","MCA",""],
+["cart","GET","/cart/cart/send-cart-list","cart/ancient/api/cart.js:199","CartController::actionSendCartList","modules/cart/controllers/CartController.php","MCA","GET с побочным эффектом; Mindbox REST",1],
+["cart","POST","/cart/remove-item/{id}","cart/ancient/api/cart.js:127","CartController::actionRemoveItem","modules/cart/controllers/CartController.php","ЧПУ",""],
+["cart","POST","/cart/cart/add-promo, /delete-promo, /add-bonus, /delete-bonus","cart/ancient/api/cart.js:227-305","CartController::actionAddPromo / DeletePromo / AddBonus / DeleteBonus","modules/cart/controllers/CartController.php","MCA","бонусы — Mindbox через BFB"],
+["cart","GET","/cart/cart/reset-exclude-positions","cart/ancient/api/cart.js:265","CartController::actionResetExcludePositions","modules/cart/controllers/CartController.php","MCA","GET меняет корзину",1],
+["cart","POST","/cart/cart/move-items","cart/services/CartService.js:150","CartController::actionMoveItems","modules/cart/controllers/CartController.php","MCA",""],
+["cart","POST","/cart/subscription/check","cart/services/CartService.js:119","CartSubscriptionController::actionCheck","src/Modules/Cart/Controllers/","ЧПУ","дубль мобильного"],
+["cart","POST","/cart/cart/check-seller-sms-code","cart/services/CartService.js:94","CartController::actionCheckSellerSmsCode","modules/cart/controllers/CartController.php","MCA","продавец в магазине"],
+["cart","GET","/cart/popular-items, /cart/ids","cart/services/CartService.js:76, :106","CartController::actionPopularItems · Cart\\CartController::actionIds","modules/cart/… · src/Modules/Cart/Controllers/CartController.php","ЧПУ",""],
+["cart","POST","/user/wishlist/add-item-fr-cart/{modelId}","cart/ancient/api/wishlist.js:11","WishlistController::actionAddItemFrCartJson","modules/wishlist/controllers/WishlistController.php","+json",""],
+["cartn","GET · PATCH · DELETE","/api/cart/items","cart/services/CartService.js:172-246","CartApiController::actionGetItems / UpdateItem / DeleteItem","src/Modules/Cart/Controllers/CartApiController.php","REST","только админы (редизайн)"],
+["cartn","GET","/api/cart/info","cart/services/CartService.js:192","CartApiController::actionGetInfo","src/Modules/Cart/Controllers/CartApiController.php","REST",""],
+["cartn","GET · POST","/api/cart/delivery-city","cart/services/CartService.js:266, :295","CartDeliveryController::actionCity / SaveCity","src/Modules/Cart/Controllers/CartDeliveryController.php","REST","нужен вход"],
+["cartn","GET","/api/cart/delivery-list","cart/services/CartService.js:316","CartDeliveryController::actionDeliveryList","src/Modules/Cart/Controllers/CartDeliveryController.php","REST",""],
+["cartn","GET · POST","/api/cart/delivery","cart/services/CartService.js:336, :366","CartDeliveryController::actionDelivery / SaveDelivery","src/Modules/Cart/Controllers/CartDeliveryController.php","REST",""],
+["chk","POST","/order/proceed-new, /proceed-preorder, /proceed-from-shop","cart/ancient/api/cart.js:77-86","OrdersController::actionProceedNew / ProceedPreorder / ProceedFromShop","modules/orders/controllers/OrdersController.php","ЧПУ","OrderService::createOrder; сбой после commit → orderFailed",1],
+["chk","POST","/delivery/delivery/place","cart/ancient/api/delivery.js:178","DeliveryController::actionPlace","modules/delivery/controllers/DeliveryController.php","MCA",""],
+["chk","GET","/delivery/delivery/intervals","cart/ancient/api/delivery.js:201","DeliveryController::actionIntervals","modules/delivery/controllers/DeliveryController.php","MCA","BFB MS"],
+["chk","GET","/delivery/delivery/boxberry-details · /export_boxberry.json","cart/services/DeliveryService.js:36 · BoxberryPopup.vue:112","DeliveryController::actionBoxberryDetails · статика","modules/delivery/controllers/DeliveryController.php","MCA",""],
+["chk","GET","/api/v1/delivery/pickup/provider/{p}/points[/{id}]","cart/services/DeliveryService.js:63, :82","PickupController::actionPointListJson / PointDetailsJson","src/Modules/Delivery/Controller/PickupController.php","REST","BFB MS + кеш"],
+["chk","GET","/api/v1/delivery/geo/countries/…/cities, /addresses, /details","geo/services/GeoService.js:151-282 · cart/ancient/services/geo.js","GeoController::actionSuggestCity / SuggestAddress / …","src/Modules/Delivery/Controller/GeoController.php","REST","BFB MS; два клиента на одни URL"],
+["chk","POST","/location/location/set-location","themes/basic/modules/location/views/location/choose_city.php:132","LocationController::actionSetLocation","modules/location/controllers/LocationController.php","MCA","jQuery в PHP-view"],
+["pay","GET","/rfi/rfi/saved-card-proceed","orders/pages/online-payment/_entry.js:80","—","модуля rfi нет","—","мёртвый вызов",1],
+["gift","POST","/giftcards/giftcards/initiate, /add","gift-certificate/services/GiftCertificateService.js:23, :38","GiftcardsController::actionInitiate / Add","modules/giftcards/controllers/GiftcardsController.php","MCA","add устарел, но вызывается"],
+["gift","POST","/giftcards/giftcards/send-code, /verify-code","GiftCertificateService.js:50, :68","GiftcardsController::actionSendCode / VerifyCode","modules/giftcards/controllers/GiftcardsController.php","MCA","Mindbox через BFB"],
+["gift","POST","/giftcards/giftcards/create-order","GiftCertificateService.js:106","GiftcardsController::actionCreateOrder","modules/giftcards/controllers/GiftcardsController.php","MCA","своя транзакция, мимо OrderService"],
+["gift","GET · POST","/giftcards/giftcards/list, /trx-list, /settings","GiftCertificateService.js:116-150","GiftcardsController::actionList / TrxList / Settings","modules/giftcards/controllers/GiftcardsController.php","MCA","Giftcards MS"],
+["gift","POST","/giftcards/giftcards/cart-certificate-use","GiftCertificateService.js:140","GiftcardsController::actionCartCertificateUse","modules/giftcards/controllers/GiftcardsController.php:617","MCA","cart_id из тела без проверки владельца",1],
+["rev","POST","/feedback-v2/feedback/save/{slug}/order/{id}","feedback/services/FeedbackService.js:33","Feedback\\FeedbackController::actionSaveJson","src/Modules/Feedback/Controllers/FeedbackController.php","+json","без X-Requested-With — 404"],
+["rev","GET · POST","/feedback/feedback-shop/…, /feedback/feedback-offline/…","orders/services/OrderService.js:131-233","FeedbackShopController · FeedbackOfflineController ::action…Json","modules/feedback/controllers/","+json",""],
+["rev","POST","/feedback/review-shop/add","review/pages/shop/content/ReviewShopContent.vue:318","ReviewShopController::actionAdd","modules/feedback/controllers/","MCA","без входа"],
+["rev","GET · POST","/poll/poll-question/get/{id} · /poll/poll-answer/add","poll/services/PollService.js:17, :37","PollQuestionController::actionGetJson · PollAnswerController::actionAddJson","modules/poll/controllers/","+json",""],
+["rev","POST","/api/rates/save","rates/services/RateService.js:17","RatesController::actionSave","modules/rates/controllers/RatesController.php","ЧПУ",""],
+["sub","POST","/user/wishlist/add-item/{id}, /remove-item/{id}","user/services/UserService.js:235","WishlistController::actionAddItemJson / RemoveItemJson","modules/wishlist/controllers/WishlistController.php","+json","Mindbox REST wishlistUpdate"],
+["sub","GET","/user/wishlist · /wishlist/ids","WishlistPage.vue:162 · wishlist/services/WishlistService.js:18","WishlistController::actionIndexJson · Wishlist\\WishlistController::actionIds","modules/wishlist/… · src/Modules/Wishlist/Controllers/","+json",""],
+["sub","POST","/notification/notification/subscribe, /unsubscribe, /unsubscribe-all","subscription/services/SubscriptionService.js:34-77","NotificationController::action…Json","modules/notification/controllers/NotificationController.php","+json",""],
+["sub","POST","/subscription/subscription/item-subscribe, /item-unsubscribe","SubscriptionService.js:118, :132","SubscriptionController::actionItemSubscribeJson / ItemUnsubscribeJson","modules/subscription/controllers/SubscriptionController.php","+json","«сообщить о поступлении», гостю доступно"],
+["sub","POST","/subscribe-ajax · /contest/add-ajax · /user/custom-subscribe-ajax","SubscriptionService.js:100, :90, :21","HomeController::actionSubscribeAjax · ContestController::actionAddAjax · UsersController::actionCustomSubscribeAjax","modules/home/…, modules/contest/…, modules/users/…","ЧПУ","три пути подписки на рассылку"],
+["cont","GET","/home/new","home/services/HomeService.js:26","MainpageController::actionNewAjax","src/Modules/Mainpage/Controllers/MainpageController.php","ЧПУ","кеш Redis"],
+["cont","GET","/lookbook, /lookbook/item/{id}, /lookbook/block-wear/{id}","lookbook/services/LookbookService.js:26-40","LookbookController::actionIndexJson / ItemJson / BlockWearJson","modules/lookbook/controllers/LookbookController.php","+json",""],
+["cont","GET","/lookbook/all-wear/{id}","lookbook/services/LookbookService.js:55","—","экшена нет","—","мёртвый вызов",1],
+["cont","GET","/blog/blog, /blog/blog/similars","blog/services/BlogService.js:21, :31","BlogController::actionIndexJson / SimilarsJson","modules/blog/controllers/BlogController.php","+json","страницы блога в PageCache"],
+["cont","GET","/content/showrooms/showrooms-city, /showroom-view","shops/services/ShopsService.js:18, :29","ShowroomsController::action…Json","modules/content/controllers/ShowroomsController.php","+json",""],
+["cont","GET","/support{url}","support/services/SupportService.js:14","SupportController::actionThemeJson","modules/support/controllers/SupportController.php","+json","страницы поддержки в PageCache"],
+["cont","GET · POST","/vacancy/vacancy/suggested-by-division, /upload-file, /apply-job","vacancies/services/VacancyService.js:22-86","VacancyController::action…Json","modules/vacancy/controllers/","+json","без входа, загрузка файлов"],
+["cont","POST","/landing/send-partner-program-email","partners-program/services/PartnersProgramService.js:38","LandingPageController::actionSendPartnerProgramEmail","modules/home/controllers/LandingPageController.php","ЧПУ","без входа"]
+];
+const state={dom:"all",q:"",flag:false};
+try{const s=JSON.parse(localStorage.getItem("web-chain-filter")||"null");if(s&&D[s.dom])state.dom=s.dom}catch(e){}
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const chips=document.getElementById("chips");
+function chip(key,label,n){const b=document.createElement("button");b.type="button";b.className="chip";b.dataset.dom=key;b.innerHTML=esc(label)+'<span class="c">'+n+"</span>";b.onclick=()=>{state.dom=key;render()};chips.appendChild(b)}
+chip("all","Все",R.length);Object.keys(D).forEach(k=>{const n=R.filter(r=>r[0]===k).length;if(n)chip(k,D[k],n)});
+document.getElementById("q").addEventListener("input",e=>{state.q=e.target.value.trim().toLowerCase();render()});
+document.getElementById("flag").addEventListener("change",e=>{state.flag=e.target.checked;render()});
+function render(){
+  document.querySelectorAll(".chip").forEach(c=>c.setAttribute("aria-pressed",String(c.dataset.dom===state.dom)));
+  try{localStorage.setItem("web-chain-filter",JSON.stringify({dom:state.dom}))}catch(e){}
+  const list=R.filter(r=>(state.dom==="all"||r[0]===state.dom)&&(!state.flag||r[8])&&(!state.q||r.join(" ").toLowerCase().includes(state.q)));
+  let html="",last="";
+  list.forEach(r=>{
+    if(r[0]!==last){last=r[0];html+='<tr class="grp"><td colspan="4">'+esc(D[r[0]])+"</td></tr>"}
+    html+='<tr><td><span class="m">'+esc(r[1])+'</span> <span class="p">'+esc(r[2])+'</span><span class="f">'+esc(r[3])+"</span></td>"+
+      '<td><span class="ctl">'+esc(r[4])+'</span><span class="f">'+esc(r[5])+"</span></td>"+
+      '<td><span class="gen'+(r[6]==="REST"?" rest":"")+'">'+esc(r[6])+"</span></td>"+
+      '<td class="nt'+(r[8]===2?" d":r[8]?" w":"")+'">'+esc(r[7])+"</td></tr>";
+  });
+  document.getElementById("rows").innerHTML=html||'<tr><td colspan="4" class="empty">Ничего не найдено. Сбросьте фильтр или измените запрос.</td></tr>';
+  document.getElementById("count").textContent="Показано "+list.length+" из "+R.length;
+}
+render();
+</script>

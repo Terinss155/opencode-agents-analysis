@@ -13,7 +13,9 @@
 | [12storeez-master-web/](12storeez-master-web/repo-map.md) | `12stz/12storeez-master-web` (Yii2 PHP-монолит, ветка `develop`) | `be3cd759d2`, 2026-10-09. Тексты написаны по копии `12storeez-master` (сентябрь 2026); пути сверены с живым репозиторием, расхождения — в `knowledge_staleness.md` |
 | [esb-monorepo/](esb-monorepo/repo-map.md) | `12stz/esb-monorepo` (NestJS/Nx, TypeScript, ветка `master`) — старый шлюз МП `core.12stz.com/api` | `beba6e61`, 2026-10-10 |
 | [mobile-monorepo-go/](mobile-monorepo-go/repo-map.md) | `12stz/mobile-monorepo-go` (Go, ветка `master`) — новый Mobile API Gateway `mobile.12stz.com/api` | `f302aeb`, 2026-10-10 |
-| [12storeez-ios/](12storeez-ios/repo-map.md) | — | Репозиторий ещё не в `12stz`; карта по копии `12storeez-ios-develop` от 12.09.2026 |
+| [12storeez-ios/](12storeez-ios/repo-map.md) | `12stz/12storeez-ios` (Swift, ветка `develop`) — iOS-приложение | `a6de858b`, 2026-10-10 |
+
+Сквозные схемы, которые касаются нескольких репозиториев сразу, лежат в [architecture/](architecture/): [call-chain.html](architecture/call-chain.html) — цепочка iOS → шлюзы `core`/`mobile` → монолит → внешние системы (сверено на коммитах всех четырёх репозиториев, 10.10.2026); [web-call-chain.html](architecture/web-call-chain.html) — цепочка сайта: браузер → ServicePipe/nginx → монолит (страницы и AJAX) → внешние системы, плюс сравнение с приложением (коммит `be3cd759d2`, 10.10.2026).
 
 Точки входа по монолиту: [repo-map.md](12storeez-master-web/repo-map.md) (карта папок и модулей) и [architecture/README.md](12storeez-master-web/architecture/README.md) (оглавление архитектурных документов 01–09).
 
@@ -57,12 +59,14 @@
 | Какой контроллер обрабатывает URL | [architecture/05-api.md](12storeez-master-web/architecture/05-api.md) «Маршрутизация», [repo-map.md](12storeez-master-web/repo-map.md) §6 | `config/url.php`, `src/Modules/Mobile/Rules/UrlRule.php`, `modules/mobilev2/rules/UrlRule.php` |
 | Какие есть API сайта и мобилки, версии, эндпоинты, OpenAPI-спецификации | [architecture/05-api.md](12storeez-master-web/architecture/05-api.md), [api/mobile-vs-core-api.md](12storeez-master-web/api/mobile-vs-core-api.md) §1 | `src/Modules/Mobile/Controllers/`, `modules/mobilev2/`, `src/Modules/MobileV2/`, `modules/api2/`; спеки — `docs/openapi/mobile.yml`, `docs/openapi/frontend.yml` (в знаниях ещё старые пути `docs/mobileApi/`, `docs/frontend/`, `docs/ssr/`) |
 | Чем отличаются Mobile API, API Gateway и Core API | [api/mobile-vs-core-api.md](12storeez-master-web/api/mobile-vs-core-api.md), [api/mobile/mobile-gateway_swagger.yaml](12storeez-master-web/api/mobile/mobile-gateway_swagger.yaml) | `docs/openapi/mobile.yml`. Код шлюзов — в `esb-monorepo` (`core`) и `mobile-monorepo-go` (`mobile`), см. раздел ниже |
+| Куда уходит запрос браузера: какой контроллер рисует страницу или отвечает на AJAX, что дальше | [architecture/web-call-chain.html](architecture/web-call-chain.html) (справочник с фильтрами) | `frontend/src/modules/*/services/*Service.js` → `config/url.php` → контроллер |
+| Чем путь сайта отличается от пути приложения (авторизация, корзина, заказ, оплата) | [architecture/web-call-chain.html](architecture/web-call-chain.html) «Сайт и приложение» | `modules/orders/controllers/OrdersController.php`, `src/Modules/Order/Services/OrderService.php`, `modules/common/service/SessionService.php` |
 | Как устроен фронтенд (Vue, сборка, entry points, `window._site`) | [architecture/06-frontend.md](12storeez-master-web/architecture/06-frontend.md) | `frontend/webpack.config.js`, `frontend/webpack.helpers.js`, `frontend/src/modules/` |
 | Админка: где формы и контроллеры | [architecture/02-backend.md](12storeez-master-web/architecture/02-backend.md), [features/order-edit.md](12storeez-master-web/features/order-edit.md) | `modules/cms/`, контроллеры `*BackendController.php` (например `modules/orders/controllers/OrdersBackendController.php`) |
 | Фича-флаги и параметры CMS | [architecture/03-business-domains.md](12storeez-master-web/architecture/03-business-domains.md) «Параметры и фича-флаги» | `src/Modules/Common/Enum/Parameters.php`, `modules/cms/models/Parameter.php` |
 | CI/CD, Kubernetes, кэш, Sentry | [architecture/07-infrastructure.md](12storeez-master-web/architecture/07-infrastructure.md) | `.gitlab-ci.yml`, `backend.Dockerfile`, `nginx.conf` |
 | Неочевидные связи и подводные камни | [architecture/09-pitfalls.md](12storeez-master-web/architecture/09-pitfalls.md) | См. чек-лист в конце документа |
-| Как возврат устроен в iOS-приложении | [12storeez-ios/repo-map.md](12storeez-ios/repo-map.md) §4 | Кода iOS в `12stz` пока нет |
+| Как возврат устроен в iOS-приложении | [12storeez-ios/repo-map.md](12storeez-ios/repo-map.md) §4 | `12stz/12storeez-ios/TwelveStoreez/Classes/Modules/ReturnOrder/`, `Business/Managers/ReturnOrder/` |
 
 ## Шлюзы мобильного приложения: вопрос → файл знаний → код
 
@@ -80,10 +84,24 @@
 | Обмен с 1С через шлюз `core` (товары, остатки, офлайн-заказы) | [esb-monorepo/repo-map.md](esb-monorepo/repo-map.md) §4.1, §6 | `esb-monorepo/libs/gateway-1c/` |
 | Окружения и хосты шлюзов | [esb-monorepo/repo-map.md](esb-monorepo/repo-map.md) §7, [mobile-monorepo-go/repo-map.md](mobile-monorepo-go/repo-map.md) §6 | `.deploy/helm/*.values.yaml` в каждом репозитории |
 
+## iOS-приложение: вопрос → файл знаний → код
+
+Пути к коду — от `12stz/12storeez-ios/TwelveStoreez/Classes/`.
+
+| Вопрос | Файл знаний | Где смотреть в коде |
+|---|---|---|
+| Куда уходит конкретный запрос iOS: шлюз → контроллер монолита → внешние системы | [architecture/call-chain.html](architecture/call-chain.html) (справочник с фильтрами) | `Business/Network/Endpoints/` → шлюз → монолит |
+| Какой запрос шлёт экран | [12storeez-ios/repo-map.md](12storeez-ios/repo-map.md) §3, §8 | `Modules/<Фича>/` → `Business/Managers/` → `Business/Services/` → `Business/Network/Endpoints/` |
+| Через какой хост идёт вызов: `core` или `mobile` | [12storeez-ios/repo-map.md](12storeez-ios/repo-map.md) §5.1, §6 | `RequestTarget` → `core` (esb-monorepo), `RequestTargetNew` → `mobile` (mobile-monorepo-go) |
+| Как iOS получает и обновляет JWT, какие заголовки шлёт | [12storeez-ios/repo-map.md](12storeez-ios/repo-map.md) §5.2–5.3 | `Business/Network/AuthRequestAdapter.swift`, `RequestTarget.swift`, `RequestTargetNew.swift` |
+| Хосты окружений в тестовых сборках | [12storeez-ios/repo-map.md](12storeez-ios/repo-map.md) §5.1 | `TwelveStoreez/Resources/Configuration/*.xcconfig`, `Business/Managers/DebugManagers/DebugServerHostManager.swift` |
+| Старый и новый чекаут в приложении | [12storeez-ios/repo-map.md](12storeez-ios/repo-map.md) §6 | `Business/Managers/CreateOrderManager.swift`, `OrderManager.swift` (старый), `Business/Managers/Checkout/` (новый) |
+| Какие внешние SDK вызываются из приложения напрямую | [12storeez-ios/repo-map.md](12storeez-ios/repo-map.md) §7 | `AppDelegate*.swift`, `Business/Managers/Payment/`, `Business/Managers/Analytics/` |
+
 ## Чего здесь нет
 
 - Каталог, корзина, чекаут, пользователи и CMS описаны только обзорно в [03-business-domains.md](12storeez-master-web/architecture/03-business-domains.md). Отдельных разборов фич по ним нет.
 - Нет схемы таблиц за пределами заказов: ER-диаграмма есть только для `cms_orders` и связанных с ней таблиц. Типы полей в ней предварительные.
 - Шлюзы МП описаны только картами репозиториев; отдельных AS-IS-контрактов по их методам нет. Реальные prod-адреса монолита и gRPC — в Vault, в репозиториях их нет.
-- Нет Android-клиента и кода iOS-приложения в `12stz`.
+- Нет Android-клиента в `12stz`. Ручки Go-шлюза, которые не вызывает iOS, перечислены в [call-chain.html](architecture/call-chain.html); вызывает ли их Android, по коду не проверить.
 - Нет описания Helm-чартов и расписаний cron: они вне этого репозитория.

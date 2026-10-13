@@ -1,0 +1,478 @@
+<title>Цепочка вызовов iOS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&family=Unbounded:wght@500;700&display=swap">
+<style>
+/* Layout: слева направо, как идёт запрос — приложение → шлюз → монолит → дальше; ниже справочник вызовов */
+:root{
+  --bg:#f3f5f4; --surface:#ffffff; --sunk:#e9eeec; --fg:#172024; --muted:#59666b; --line:#d3dbd8;
+  --core:#a8650f; --core-soft:#f6ead8;
+  --mob:#16697f; --mob-soft:#dcedf1;
+  --grpc:#634fa3; --grpc-soft:#ebe6f6;
+  --ext:#3d6e39; --ext-soft:#e3efe1;
+  --hi:#b3261e; --hi-soft:#fbe4e1; --mid:#9a6a00; --mid-soft:#fbf0d4; --lo:#59666b; --lo-soft:#e9eeec;
+  --f-display:"Unbounded","Golos Text",system-ui,sans-serif;
+  --f-body:"Golos Text",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,"Cascadia Mono",Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#111618; --surface:#182023; --sunk:#1f292c; --fg:#e4ebe9; --muted:#97a5a9; --line:#2d393c;
+  --core:#e2a24c; --core-soft:#33281a; --mob:#5bb6cc; --mob-soft:#15303a; --grpc:#a796e0; --grpc-soft:#272140;
+  --ext:#86c27f; --ext-soft:#1d2e1c; --hi:#f08a80; --hi-soft:#3a1d1b; --mid:#e6bb55; --mid-soft:#352b14; --lo:#97a5a9; --lo-soft:#1f292c;
+  color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#111618; --surface:#182023; --sunk:#1f292c; --fg:#e4ebe9; --muted:#97a5a9; --line:#2d393c;
+  --core:#e2a24c; --core-soft:#33281a; --mob:#5bb6cc; --mob-soft:#15303a; --grpc:#a796e0; --grpc-soft:#272140;
+  --ext:#86c27f; --ext-soft:#1d2e1c; --hi:#f08a80; --hi-soft:#3a1d1b; --mid:#e6bb55; --mid-soft:#352b14; --lo:#97a5a9; --lo-soft:#1f292c;
+  color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font:15px/1.55 var(--f-body);padding:0 16px}
+.wrap{max-width:1180px;margin:0 auto;padding-block:32px 64px;display:flex;flex-direction:column;gap:48px}
+h1,h2,h3{text-wrap:balance;margin:0}
+h1{font:700 clamp(26px,4vw,38px)/1.15 var(--f-display);letter-spacing:-.01em}
+h2{font:500 21px/1.25 var(--f-display)}
+h3{font:600 15px/1.3 var(--f-body)}
+p{margin:0;max-width:68ch}
+code,.mono{font-family:var(--f-mono);font-size:.86em}
+.eyebrow{font:600 11px/1 var(--f-body);letter-spacing:.09em;text-transform:uppercase;color:var(--muted)}
+section{display:flex;flex-direction:column;gap:18px}
+.lead{color:var(--muted);font-size:16px}
+header{display:flex;flex-direction:column;gap:14px}
+.snap{display:flex;flex-wrap:wrap;gap:8px}
+.snap span{font:12px/1.3 var(--f-mono);background:var(--sunk);border:1px solid var(--line);border-radius:6px;padding:5px 8px;color:var(--muted)}
+.snap b{color:var(--fg);font-weight:600}
+
+/* схема слоёв */
+.flow{display:grid;grid-template-columns:minmax(0,1fr) 22px minmax(0,1.15fr) 22px minmax(0,1.1fr) 22px minmax(0,1.5fr);align-items:stretch;gap:0}
+.lane{display:flex;flex-direction:column;gap:10px;min-width:0}
+.lane>.eyebrow{padding-bottom:2px}
+.arrow{display:flex;align-items:center;justify-content:center;color:var(--muted);font:600 18px var(--f-body)}
+.node{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:12px 13px;display:flex;flex-direction:column;gap:6px;min-width:0}
+.node .t{font-weight:600}
+.node .s{font-size:12.5px;color:var(--muted);line-height:1.45}
+.node .s code{font-size:11.5px}
+.node.core{border-color:var(--core);box-shadow:inset 3px 0 0 var(--core)}
+.node.mob{border-color:var(--mob);box-shadow:inset 3px 0 0 var(--mob)}
+.node.grpc{border-color:var(--grpc)}
+.node.ext{border-color:var(--ext)}
+.node .n{font:600 12px var(--f-mono)}
+.node.core .n{color:var(--core)} .node.mob .n{color:var(--mob)}
+.tags{display:flex;flex-wrap:wrap;gap:5px}
+.tag{font:500 11.5px/1 var(--f-body);padding:4px 7px;border-radius:5px;background:var(--sunk);color:var(--fg);white-space:nowrap}
+.tag.g{background:var(--grpc-soft);color:var(--grpc)} .tag.e{background:var(--ext-soft);color:var(--ext)}
+.note{font-size:13px;color:var(--muted)}
+@media (max-width:860px){
+  .flow{grid-template-columns:minmax(0,1fr)}
+  .arrow{transform:rotate(90deg);height:26px}
+}
+
+/* домены — конец цепочки */
+.ends{display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:12px}
+.end{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px 15px;display:flex;flex-direction:column;gap:8px;min-width:0}
+.end ol{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:4px;font-size:13.5px}
+.end li::marker{color:var(--muted);font:12px var(--f-mono)}
+.mode{font:600 10.5px/1 var(--f-body);letter-spacing:.06em;text-transform:uppercase;padding:3px 6px;border-radius:4px;margin-left:4px;vertical-align:1px}
+.mode.sync{background:var(--sunk);color:var(--muted)} .mode.async{background:var(--grpc-soft);color:var(--grpc)}
+
+/* находки */
+.finds{display:flex;flex-direction:column;gap:10px}
+.find{display:grid;grid-template-columns:92px minmax(0,1fr);gap:14px;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:13px 15px}
+.sev{font:600 11px/1 var(--f-body);letter-spacing:.06em;text-transform:uppercase;padding:6px 8px;border-radius:5px;align-self:start;text-align:center}
+.sev.hi{background:var(--hi-soft);color:var(--hi)} .sev.mid{background:var(--mid-soft);color:var(--mid)} .sev.lo{background:var(--lo-soft);color:var(--lo)}
+.find .b{display:flex;flex-direction:column;gap:5px;min-width:0}
+.find p{font-size:14px}
+.find .where{font:12px/1.5 var(--f-mono);color:var(--muted);overflow-wrap:anywhere}
+.ios{font:600 11px/1 var(--f-body);padding:3px 6px;border-radius:4px;margin-left:6px;vertical-align:1px}
+.ios.y{background:var(--hi-soft);color:var(--hi)} .ios.n{background:var(--sunk);color:var(--muted)}
+@media (max-width:560px){.find{grid-template-columns:minmax(0,1fr)}}
+
+/* справочник */
+.controls{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden;background:var(--surface)}
+.seg button{font:500 13px var(--f-body);border:0;background:none;color:var(--fg);padding:7px 12px;cursor:pointer}
+.seg button+button{border-left:1px solid var(--line)}
+.seg button[aria-pressed="true"]{background:var(--fg);color:var(--bg)}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{font:500 12.5px var(--f-body);border:1px solid var(--line);background:var(--surface);color:var(--fg);border-radius:999px;padding:5px 11px;cursor:pointer}
+.chip[aria-pressed="true"]{border-color:var(--fg);background:var(--fg);color:var(--bg)}
+.chip .c{font:11px var(--f-mono);opacity:.7;margin-left:4px}
+input[type=search]{font:14px var(--f-body);padding:8px 11px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--fg);min-width:0;flex:1 1 240px;max-width:380px}
+button:focus-visible,input:focus-visible{outline:2px solid var(--mob);outline-offset:2px}
+.count{font:12.5px var(--f-mono);color:var(--muted)}
+.tbl{overflow-x:auto;border:1px solid var(--line);border-radius:10px;background:var(--surface)}
+table{border-collapse:collapse;width:100%;min-width:1040px;font-size:13px}
+th{position:sticky;top:0;background:var(--sunk);text-align:left;font:600 11px/1.2 var(--f-body);letter-spacing:.06em;text-transform:uppercase;color:var(--muted);padding:9px 10px;border-bottom:1px solid var(--line)}
+td{padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+tr.grp td{background:var(--bg);font:600 12.5px var(--f-body);padding:10px;color:var(--fg)}
+tr:last-child td{border-bottom:0}
+.h{font:600 10.5px/1 var(--f-mono);padding:4px 6px;border-radius:4px;display:inline-block}
+.h.core{background:var(--core-soft);color:var(--core)} .h.mobile{background:var(--mob-soft);color:var(--mob)}
+.m{font:600 11px var(--f-mono);color:var(--muted);white-space:nowrap}
+.p{font:12.5px var(--f-mono);overflow-wrap:anywhere}
+.cls{font:11.5px var(--f-mono);color:var(--muted);display:block;margin-top:2px}
+.tg{font:12px var(--f-mono);overflow-wrap:anywhere}
+.tg.grpc{color:var(--grpc)} .tg.ext{color:var(--ext)}
+.ctl{font:12px var(--f-mono);overflow-wrap:anywhere}
+.nt{font-size:12.5px;color:var(--muted)}
+.nt.w{color:var(--mid)}
+.empty{padding:28px;text-align:center;color:var(--muted)}
+.legend{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:8px 18px;font-size:13px}
+.legend div{display:flex;gap:8px;min-width:0}
+.legend code{color:var(--fg);flex:none}
+.legend span{color:var(--muted);overflow-wrap:anywhere}
+.unused{columns:3 260px;column-gap:24px;margin:0;padding-left:18px;font-size:13.5px}
+.unused li{break-inside:avoid;margin-bottom:4px}
+footer{font-size:13px;color:var(--muted);border-top:1px solid var(--line);padding-top:16px;display:flex;flex-direction:column;gap:6px}
+@media (prefers-reduced-motion:no-preference){.chip,.seg button{transition:background .15s,color .15s}}
+</style>
+
+<div class="wrap">
+<header>
+  <span class="eyebrow">База знаний · 12storeez-ios · AS-IS</span>
+  <h1>Цепочка вызовов iOS</h1>
+  <p class="lead">Куда уходит каждый запрос iOS-приложения 12Storeez: какой шлюз его принимает, какой контроллер монолита обрабатывает и какие системы монолит вызывает дальше. Собрано по коду четырёх репозиториев 10.10.2026.</p>
+  <div class="snap">
+    <span>12storeez-ios <b>a6de858b</b> · develop · 05.10</span>
+    <span>esb-monorepo <b>e7c22003</b> · 06.10</span>
+    <span>mobile-monorepo-go <b>bc39bdb</b> · 06.10</span>
+    <span>12storeez-master-web <b>be3cd759d2</b> · develop · 07.10</span>
+  </div>
+</header>
+
+<section aria-labelledby="s-map">
+  <span class="eyebrow">Обзор</span>
+  <h2 id="s-map">Четыре звена цепочки</h2>
+  <p>У приложения два своих хоста. Оба шлюза почти ничего не решают сами: большую часть запросов они проксируют в монолит, остальное отправляют по gRPC в сервисы ESB. Внешние системы (1С, RetailCRM, Mindbox, платёжные провайдеры) видит только монолит, и чаще всего через очередь.</p>
+  <div class="flow">
+    <div class="lane">
+      <span class="eyebrow">Приложение</span>
+      <div class="node"><span class="t">iOS 12Storeez</span><span class="s">Swift, UIKit, Alamofire. Экран → <code>Manager</code> → <code>Service</code> → <code>Endpoint</code></span></div>
+      <div class="node core"><span class="n">RequestTarget</span><span class="s">Хост <code>BASE_URL</code><br>Заголовки <code>x-platform</code>, <code>Version</code></span></div>
+      <div class="node mob"><span class="n">RequestTargetNew</span><span class="s">Хост <code>BASE_URL_NEW</code><br>Заголовки <code>X-Platform</code>, <code>X-Version</code></span></div>
+      <div class="node ext"><span class="t">Напрямую из приложения</span><div class="tags"><span class="tag e">Diginetica</span><span class="tag e">Mindbox SDK</span><span class="tag e">YooKassa SDK</span><span class="tag e">Dresscode</span><span class="tag e">AppsFlyer</span><span class="tag e">AppMetrica</span><span class="tag e">Sentry</span></div></div>
+    </div>
+    <div class="arrow" aria-hidden="true">→</div>
+    <div class="lane">
+      <span class="eyebrow">Шлюзы</span>
+      <div class="node core"><span class="n">core.12stz.com/api</span><span class="t">esb-monorepo</span><span class="s">NestJS. Выдаёт и обновляет JWT для обоих хостов. Профиль, карточка товара, контент, заказы, отзывы, старый чекаут</span><span class="s"><b id="cnt-core">—</b> строк в справочнике</span></div>
+      <div class="node mob"><span class="n">mobile.12stz.com/api</span><span class="t">mobile-monorepo-go</span><span class="s">Go, Fiber. Проверяет тот же JWT. Главная, листинг, новый чекаут, платежи, сертификаты, резерв, гео</span><span class="s"><b id="cnt-mob">—</b> строк в справочнике</span></div>
+      <div class="node grpc"><span class="t">Сервисы ESB по gRPC</span><div class="tags"><span class="tag g">Mindbox</span><span class="tag g">Geo</span><span class="tag g">Meta</span><span class="tag g">Feedbacks</span><span class="tag g">Orders (офлайн)</span><span class="tag g">Logistics</span></div><span class="s">Вызываются шлюзами мимо монолита: коды входа, бонусы, гео, магазины, отзывы, интервалы доставки</span></div>
+    </div>
+    <div class="arrow" aria-hidden="true">→</div>
+    <div class="lane">
+      <span class="eyebrow">Монолит</span>
+      <div class="node"><span class="t">12storeez-master-web</span><span class="s">Yii2 PHP. Принимает <code>mobile/…</code>, <code>mobile/v2/…</code>, <code>mobilev2/…</code>. Пользователь — по <code>x-session-token</code> из JWT</span></div>
+      <div class="node"><span class="t">Маршрутизация</span><span class="s"><code>config/url.php</code><br><code>src/Modules/Mobile/Rules/UrlRule.php</code><br><code>modules/mobilev2/rules/UrlRule.php</code></span></div>
+      <div class="node"><span class="t">Три кодовые базы контроллеров</span><span class="s"><code>M1</code> src/Modules/Mobile<br><code>M2</code> modules/mobilev2<br><code>M3</code> src/Modules/MobileV2</span></div>
+    </div>
+    <div class="arrow" aria-hidden="true">→</div>
+    <div class="lane">
+      <span class="eyebrow">Дальше</span>
+      <div class="node"><span class="t">Хранилища</span><div class="tags"><span class="tag">MySQL</span><span class="tag">Redis (кеш)</span><span class="tag">Elasticsearch</span></div></div>
+      <div class="node"><span class="t">Синхронно через BFB MS</span><div class="tags"><span class="tag e">Mindbox: расчёт, бонусы, рекомендации</span><span class="tag e">Доставка, ПВЗ, гео</span><span class="tag e">Billing: Подели, Сплит, Yandex Pay, СБП, Долями</span><span class="tag e">Giftcards MS</span></div></div>
+      <div class="node"><span class="t">Напрямую</span><div class="tags"><span class="tag e">YooKassa API</span><span class="tag e">Diginetica (поиск)</span><span class="tag e">SMTP</span></div></div>
+      <div class="node grpc"><span class="t">Асинхронно: outbox → RabbitMQ</span><div class="tags"><span class="tag g">1С</span><span class="tag g">RetailCRM</span><span class="tag g">Mindbox</span><span class="tag g">Платёжные статусы</span><span class="tag g">Чеки ATOL</span></div><span class="s">Обратно: статусы и возвраты из 1С — inbox <code>from.onec.order.update.v1.command</code></span></div>
+    </div>
+  </div>
+  <p class="note">Как найти конкретный вызов в коде: <code>knowledge/12storeez-ios/repo-map.md</code>, раздел 8.</p>
+</section>
+
+<section aria-labelledby="s-ends">
+  <span class="eyebrow">Конец цепочки</span>
+  <h2 id="s-ends">Что монолит делает дальше, по доменам</h2>
+  <div class="ends">
+    <div class="end"><h3>Каталог и поиск <span class="mode sync">синхронно</span></h3><ol>
+      <li>Листинг: кеш Redis, затем Elasticsearch; если Elastic выключен или помечен сломанным, то MySQL</li>
+      <li>Поиск <code>advanced-search</code>: Diginetica, при ошибке — свой движок</li>
+      <li>Рекомендации: Mindbox через BFB MS, при сбое — запасные выборки из MySQL</li>
+      <li>Наличие в магазинах: остатки в MySQL</li></ol></div>
+    <div class="end"><h3>Корзина и чекаут <span class="mode sync">синхронно</span><span class="mode async">+ очередь</span></h3><ol>
+      <li>Корзина в MySQL, сервис выбирает <code>CartServiceFactory</code></li>
+      <li>Скидки и бонусы: расчёт Mindbox через BFB MS, с кешем</li>
+      <li><code>PUT v2/cart</code> публикует <code>mindbox.mobile-cart.send.v1.command</code></li>
+      <li>Варианты доставки, ПВЗ, интервалы, гео: BFB MS и кеш Redis</li></ol></div>
+    <div class="end"><h3>Создание заказа и резерва <span class="mode sync">транзакция</span><span class="mode async">outbox</span></h3><ol>
+      <li><code>OrderService::createOrder</code>: заказ и позиции в MySQL, commit</li>
+      <li>События <code>AfterSaveEvent</code>: 10 у <code>POST v1/orders</code> (<code>CreateOrderServiceMobile</code>), 5 у старого <code>PUT orders</code> — буфер остатков, блокировка сертификатов, переиндексация, срок резерва</li>
+      <li>Outbox → <code>to.onec.order.create</code>, <code>to.rcrm.order.create</code>, <code>mindbox.order.create</code></li>
+      <li>Письмо менеджеру по SMTP</li></ol></div>
+    <div class="end"><h3>Платежи <span class="mode sync">создание</span><span class="mode async">статусы</span></h3><ol>
+      <li>YooKassa: SDK напрямую, вебхуки в <code>modules/yandex/controllers/PayController.php</code></li>
+      <li>Подели, Сплит, Yandex Pay, СБП: billing MS через BFB; Долями — отдельный хост <code>AGGREGATE_BILLING_MS_URL</code></li>
+      <li>Commit, cancel, refund: outbox → <code>to.&lt;система&gt;.payment.v1.command</code></li>
+      <li>Чек предоплаты YooKassa — API чеков YooKassa; остальные чеки: outbox <code>order_receipts_to_send_outbox</code> → ATOL (через BFB при <code>USE_RECEIPT_MS</code>)</li></ol></div>
+    <div class="end"><h3>Возвраты <span class="mode sync">синхронно</span><span class="mode async">outbox</span></h3><ol>
+      <li>Способы возврата: конфигурация в Redis (<code>ReturnDetailsConfigService</code>)</li>
+      <li>Детали возврата: MySQL + outbox в RetailCRM</li>
+      <li>Статус возврата из 1С приходит через inbox</li></ol></div>
+    <div class="end"><h3>Сертификаты, лояльность, вход <span class="mode sync">синхронно</span></h3><ol>
+      <li>Сертификаты: Giftcards MS; коды подтверждения — Mindbox через BFB</li>
+      <li>Бонусы и история: шлюз <code>mobile</code> берёт из Mindbox по gRPC</li>
+      <li>SMS-коды входа и смены телефона: Mindbox по gRPC из шлюза <code>core</code></li>
+      <li>Мобильная сессия: MySQL монолита</li></ol></div>
+  </div>
+</section>
+
+<section aria-labelledby="s-find">
+  <span class="eyebrow">Находки</span>
+  <h2 id="s-find">Что стоит проверить</h2>
+  <p class="note">Метка справа от заголовка показывает, затрагивает ли проблема iOS-приложение.</p>
+  <div class="finds">
+    <div class="find"><span class="sev hi">Высокий</span><div class="b"><h3>Outbox заказа пишется после commit <span class="ios y">iOS затронут</span></h3><p>Строки outbox для 1С, RetailCRM и Mindbox создаются вне транзакции: после commit и после событий <code>AfterSaveEvent</code>. Если событие упадёт с исключением, заказ останется в БД, но во внешние системы не уйдёт. Касается <code>POST v1/orders</code>, <code>PUT orders</code> и <code>POST v1/reservation</code>.</p><span class="where">12storeez-master-web/src/Modules/Order/Services/OrderService.php:182 → :201 → :209</span></div></div>
+    <div class="find"><span class="sev hi">Высокий</span><div class="b"><h3>Один JWT-ключ на два шлюза <span class="ios y">iOS затронут</span></h3><p>Токен выдаёт только esb: ключ HS256 — константа в коде. Go проверяет тот же токен по <code>JWT_SECRET</code> из Vault. Значения обязаны совпадать: если сменить ключ в одном месте, все вызовы на <code>mobile</code> получат 401. Сам ключ при этом хранится в репозитории.</p><span class="where">esb-monorepo/libs/core/src/lib/constants.ts:7-9 · mobile-monorepo-go/cmd/mobile_api/mobile_api.go:468-493</span></div></div>
+    <div class="find"><span class="sev mid">Средний</span><div class="b"><h3>Два чекаута одновременно <span class="ios y">iOS затронут</span></h3><p>Старый чекаут (<code>CreateOrderManager</code>, <code>OrderManager</code>) ходит в <code>core</code>: <code>cart/*</code>, <code>cart/delivery2</code>, <code>PUT orders</code>. Новый (<code>Managers/Checkout/*</code>) ходит в <code>mobile</code>: <code>v1/cart/*</code>, <code>POST v1/orders</code>. Оба сходятся в одном <code>OrderService::createOrder</code>, поэтому любое изменение заказа нужно проверять в обоих.</p><span class="where">TwelveStoreez/Classes/Business/Managers/CreateOrderManager.swift · Managers/Checkout/CheckoutCreateOrderManager.swift</span></div></div>
+    <div class="find"><span class="sev mid">Средний</span><div class="b"><h3>Маршруты esb без проверки авторизации <span class="ios y">iOS затронут</span></h3><p><code>cart/delivery</code> и <code>cart/delivery2*</code> работают без guard. <code>metadata/about</code>, <code>metadata/stores*</code> и <code>geo/countries/phone-details</code> идут сразу в gRPC: подпись JWT у них проверяет только перехватчик Sentry.</p><span class="where">esb-monorepo/libs/cart/controllers/src/lib/delivery*/ · libs/sentry/src/sentry.interceptor.ts:76</span></div></div>
+    <div class="find"><span class="sev mid">Средний</span><div class="b"><h3>Платёжный <code>/info</code> знает не все системы <span class="ios n">iOS не затронут</span></h3><p>Правило монолита пропускает только <code>dolyame|yookassa|podeli|split</code>, а для <code>pay</code> и <code>yandex-sbp</code> маршрута нет. Долями в новом пути <code>v2/payments</code> — заглушка с исключением. iOS проверяет статус только для Подели, а Долями получает через <code>core</code> (<code>orders/dolyame-id</code>).</p><span class="where">12storeez-master-web/src/Modules/Mobile/Rules/UrlRule.php:147-154 · SplitPaymentManager.swift:43</span></div></div>
+    <div class="find"><span class="sev lo">Низкий</span><div class="b"><h3>Работает по совпадению: резерв и последние запросы <span class="ios y">iOS затронут</span></h3><p>В Go роут <code>/reservation/:id</code> зарегистрирован раньше <code>/instructions</code> и <code>/expiration</code>, поэтому оба запроса обрабатывает <code>GetReservationItem</code>. Выручает то, что он строит тот же адрес в монолите. То же в esb: <code>products/v2/last-search-term</code> перехватывает <code>/:model_id</code>. Если поменять формат адреса, эти вызовы сломаются.</p><span class="where">mobile-monorepo-go/cmd/mobile_api/mobile_api.go:287-290 · esb-monorepo/libs/products/controllers/src/lib/v2/v2.controller.ts:106, :192</span></div></div>
+    <div class="find"><span class="sev lo">Низкий</span><div class="b"><h3>Ошибки в неиспользуемых iOS ручках Go <span class="ios n">iOS не затронут</span></h3><p><code>POST v1/giftcards/send-code</code> идёт в <code>mobile/v2/giftcards/send-email-code</code>, а такого действия в монолите нет, ответ 404. <code>LoginByPhoneRequestCode</code> передаёт в Mindbox платформу в поле <code>Version</code>. Swagger Go не описывает <code>metadata/contacts</code> и <code>about</code>. Возможно, это касается Android.</p><span class="where">mobile-monorepo-go/.deploy/helm/values.yaml · internal/app/service/auth.go:380</span></div></div>
+    <div class="find"><span class="sev lo">Низкий</span><div class="b"><h3>Расхождения базы знаний с кодом <span class="ios n">iOS не затронут</span></h3><p>В <code>08-integrations.md</code> сказано, что Долями и Подели вызываются напрямую, а в коде оба идут через billing MS. В карте esb §5.4 написано, что срок JWT не проверяется, а на деле <code>exp</code> проверяется. Карты esb и Go сверены на коммит раньше текущего HEAD.</p><span class="where">knowledge/12storeez-master-web/architecture/08-integrations.md · knowledge/esb-monorepo/repo-map.md</span></div></div>
+  </div>
+</section>
+
+<section aria-labelledby="s-ref">
+  <span class="eyebrow">Справочник</span>
+  <h2 id="s-ref">Все вызовы iOS</h2>
+  <p>Каждая строка — один запрос приложения: путь на хосте, файл шлюза, адрес в монолите или сервис gRPC, контроллер монолита.</p>
+  <div class="controls">
+    <div class="seg" role="group" aria-label="Хост">
+      <button type="button" data-host="all" aria-pressed="true">Все хосты</button>
+      <button type="button" data-host="core" aria-pressed="false">core</button>
+      <button type="button" data-host="mobile" aria-pressed="false">mobile</button>
+    </div>
+    <input type="search" id="q" placeholder="Путь, endpoint, контроллер…" aria-label="Поиск по вызовам">
+    <span class="count" id="count"></span>
+  </div>
+  <div class="chips" id="chips" role="group" aria-label="Домен"></div>
+  <div class="tbl"><table>
+    <thead><tr><th style="width:74px">Хост</th><th style="width:22%">Запрос iOS · endpoint</th><th style="width:15%">Шлюз</th><th style="width:22%">Монолит / сервис</th><th>Контроллер монолита</th><th style="width:14%">Заметка</th></tr></thead>
+    <tbody id="rows"></tbody>
+  </table></div>
+  <div class="legend">
+    <div><code>M1</code><span>12storeez-master-web/src/Modules/Mobile/Controllers/</span></div>
+    <div><code>M2</code><span>12storeez-master-web/modules/mobilev2/controllers/</span></div>
+    <div><code>M3</code><span>12storeez-master-web/src/Modules/MobileV2/Controllers/</span></div>
+    <div><code>*.ts</code><span>esb-monorepo/libs/&lt;домен&gt;/controllers/src/lib/…</span></div>
+    <div><code>*.go</code><span>mobile-monorepo-go/internal/app/service/</span></div>
+    <div><code>iOS</code><span>TwelveStoreez/Classes/Business/Network/Endpoints/</span></div>
+  </div>
+</section>
+
+<section aria-labelledby="s-unused">
+  <span class="eyebrow">Без клиента iOS</span>
+  <h2 id="s-unused">Ручки Go-шлюза, которые iOS не вызывает</h2>
+  <p>Возможно, их вызывает Android, иначе это мёртвый код. Проверить по логам шлюза.</p>
+  <ul class="unused">
+    <li>Весь <code>/api/v1/auth/*</code>: iOS входит через <code>core</code></li>
+    <li><code>metadata/contacts</code>, <code>metadata/about</code></li>
+    <li><code>profile/bind-phone</code></li>
+    <li><code>geo/cities/:ip</code>, <code>…/normalize</code>, <code>get-by-phone</code></li>
+    <li><code>delivery/types</code></li>
+    <li><code>PUT v1/cart</code>, <code>cart/reset-exclude-positions</code></li>
+    <li><code>POST cart/delivery-list</code>, <code>cart/subscription/check</code>, <code>cart/ping</code></li>
+    <li><code>giftcards/send-code</code>, весь <code>/api/v2/giftcards/*</code></li>
+    <li><code>products/:id/accompaniments</code></li>
+    <li><code>version/check</code>: в iOS endpoint описан, но не вызывается</li>
+  </ul>
+</section>
+
+<footer>
+  <span>Файл: <code>new/knowledge/architecture/call-chain.html</code>. Карта репозитория: <code>knowledge/12storeez-ios/repo-map.md</code>.</span>
+  <span>Собрано чтением кода, без трафика и логов. Значения секретов и prod-адреса из Vault не проверялись.</span>
+</footer>
+</div>
+
+<script>
+const D={auth:"Авторизация",prof:"Профиль и лояльность",cat:"Каталог и поиск",cont:"Контент",geo:"Гео",cart:"Новый чекаут",old:"Старый чекаут",ord:"Заказы",ret:"Возвраты",pay:"Платежи",gift:"Сертификаты",res:"Резерв",rev:"Отзывы",ntf:"Уведомления"};
+// [домен, хост, метод, путь iOS, endpoint iOS, шлюз, монолит/сервис, контроллер, заметка, предупреждение]
+const R=[
+["auth","core","PUT","authorization/generate-token","AuthGuestEndpoint","authorization.controller.ts:43","PUT mobile/user/token","M1 UserController::actionToken","esb выпускает гостевой JWT"],
+["auth","core","PUT","authorization/session","AuthSessionEndpoint.refresh","session.controller.ts:36","PUT mobile/user/session","M1 UserController::actionSession","перевыпуск JWT по refresh_token"],
+["auth","core","GET","authorization/session","AuthSessionEndpoint.status","session.controller.ts:22","GET mobile/user/session","M1 UserController::actionSession","503 → экран техработ"],
+["auth","core","POST","authorization/login","AuthEmailEndpoint","authorization.controller.ts:68","POST mobile/user/auth · gRPC Mindbox initClient","M1 UserController::actionAuth",""],
+["auth","core","POST","authorization/login/by-phone/request-code","AuthPhoneEndpoint.code","authorization.controller.ts:93","gRPC Mindbox Mobile.code","—","в монолит не ходит"],
+["auth","core","POST","authorization/login/by-phone","AuthPhoneEndpoint.confirm","authorization.controller.ts:124","gRPC checkCode → POST mobile/user/auth-phone → initClient","M1 UserController::actionAuthPhone","WAF-блок → v1/errors/waf"],
+["auth","core","POST","authorization/logout","AuthLogoutEndpoint","authorization.controller.ts:190","DELETE mobile/user/auth · gRPC removeDevice","M1 UserController::actionAuth","новый гостевой JWT"],
+["auth","core","POST","profile/actions/restore-password","RestorePasswordEndpoint","profile.controller.ts:105","POST mobile/user/restore-password","M1 UserController::actionRestorePassword",""],
+["auth","mobile","GET","v1/settings","SessionSettingsEndpoint","settings.go:41","GET mobile/v2/settings","M3 SettingsController::actionIndex",""],
+["auth","mobile","GET","v1/users/device-session-token","UsersEndpoint.deviceSessionToken","user.go:153","GET mobile/user/device-session-token","M1 UserController::actionDeviceSessionToken","случайная строка, не хранится"],
+["auth","mobile","POST","v1/errors/waf","WafErrorEndpoint","errors.go:44","— (лог шлюза)","—","без JWT"],
+["prof","core","GET","profile","ProfileEndpoint.profile","profile.controller.ts:41","GET mobile/user","M1 UserController::actionIndex",""],
+["prof","core","PATCH","profile","ProfileEndpoint.update","profile.controller.ts:67","PATCH mobile/user","M1 UserController::actionIndex",""],
+["prof","core","DELETE","profile","ProfileEndpoint.deleteProfile","profile.controller.ts:79","DELETE mobile/user","M1 UserController::actionIndex","заголовок remove: true"],
+["prof","core","POST","profile/password","ProfileEndpoint.changePassword","profile.controller.ts:119","POST mobile/user/change-password","M1 UserController::actionChangePassword",""],
+["prof","core","POST","profile/phone","ProfileEndpoint.editPhone","phone.controller.ts:37","gRPC Mindbox Mobile.code","—",""],
+["prof","core","PATCH","profile/phone","ProfileEndpoint.confirmEditPhone","phone.controller.ts:75","gRPC isUserExist → checkCode → PATCH mobile/user + editUser","M1 UserController::actionIndex","403, если номер занят"],
+["prof","core","GET","profile/addresses","ProfileEndpoint.addresses","addresses.controller.ts:35","GET mobile/user/addresses","M1 UserController::actionAddresses",""],
+["prof","core","DELETE","profile/addresses/{id}","ProfileEndpoint.deleteAddress","addresses.controller.ts:62","DELETE mobile/user/addresses/{id}","M1 UserController::actionAddresses",""],
+["prof","core","GET","profile/icons","ProfileEndpoint.icons","profile.controller.ts:136","GET mobile/profile/icons","M1 ProfileController::actionIcons",""],
+["prof","core","GET","profile/qr","QrCodeEndpoint","profile-v2.controller.ts:21","GET mobile/v2/profile/qr","M2 ProfileController::actionQr",""],
+["prof","core","GET","profile/subscriptions/v2","ProfileEndpoint.subscriptions","subscriptions-v2.controller.ts:23","GET mobilev2/subscribtions/items","M2 SubscribtionsController::actionItems",""],
+["prof","core","PUT","profile/subscriptions","SubscriptionEndpoint.add","subscriptions.controller.ts:57","PUT mobile/subscribtions/items","M1 SubscribtionsController::actionItems",""],
+["prof","core","DELETE","profile/subscriptions/{barcode}","SubscriptionEndpoint.remove","subscriptions.controller.ts:67","DELETE mobile/subscribtions/items/{barcode}","M1 SubscribtionsController::actionItems",""],
+["prof","core","PUT","profile/wishlist","WishlistEndpoint.add","wishlist.controller.ts:54","PUT mobile/wishlist","M1 WishlistController::actionIndex",""],
+["prof","core","DELETE","profile/wishlist/{id}","WishlistEndpoint.remove","wishlist.controller.ts:69","DELETE mobile/wishlist/{id}","M1 WishlistController::actionIndex",""],
+["prof","core","GET","profile/wishlist/ids","WishlistEndpoint.ids","wishlist.controller.ts:42","GET mobile/wishlist/ids","M1 WishlistController::actionIds",""],
+["prof","mobile","GET","v1/users/wishlist","UsersEndpoint.wishlist","user.go:122","GET mobile/v2/wishlist","M2 WishlistController::actionIndex",""],
+["prof","mobile","GET","v1/users/addresses","UserAddressesEndpoint.addressList","user.go:244","GET mobile/user-address/addresses","M1 UserAddressController::actionList",""],
+["prof","mobile","PUT","v1/users/addresses","UserAddressesEndpoint.createAddress","user.go:351","PUT mobile/user-address/addresses","M1 UserAddressController",""],
+["prof","mobile","POST","v1/users/addresses/{id}","UserAddressesEndpoint.updateAddress","user.go:274","POST mobile/user-address/addresses/{id}","M1 UserAddressController",""],
+["prof","mobile","DELETE","v1/users/addresses/{id}","UserAddressesEndpoint.deleteAddress","user.go:316","DELETE mobile/user-address/addresses/{id}","M1 UserAddressController",""],
+["prof","mobile","GET","v1/users/permissions","UsersEndpoint.permissions","user.go:385","GET mobile/user/capabilities","M1 UserController::actionCapabilities",""],
+["prof","mobile","GET","v1/users/bonuses","UsersEndpoint.bonuses","user.go:55","gRPC Mindbox User.Info","—","user_id из JWT"],
+["prof","mobile","GET","v1/users/bonuses/history","UsersEndpoint.bonusesHistory","user.go:88","gRPC Mindbox User.Orders","—",""],
+["cat","core","GET","catalog/filter","FiltersEndpoint","catalog.controller.ts:14","GET mobile/catalog/filter","M1 CatalogController::actionFilter",""],
+["cat","core","GET","products/v2/{id}","ProductDetailEndpoint","v2.controller.ts:106","GET mobile/v2/products/{id}","M2 ProductsController::actionIndex",""],
+["cat","core","GET","products/v2/{id}/stocks","ProductInStocksEndpoint","v2.controller.ts:126","GET mobile/v2/products/stocks/{id}","M2 ProductsController::actionStocks",""],
+["cat","core","GET","products/v2/{id}/fashion","ProductLookEndpoint","v2.controller.ts:159","GET mobile/v2/products/fashion/{id}","M2 ProductsController::actionFashion",""],
+["cat","core","GET","products/v2/{id}/fashion-stylist","ProductFashionStylesEndpoint","v2.controller.ts:169","GET mobile/v2/products/fashion-stylist/{id}","M2 ProductsController::actionFashionStylist",""],
+["cat","core","GET","products/v2/last-view, /{id}/last-view","ProductLastViewedEndpoint","v2.controller.ts:75, :149","GET mobile/v2/products/last-view[/{id}]","M2 ProductsController::actionLastView",""],
+["cat","core","GET","products/last-search","ProductLastSearchEndpoint","products.controller.ts:26","GET mobile/products/last-search","M1 ProductsController::actionLastSearch",""],
+["cat","core","GET","products/v2/suggest","SuggestEndpoint","v2.controller.ts:89","GET mobile/v2/products/suggest","M2 ProductsController::actionSuggest",""],
+["cat","core","GET","products/v2/last-search-term","LastSearchTermsEndpoint","v2.controller.ts:106 (вместо :192)","GET mobile/v2/products/last-search-term","M2 ProductsController::actionLastSearchTerm","перехвачен /:model_id, работает по совпадению",1],
+["cat","core","GET","reviews/product/{id}","ReviewsEndpoint.loadByProductId","product.controller.ts:34","GET mobile/feedback/items/{id}","M1 FeedbackController::actionItems",""],
+["cat","mobile","GET","v1/pages/home","HomeEndpoint","pages.go:49","GET mobile/v2/home/new","M2 HomeController::actionNew","кеш Redis"],
+["cat","mobile","GET","v1/pages/catalog","CatalogEndpoint","pages.go:86","GET mobile/v2/home/catalog","M2 HomeController::actionCatalog",""],
+["cat","mobile","GET","v1/products","ProductEndpoint","product.go:261","GET mobile/v2/products","M2 ProductsController::actionIndex","Redis → Elastic или MySQL"],
+["cat","mobile","GET","v1/products/advanced-search","ProductAdvancedSearchEndpoint","product.go:62","GET mobile/v2/products/advanced-search","M2 ProductsController::actionAdvancedSearch","Diginetica, запасной — свой поиск"],
+["cat","mobile","GET","v1/products/category","CategoryInfoEndpoint","product.go:97","GET mobile/v2/products/category","M3 CategoryController::actionSearchMain",""],
+["cat","mobile","GET","v1/products/{id}/recommendations","ProductRecommendedEndpoint","product.go:159","GET mobile/v1/products/{id}/recommendations","M1 ProductsController::actionProductRecommendations","Mindbox через BFB"],
+["cat","mobile","GET","v1/products/recommendations","CartRecommendedEndpoint","product.go:128","GET mobile/products/recommendations","M1 ProductsController::actionRecommendations","Mindbox через BFB"],
+["cat","mobile","GET","v1/products/{id}/store-availability","StoreAvailabilitySizesEndpoint","product.go:294","GET mobile/products/{id}/store-availability","M1 ProductsController::actionStoreAvailability","остатки в MySQL"],
+["cat","mobile","GET","v1/products/for-cart","CartLastViewedEndpoint","product.go:190","GET mobile/v2/products/for-cart","M2 ProductsController::actionForCart","query клиента отбрасывается"],
+["cat","mobile","GET","v1/products/{id}/complete-set","CartCompleteSetEndpoint","product.go:344","GET mobile/v1/products/{id}/complete-set","M1 ProductsController::actionCompleteSet",""],
+["cont","core","GET","metadata/about","MetadataEndpoint.about","about.controller.ts:21","gRPC Meta Mobile.about","—",""],
+["cont","core","GET","metadata/faq","MetadataEndpoint.faq","faq.controller.ts:19","GET mobile/support","M1 SupportController::actionIndex",""],
+["cont","core","GET","metadata/faq/category/{id}","MetadataEndpoint.faqCategory","faq.controller.ts:26","GET mobile/support/category/{id}","M1 SupportController::actionCategory",""],
+["cont","core","GET","metadata/faq/theme/{id}","MetadataEndpoint.faqTheme","faq.controller.ts:36","GET mobile/support/theme/{id}","M1 SupportController::actionTheme",""],
+["cont","core","GET","metadata/stores","ShopsEndpoint.stores","stores.controller.ts:29","gRPC Meta Stores.all","—","store_id → id"],
+["cont","core","GET","metadata/stores/{id}","ShopsEndpoint.detail","stores.controller.ts:85","gRPC Meta Stores.ByID","—",""],
+["cont","core","GET","metadata/stores/cities","MetadataEndpoint.cities","stores.controller.ts:48","gRPC Meta Stores.cities","—",""],
+["cont","core","GET","metadata/sizes","MetadataEndpoint.sizes","sizes.controller.ts:19","GET mobile/metadata/sizes","M1 MetadataController::actionSizes",""],
+["cont","core","GET","metadata/sizes-table","MetadataEndpoint.sizesTable","size-table.controller.ts:19","GET mobile/metadata/sizes-table/{product_id}","M1 MetadataController::actionSizesTable",""],
+["cont","core","GET","metadata/social","MetadataEndpoint.communities","social.controller.ts:19","GET mobile/metadata/socials","M1 MetadataController::actionSocials",""],
+["cont","core","GET","metadata/stories/v2","MetadataEndpoint.stories","stories-v2.controller.ts:25","GET mobile/v2/lookbooks","M3 LookbookController::actionList",""],
+["cont","core","GET","metadata/stories/v2/{id}","MetadataEndpoint.storiesDetailed","stories-v2.controller.ts:39","GET mobile/v2/lookbooks/{id}","M3 LookbookController::actionDetail",""],
+["cont","core","GET","landings/v2/{id}","LandingPageEndpoint","landings.controller.ts:27","GET mobile/v2/landings/{id}","M3 MobileLandingController::actionIndex",""],
+["cont","core","POST","v2/ulink","ULinkEndpoint","ulink.controller.ts:34","POST mobile/v2/ulink","M2 UlinkController::actionIndex",""],
+["cont","core","GET","geo/countries/phone-details","PhoneCodeEndpoint","countries.controller.ts:58","gRPC Geo suggestCountry","—",""],
+["cont","mobile","GET","v1/metadata/splash-screen-image","SplashScreenEndpoint","metadata.go:67","GET api/metadata/splash-screen-image","src/Modules/Metadata/Controllers/MetadataController::actionSplashScreenImage",""],
+["geo","mobile","GET","v1/geo/countries","CountriesEndpoint","geo.go:50","gRPC Geo SuggestCountry","—",""],
+["geo","mobile","GET","v1/geo/countries/{iso}/cities","GeoCitiesEndpoint.suggest","geo.go:130","gRPC Geo SuggestCity","—",""],
+["geo","mobile","GET","v1/geo/countries/{iso}/cities/{geoId}/details","GeoCitiesEndpoint.info","geo.go:170","gRPC Geo CityDetailsByGeoID","—",""],
+["geo","mobile","GET","v1/geo/countries/{iso}/addresses","AddressEndpoint.suggest","geo.go:299","gRPC Geo SuggestAddress","—",""],
+["geo","mobile","GET","v1/geo/countries/{iso}/addresses/{geoId}/details","AddressEndpoint.info","geo.go:344","gRPC Geo AddressDetailsByGeoID","—",""],
+["geo","mobile","GET · POST","v1/users/geo/confirmation","ConfirmationEndpoint","user.go:175, :204","mobile/v2/geo/confirmation","M3 UserGeoController::actionConfirmation",""],
+["cart","mobile","GET","v1/cart","CartEndpointNew.load, .preview","cart.go:154","GET mobile/cart","M1 CartController::actionIndex","расчёт Mindbox через BFB"],
+["cart","mobile","PUT","v2/cart","CartEndpointNew.addItems","cart.go:1538","PUT mobile/v2/cart","M3 CartController::actionAddItem","+ RabbitMQ mindbox.mobile-cart"],
+["cart","mobile","GET","v1/cart/items","NewCartEndpoint.cartItems","cart.go:1063","GET mobile/cart/items","M1 CartDetailsController::actionItems",""],
+["cart","mobile","PATCH · DELETE","v1/cart/items","NewCartEndpoint.updateCartItem, .deleteCartItems","cart.go:1100, :1137","mobile/cart/items","M1 CartDetailsController::actionItems",""],
+["cart","mobile","GET","v1/cart/info","NewCartEndpoint.cartInfo","cart.go:1027","GET mobile/cart/info","M1 CartDetailsController::actionInfo",""],
+["cart","mobile","POST","v1/cart/apply-order-settings","NewCartEndpoint.previousData","cart.go:1474","POST mobile/cart/apply-order-settings","M1 CartDetailsController::actionApplyOrderSettings",""],
+["cart","mobile","POST","v1/cart/move-items","NewCartEndpoint.moveItemsFromExpress","cart.go:191","POST mobile/cart/move-items","M1 CartController::actionMoveItems","mode=express_delivery"],
+["cart","mobile","POST","v1/cart/move-unavailable-to-favourites","NewCartEndpoint.moveUnavailableToFavourites","cart.go:1438","POST mobile/cart/move-unavailable-to-favourites","M1 CartDetailsController::actionMoveUnavailableToFavourites",""],
+["cart","mobile","GET · POST","v1/cart/delivery/city","NewCartEndpoint.selectedGeo, .selectGeo","cart.go:686, :723","mobile/cart-delivery/city","M1 CartDeliveryController::actionCity / actionSaveCity",""],
+["cart","mobile","GET","v1/cart/delivery-list","NewCartEndpoint.deliveryOptions","cart.go:227","GET mobile/cart-delivery/list","M1 CartDeliveryController::actionList",""],
+["cart","mobile","GET · POST","v1/cart/delivery","NewCartEndpoint.selectedDeliveryOption, .selectDeliveryOption","cart.go:299, :336","mobile/cart-delivery","M1 CartDeliveryController::actionIndex",""],
+["cart","mobile","GET · POST","v1/cart/delivery-address","NewCartEndpoint.selectedAddress, .selectAddress","cart.go:554, :590","mobile/cart-delivery/address","M1 CartDeliveryController::actionAddress",""],
+["cart","mobile","POST","v1/cart/delivery-address-from-list","NewCartEndpoint.selectAddressFromList","cart.go:638","POST mobile/cart-delivery/address-from-list","M1 CartDeliveryController::actionSaveAddressFromList",""],
+["cart","mobile","GET","v1/cart/delivery/pickup-points","NewCartEndpoint.pickupFromShop","cart.go:445","GET mobile/cart-delivery/pickup-points","M1 CartDeliveryController::actionPickupPoints",""],
+["cart","mobile","GET · POST","v1/cart/delivery/pickup-point","NewCartEndpoint.selectedPickupFromShop, .selectPickupFromShop","cart.go:481, :518","mobile/cart-delivery/pickup-point","M1 CartDeliveryController::actionPickupPoint",""],
+["cart","mobile","GET · POST","v1/cart/delivery/pvz","NewCartEndpoint.selectedPickupPoint, .selectPickupPoint","cart.go:372, :409","mobile/cart-delivery/pvz","M1 CartDeliveryController::actionPvz",""],
+["cart","mobile","POST","v1/cart/delivery/interval","NewCartEndpoint.selectDeliveryInterval","cart.go:772","POST mobile/cart-delivery/interval","M1 CartDeliveryController::actionInterval",""],
+["cart","mobile","GET","v1/cart/payment-list","NewCartEndpoint.paymentTypes","cart.go:1209","GET mobile/cart-payment/list","M1 CartPaymentController::actionList",""],
+["cart","mobile","GET · POST","v1/cart/payment","NewCartEndpoint.selectedPaymentType, .selectPaymentType","cart.go:1173, :1245","mobile/cart-payment","M1 CartPaymentController::actionGetCartPayment / actionSaveCartPayment",""],
+["cart","mobile","GET · POST","v1/cart/user-info","NewCartEndpoint.selectedRecipient, .selectRecipient","cart.go:1291, :1328","mobile/cart/user-info","M1 CartController::actionUserInfo",""],
+["cart","mobile","GET · POST","v1/cart/recipient","NewCartEndpoint.selectedAnotherRecipient, .selectAnotherRecipient","cart.go:954, :991","mobile/cart-recipient","M1 CartRecipientController::actionIndex",""],
+["cart","mobile","GET · POST","v1/cart/discount/bonuses","NewCartEndpoint.selectedBonuses, .selectBonuses","cart.go:881, :918","mobile/cart-discount/bonuses","M1 CartDiscountController::actionBonuses","Mindbox через BFB"],
+["cart","mobile","POST · DELETE","v1/cart/discount/promo-code","NewCartEndpoint.addPromocode, .deletePromocode","cart.go:809, :845","mobile/cart-discount/promo-code","M1 CartDiscountController::actionPromoCode",""],
+["cart","mobile","POST · DELETE","v1/cart/giftcard","NewCartEndpoint.addGiftCard, .deleteGiftCard","cart.go:1365, :1402","mobile/cart-giftcard","M1 CartGiftcardController::actionAddGiftcard / actionDeleteGiftcard",""],
+["cart","mobile","POST","v1/orders","CheckoutCreateOrderEndpoint","order.go:46","POST mobile/orders","M1 OrdersController::actionIndex → OrderService::createOrder","MySQL, события, outbox",1],
+["cart","mobile","POST","v1/delivery/intervals","TimeIntervalsEndpoint","delivery.go:72","gRPC Logistics WinnerService.Intervals","—","мимо монолита"],
+["cart","mobile","GET","v1/pickup/provider/{id}/points","PickUpPointEndpoint.pvzListPoints","pickup.go:41","HTTP Logistics /api/v1/winner/pickup/{id}/points","—","мимо монолита"],
+["cart","mobile","GET","v1/pickup/provider/{id}/points/{point}","PickUpPointEndpoint.pvzPoint","pickup.go:78","HTTP Logistics /api/v1/winner/pickup/{id}/points/{point}","—","мимо монолита"],
+["old","core","POST","cart/{barcode}","CartEndpoint.updateCount","cart.controller.ts:99","PATCH mobile/cart/{barcode}","M1 CartController::actionUpdate",""],
+["old","core","DELETE","cart/{barcode}","CartEndpoint.deleteItem","cart.controller.ts:66","DELETE mobile/cart/{barcode}","M1 CartController::actionUpdate",""],
+["old","core","GET","cart/clean","CartEndpoint.clean","cart.controller.ts:128","GET mobile/cart/clean","M1 CartController::actionClean",""],
+["old","core","GET","cart/check-items","CartEndpoint.checkCartChange","cart.controller.ts:43","GET mobile/cart/check-items","M1 CartController::actionCheckItems",""],
+["old","core","POST","cart/payment","CartEndpoint.payment","cart.controller.ts:86","POST mobile/cart/payment","M1 CartController::actionPayment",""],
+["old","core","GET","cart/delivery2","CartDeliveryEndpoint","delivery2.controller.ts:16","POST mobile/v2/delivery","M2 DeliveryController::actionIndex","GET превращается в POST; без guard",1],
+["old","core","GET","cart/delivery2/boxberry[/{id}]","CartEndpoint.boxberryListPoints, .boxberryPoint","delivery2.controller.ts:30, :40","GET mobile/v2/delivery/boxberry[/{id}]","M2 DeliveryController::actionBoxberry","без guard",1],
+["old","core","POST","cart/delivery","SaveDeliveryEndpoint","delivery.controller.ts:29","POST mobile/cart/delivery","M1 CartController::actionDelivery","без guard",1],
+["old","core","PUT","orders","CreateOrderEndpoint","orders.controller.ts:214","PUT mobile/orders","M1 OrdersController::actionIndex → OrderService::createOrder","тот же createOrder",1],
+["ord","core","GET","orders","OrdersEndpoint.orders","orders.controller.ts:54","GET mobile/orders · gRPC Feedbacks canBeSaved","M1 OrdersController::actionIndex","кнопка «Оценить»"],
+["ord","core","GET","orders/{id}","OrdersEndpoint.orderDetail","orders.controller.ts:227","GET mobile/orders/{id} · gRPC Feedbacks canBeSaved","M1 OrdersController::actionIndex",""],
+["ord","core","DELETE","orders","OrdersEndpoint.cancel","orders.controller.ts:272","POST mobile/orders/cancel","M1 OrdersController::actionCancel","DELETE превращается в POST"],
+["ord","core","GET","orders/offline","OrdersEndpoint.offlineOrders","orders.controller.ts:88","gRPC Orders Offline.byClient + POST api2/products/items","modules/api2","чеки магазинов"],
+["ord","core","GET","orders/offline/{id}","OrdersEndpoint.offlineOrder","orders.controller.ts:146","gRPC Orders Offline.getById + POST api2/products/items","modules/api2",""],
+["ord","core","GET","orders/dolyame-id/{id}","OrderDolyameIdEnpoint","orders.controller.ts:284","GET mobile/orders/dolyame-id/{id}","M1 OrdersController::actionDolyameId","Долями в iOS"],
+["ord","mobile","GET","v2/payment-types","PaymentTypesEndpoint","payment.go:178","GET mobile/v2/payment-types","M3 ChangePaymentController::actionPaymentTypes","query order_id"],
+["ord","mobile","PATCH","v2/orders/{id}/change-payment-method","ChangePaymentTypeEndpoint","payment.go:218","PATCH mobile/v2/orders/{id}/change-payment-method","M3 ChangePaymentController::actionChangePaymentMethod","outbox в Mindbox, 1С, RCRM"],
+["ret","core","POST","orders/{id}/return","ReturnOrderEndpoint.returnOrder","orders.controller.ts:254","POST mobile/orders/{id}/return","M1 OrdersController::actionReturnPositions","позиции и реквизиты"],
+["ret","core","GET","orders/v2/return-reasons","ReturnOrderEndpoint.loadReasons","orders.controller.ts:204","GET mobile/v2/orders/return-reasons","M2 OrdersController::actionReturnReasons",""],
+["ret","mobile","GET","v1/delivery/{id}/return-method-list","ReturnOrderMethodsEndpoint","delivery.go:166","GET mobile/orders/{id}/return-method-list","M1 OrdersController::actionReturnMethodList","конфигурация в Redis"],
+["ret","mobile","POST","v1/delivery/{id}/return-details","ReturnOrderDetailsEndpoint","delivery.go:112","POST mobile/orders/{id}/return-details","M1 OrdersController::actionReturnDetails","outbox в RetailCRM"],
+["pay","mobile","POST","v1/payment/yookassa","PaymentEndpoint.yooKassa","payment.go:55","POST mobile/v2/payment/yookassa","M3 PaymentController::actionYookassa","YooKassa API напрямую"],
+["pay","mobile","GET","v1/payment/yookassa/{pid}/{oid}","PaymentEndpoint.status","payment.go:101","GET mobile/v2/payment/yookassa/{pid}/{oid}","M3 PaymentController::actionYookassa",""],
+["pay","mobile","POST","v1/payments/{oid}/{system}","PaymentsEndpoint.payments","payments.go:51","POST mobile/v2/payments/{oid}/{system}","M3 PaymentController::actionIndex","billing MS через BFB"],
+["pay","mobile","GET","v1/payments/{oid}/{system}/{pid}/info","PaymentsEndpoint.checkPaymentStatus","payment.go:141","GET mobile/payments/{oid}/{system}/{pid}/info","M1 PaymentController::actionInfo","iOS шлёт только podeli, pid = orderId"],
+["gift","mobile","GET","v1/giftcards/settings","GiftCardsEndpoint.settings","giftcard.go:55","GET mobilev2/giftcards/settings","M2 GiftcardsController::actionSettings","Giftcards MS"],
+["gift","mobile","GET","v1/timezones","GiftCardsEndpoint.timeZones","timezones.go:36","GET mobilev2/giftcards/timezones","M2 GiftcardsController::actionTimezones",""],
+["gift","mobile","POST","v1/giftcards/create-order","GiftCardsEndpoint.createOrder","giftcard.go:139","POST mobilev2/giftcards/create-order","M2 GiftcardsController::actionCreateOrder",""],
+["gift","mobile","GET","v1/giftcards/ping","GiftCardsEndpoint.check","giftcard.go:110","GET mobile/cart-giftcard/ping","M1 CartGiftcardController::actionPing",""],
+["gift","mobile","GET","v1/giftcards","GiftCardsEndpoint.list","giftcard.go:197","GET mobile/cart-giftcard/list","M1 CartGiftcardController::actionList",""],
+["gift","mobile","GET","v1/giftcards/{id}/trx-list","GiftCardsEndpoint.transactions","giftcard.go:234","POST mobilev2/giftcards/trx-list","M2 GiftcardsController::actionTrxList","GET превращается в POST"],
+["gift","mobile","POST","v1/giftcards","GiftCardsEndpoint.addGiftCard","giftcard.go:275","POST mobilev2/giftcards/add","M2 GiftcardsController::actionAdd",""],
+["gift","mobile","PUT","v1/giftcards/{id}","GiftCardsEndpoint.addToCart","giftcard.go:306","POST mobilev2/giftcards/add-to-cart","M2 GiftcardsController::actionAddToCart",""],
+["gift","mobile","DELETE","v1/giftcards/{id}","GiftCardsEndpoint.deleteFromCart","giftcard.go:355","POST mobilev2/giftcards/del-from-cart","M2 GiftcardsController::actionDelFromCart",""],
+["gift","mobile","POST","v1/giftcards/initiate","GiftCardsEndpoint.initiateGiftCard","giftcard.go:402","POST mobile/v2/giftcards/initiate","M2 GiftcardsController::actionInitiate","Mindbox через BFB"],
+["gift","mobile","POST","v1/giftcards/verify-code","GiftCardsEndpoint.verifyCode","giftcard.go:460","POST mobile/v2/giftcards/verify-code","M2 GiftcardsController::actionVerifyCode","Mindbox через BFB"],
+["res","mobile","POST","v1/reservation/cart","ReservationEndpoint.addToCart","reservation.go:52","POST mobile/reservation/cart","M1 ReservationController::actionCreateCart",""],
+["res","mobile","POST","v1/reservation","ReservationEndpoint.create","reservation.go:220","POST mobile/reservation","M1 ReservationController::actionOrder","тот же createOrder"],
+["res","mobile","GET","v1/reservation","ReservationEndpoint.myReservations","reservation.go:94","GET mobile/reservation","M1 ReservationController::actionList",""],
+["res","mobile","GET","v1/reservation/{id}","ReservationEndpoint.reservationDetail","reservation.go:183","GET mobile/reservation/{id}","M1 ReservationController::actionItem",""],
+["res","mobile","GET","v1/reservation/instructions","ReservationEndpoint.conditions","reservation.go:183 (вместо :127)","GET mobile/reservation/instructions","M1 ReservationController::actionInstructions","работает по совпадению",1],
+["res","mobile","GET","v1/reservation/expiration","ReservationEndpoint.expiration","reservation.go:183 (вместо :153)","GET mobile/reservation/expiration","M1 ReservationController::actionExpiration","работает по совпадению",1],
+["rev","core","GET","reviews/company","ReviewsEndpoint.loadReviewsCompany","company.controller.ts:27","GET mobile/feedback/shop","M1 FeedbackController::actionShop",""],
+["rev","core","GET","reviews/order/reasons/{orderId}","ReviewsEndpoint.reasonsForReviewOrder","reviews.controller.ts:131","gRPC Feedbacks reasonsByOrder","—","store_code по умолчанию 199"],
+["rev","core","PUT","reviews/product/{orderId}","ProductReviewEndpoint","product.controller.ts:47","PUT mobile/feedback/items/{orderId}","M1 FeedbackController::actionItems",""],
+["rev","core","PUT","reviews/app","FeedbackEndpoint.createReviewApp","reviews.controller.ts:85","gRPC Feedbacks app","—",""],
+["rev","core","PUT","reviews/company","FeedbackEndpoint.createReviewCompany","company.controller.ts:47","PUT mobile/feedback/shop","M1 FeedbackController::actionShop",""],
+["rev","core","PUT","reviews/order","FeedbackEndpoint.createReviewOrder","reviews.controller.ts:43","gRPC Feedbacks order","—",""],
+["rev","core","PUT","reviews/store","FeedbackEndpoint.createReviewStore","reviews.controller.ts:64","gRPC Feedbacks store","—",""],
+["rev","mobile","PUT","v1/reviews/offline-product","OfflineProductReviewEndpoint","reviews.go:34","PUT mobile/v2/feedback/offline-product","M2 FeedbackController::actionOfflineProduct","только MySQL"],
+["ntf","core","GET","notification/message","NotificationEndpoint.message","notification.controller.ts:85","GET mobile/v2/notification/message","M2 NotificationController::actionMessage",""],
+["ntf","core","GET","notification/info","NotificationEndpoint.info","notification.controller.ts:97","GET mobile/v2/notification/info","M2 NotificationController::actionInfo","Accept-Language"],
+["ntf","core","GET","notification/user-activities","NotificationEndpoint.needReviewOrder","notification.controller.ts:123","GET mobile/user-activities","M1 UserActivitiesController::actionIndex",""],
+["ntf","mobile","GET · POST","v1/notification/polls","PollsEndpoint","notification.go:42, :72","mobile/v2/notification/polls","M2 NotificationController::actionPolls",""]
+];
+const state={host:"all",dom:"all",q:""};
+try{const s=JSON.parse(localStorage.getItem("chain-filter")||"null");if(s&&D[s.dom])state.dom=s.dom;if(s&&["all","core","mobile"].includes(s.host))state.host=s.host}catch(e){}
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const nC=R.filter(r=>r[1]==="core").length,nM=R.length-nC;
+document.getElementById("cnt-core").textContent=nC;document.getElementById("cnt-mob").textContent=nM;
+const chips=document.getElementById("chips");
+function chip(key,label,n){const b=document.createElement("button");b.type="button";b.className="chip";b.dataset.dom=key;b.innerHTML=esc(label)+'<span class="c">'+n+"</span>";b.setAttribute("aria-pressed",String(state.dom===key));b.onclick=()=>{state.dom=key;render()};chips.appendChild(b)}
+chip("all","Все домены",R.length);Object.keys(D).forEach(k=>chip(k,D[k],R.filter(r=>r[0]===k).length));
+document.querySelectorAll(".seg button").forEach(b=>b.onclick=()=>{state.host=b.dataset.host;render()});
+document.getElementById("q").addEventListener("input",e=>{state.q=e.target.value.trim().toLowerCase();render()});
+function cls(t){return t.startsWith("gRPC")?"grpc":t.startsWith("HTTP")?"ext":""}
+function render(){
+  document.querySelectorAll(".chip").forEach(c=>c.setAttribute("aria-pressed",String(c.dataset.dom===state.dom)));
+  document.querySelectorAll(".seg button").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.host===state.host)));
+  try{localStorage.setItem("chain-filter",JSON.stringify({dom:state.dom,host:state.host}))}catch(e){}
+  const list=R.filter(r=>(state.host==="all"||r[1]===state.host)&&(state.dom==="all"||r[0]===state.dom)&&(!state.q||r.join(" ").toLowerCase().includes(state.q)));
+  let html="",last="";
+  list.forEach(r=>{
+    if(r[0]!==last){last=r[0];html+='<tr class="grp"><td colspan="6">'+esc(D[r[0]])+"</td></tr>"}
+    html+="<tr><td><span class=\"h "+r[1]+"\">"+r[1]+"</span></td>"+
+      '<td><span class="m">'+esc(r[2])+'</span> <span class="p">'+esc(r[3])+'</span><span class="cls">'+esc(r[4])+"</span></td>"+
+      '<td class="ctl">'+esc(r[5])+"</td>"+
+      '<td><span class="tg '+cls(r[6])+'">'+esc(r[6])+"</span></td>"+
+      '<td class="ctl">'+esc(r[7])+"</td>"+
+      '<td class="nt'+(r[9]?" w":"")+'">'+esc(r[8])+"</td></tr>";
+  });
+  document.getElementById("rows").innerHTML=html||'<tr><td colspan="6" class="empty">Ничего не найдено. Сбросьте фильтр домена или измените запрос.</td></tr>';
+  document.getElementById("count").textContent="Показано "+list.length+" из "+R.length;
+}
+render();
+</script>

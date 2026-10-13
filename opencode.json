@@ -32,7 +32,8 @@
       "gap-analysis": "allow",
       "handoff": "allow",
       "adr": "allow",
-      "security-review-checklist": "allow"
+      "security-review-checklist": "allow",
+      "ui-review-checklist": "allow"
     }
   }
 }
