@@ -109,6 +109,7 @@ projects/<проект>/
 │   ├── backend/          ← логика (skill/backend-logic) и задачи в трекер backend/US-NN/ (skill/backend-task)
 │   ├── diagrams/<тип>/   ← sequence / erd / state целевого состояния
 │   ├── nfr/              ← nfr.md, если есть
+│   ├── questions/        ← рабочие вопросы к бизнесу и смежным командам: <тема>_questions.md, одна тема — один файл (решено + открытые вопросы с адресатом)
 │   └── adr/              ← [ГГГГ-ММ-ДД ЧЧ-ММ] ADR-<ТЕМА>-<NNN>-<решение>-vN.md (skill/adr)
 ├── reviews/          ← ПРОВЕРКИ бандла (в git, с датой в имени)
 │   ├── gap/          ← gap-анализ, аудиты BRD (skill/gap-analysis)
@@ -217,6 +218,7 @@ projects/<проект>/
 - `system-analyst`: `requirements/backend/<объект>_backend.md`, `requirements/backend/US-NN/<теги> <объект>_task.md` (задача на бэк, `skill/backend-task`; папка — User Story из Трекера, например `[B][Mobile API] order-card-return_task.md`), `<объект>_erd.*` + `sql.sql`, `<объект>_sequence.plantuml`, `<объект>_state.md` (в `as-is/diagrams/<тип>/` или `requirements/diagrams/<тип>/`), `openapi.yaml`, `asyncapi.yaml`, `requirements/nfr/nfr.md`, ADR — как у BA
 - `product-owner`: `requirements/user-story/user-story.md`, `backlog-priority.md`, `business-case.md`, `roadmap.md`, `stakeholder-map.md`, ADR — как у BA
 - `repository-researcher`: `knowledge/<репозиторий>/repo-map.md`, `knowledge/<репозиторий>/features/<фича>.md`, `knowledge/<репозиторий>/architecture/*.md`
+- Рабочие вопросы (любой агент): `requirements/questions/<тема>_questions.md` — одна тема в одном файле, без дублирования между файлами; задачи на бэк в эту папку не кладутся.
 - Ревью: `reviews/<тип>/[ГГГГ-ММ-ДД] <артефакт>_<тип>-review.md`; `security-reviewer` → `reviews/security/`, `ui-reviewer` → `reviews/ui/`, `system-analyst` (по явному запросу) → `reviews/quality/`. Устаревшее ревью переносится в `archive/`.
 
 ## Рабочий процесс
