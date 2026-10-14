@@ -108,7 +108,7 @@ ADR при наличии указывается только в легенде:
 |---|---|---|
 | BO-<n> | Бизнес-цель | brd.md, «Бизнес-цели» |
 | BR-<n> | Бизнес-требование | brd.md, «Бизнес-требования» |
-| US-<n> | User Story | user-story/user-story.md |
+| US-<n> | User Story | user-story/user-story-mvp.md, user-story/user-story-post-mvp.md |
 | UC-RET-<n> | Use Case | use-case/use-case.md |
 | TASK-RET-DATA | Модель данных | backend/return-entity_data-model_task.md |
 | SEQ-RET-* | Sequence | diagrams/sequence/as-is/*.plantuml |

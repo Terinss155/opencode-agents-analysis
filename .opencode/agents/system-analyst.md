@@ -58,7 +58,8 @@ permission:
 | `backend-task` | постановка задачи бэк-разработчику в трекер: доработка или новый эндпоинт (`[B]`, `[B][Web]`, `[B][Mobile API]`, `[B][Mobile API][Gate]`) |
 | `srs` | SRS по шаблону `skill/srs/template.md`: User Story по функциональным областям, сценарий с API, взаимодействие компонентов, задачи |
 | `erd-model` | ER-диаграмма (PlantUML) + SQL-скрипт |
-| `sequence-diagram` | диаграмма последовательности взаимодействий (PlantUML) |
+| `sequence-diagram` | диаграмма последовательности взаимодействий (Mermaid): кто кого вызывает и в каком порядке |
+| `flowchart-diagram` | диаграмма логики сценария (Mermaid flowchart): условия и ветки, без вызовов систем |
 | `openapi-spec` | REST API в формате OpenAPI |
 | `asyncapi-spec` | события Kafka в формате AsyncAPI |
 | `nfr-requirements` | нефункциональные требования (производительность, надёжность, безопасность, масштабируемость) |

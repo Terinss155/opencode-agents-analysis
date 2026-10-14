@@ -15,6 +15,7 @@
       "srs": "allow",
       "erd-model": "allow",
       "sequence-diagram": "allow",
+      "flowchart-diagram": "allow",
       "openapi-spec": "allow",
       "asyncapi-spec": "allow",
       "nfr-requirements": "allow",

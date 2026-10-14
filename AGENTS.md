@@ -76,7 +76,7 @@ new/
 |---|---|---|
 | `product-owner` | primary | `user-story`, `backlog-prioritization`, `business-case`, `product-roadmap`, `stakeholder-map`, `adr` |
 | `business-analyst` | primary | `business-process-bpmn`, `brd`, `use-case`, `screen-spec`, `traceability-matrix`, `gap-analysis`, `brs`, `adr` |
-| `system-analyst` | primary | `backend-logic`, `backend-task`, `srs`, `erd-model`, `sequence-diagram`, `openapi-spec`, `asyncapi-spec`, `nfr-requirements`, `adr` |
+| `system-analyst` | primary | `backend-logic`, `backend-task`, `srs`, `erd-model`, `sequence-diagram`, `flowchart-diagram`, `openapi-spec`, `asyncapi-spec`, `nfr-requirements`, `adr` |
 | `repository-researcher` | primary | — (опц. `sequence-diagram` для sequence-схем) |
 | `security-reviewer` | subagent | `security-review-checklist` |
 | `ui-reviewer` | subagent | `ui-review-checklist` |
@@ -101,11 +101,11 @@ projects/<проект>/
 │   ├── index.md          ← точка входа: вкладки, порядок чтения, версия и статус бандла
 │   ├── brd.md            ← вкладка 00. BRD (skill/brd)
 │   ├── traceability.md   ← вкладка 03. Матрица трассируемости (skill/traceability-matrix)
-│   ├── user-story/       ← вкладка 01: user-story*.md + Acceptance Criteria (skill/user-story)
+│   ├── user-story/       ← вкладка 01: user-story-mvp.md (общие разделы + MVP), user-story-post-mvp.md + Acceptance Criteria (skill/user-story)
 │   ├── use-case/         ← вкладка 02: use-case*.md, только сложные/ветвящиеся US (skill/use-case)
 │   ├── screen-spec/      ← экраны восприятия (skill/screen-spec)
 │   ├── steps/web/, steps/mobile/   ← пошаговый TO-BE по каналам; каждый шаг ссылается на свой AS-IS (+ to-be.bpmn.md)
-│   ├── srs/              ← SRS по каналам (skill/srs)
+│   ├── srs/              ← SRS по каналам, отдельно MVP и Post-MVP: srs-<канал>-mvp.md, srs-<канал>-post-mvp.md (skill/srs)
 │   ├── backend/          ← логика (skill/backend-logic) и задачи в трекер backend/US-NN/ (skill/backend-task)
 │   ├── diagrams/<тип>/   ← sequence / erd / state целевого состояния
 │   ├── nfr/              ← nfr.md, если есть
@@ -204,7 +204,7 @@ projects/<проект>/
 | `TASK-<ТЕМА>-<...>` | задача проектирования БД / модели данных | `requirements/backend/*.md` (`skill/backend-logic`, `skill/erd-model`) |
 | `ERD-<ТЕМА>` | модель данных / ERD | `as-is/diagrams/erd/` или `requirements/diagrams/erd/` — `*_erd.*` + `*_sql.sql` (`skill/erd-model`); модели, общие для разных проектов, — `knowledge/<репозиторий>/database/` |
 | `API-<...>` | API-контракт / метод | `requirements/*_openapi.yaml` (TO-BE); AS-IS-разбор: `as-is/api/` (только этот процесс) или `knowledge/<репозиторий>/api/{web,mobile}/` (общий) (`skill/openapi-spec`) |
-| `SEQ-<ТЕМА>-<...>` | sequence-диаграмма | `as-is/diagrams/sequence/*.plantuml` для AS-IS, `requirements/diagrams/sequence/*.plantuml` для TO-BE (`skill/sequence-diagram`) |
+| `SEQ-<ТЕМА>-<...>` | sequence-диаграмма | `as-is/diagrams/sequence/*_sequence.md` для AS-IS, `requirements/diagrams/sequence/*_sequence.md` для TO-BE (Mermaid) (`skill/sequence-diagram`) |
 | `SCR-<ТЕМА>-<n>` | спецификация экрана восприятия | `requirements/screen-spec/` (`skill/screen-spec`) |
 | `NFR-<КАТ>-<n>` | нефункциональное требование отдельного NFR-артефакта (не путать с `NFR-NN` раздела 7.4 BRD); требования ИБ — `NFR-SEC-<n>` | `requirements/nfr/nfr.md` (`skill/nfr-requirements`) |
 | `TC-<...>` | тест-кейс QA (если ведётся отдельным артефактом) | QA |
@@ -215,8 +215,8 @@ projects/<проект>/
 ## Конвенция имён файлов
 Пути — от `projects/<проект>/`.
 - `business-analyst`: `requirements/index.md`, `requirements/brd.md`, `requirements/traceability.md`, `as-is/as-is.bpmn.md`, `requirements/steps/to-be.bpmn.md`, `requirements/use-case/use-case.md`, `requirements/screen-spec/screen-spec.md`, `reviews/gap/gap-analysis.md`, `brs.md`, `requirements/adr/[ГГГГ-ММ-ДД ЧЧ-ММ] ADR-<ТЕМА>-<NNN>-<решение>-vN.md`
-- `system-analyst`: `requirements/backend/<объект>_backend.md`, `requirements/backend/US-NN/<теги> <объект>_task.md` (задача на бэк, `skill/backend-task`; папка — User Story из Трекера, например `[B][Mobile API] order-card-return_task.md`), `<объект>_erd.*` + `sql.sql`, `<объект>_sequence.plantuml`, `<объект>_state.md` (в `as-is/diagrams/<тип>/` или `requirements/diagrams/<тип>/`), `openapi.yaml`, `asyncapi.yaml`, `requirements/nfr/nfr.md`, ADR — как у BA
-- `product-owner`: `requirements/user-story/user-story.md`, `backlog-priority.md`, `business-case.md`, `roadmap.md`, `stakeholder-map.md`, ADR — как у BA
+- `system-analyst`: `requirements/backend/<объект>_backend.md`, `requirements/backend/US-NN/<теги> <объект>_task.md` (задача на бэк, `skill/backend-task`; папка — User Story из Трекера, например `[B][Mobile API] order-card-return_task.md`), `<объект>_erd.*` + `sql.sql`, `<объект>_sequence.md` (Mermaid), `<объект>_state.md` (в `as-is/diagrams/<тип>/` или `requirements/diagrams/<тип>/`), `openapi.yaml`, `asyncapi.yaml`, `requirements/nfr/nfr.md`, `requirements/srs/srs-<канал>-mvp.md` и `srs-<канал>-post-mvp.md` (канал — `web`, `mobile`; копия для Яндекс Вики — с суффиксом `_wiki`, например `srs-mobile-mvp_wiki.md`), ADR — как у BA
+- `product-owner`: `requirements/user-story/user-story-mvp.md` (общие разделы вкладки и истории MVP) и `requirements/user-story/user-story-post-mvp.md` (истории Post-MVP; история переносится между файлами при смене объёма), `backlog-priority.md`, `business-case.md`, `roadmap.md`, `stakeholder-map.md`, ADR — как у BA
 - `repository-researcher`: `knowledge/<репозиторий>/repo-map.md`, `knowledge/<репозиторий>/features/<фича>.md`, `knowledge/<репозиторий>/architecture/*.md`
 - Рабочие вопросы (любой агент): `requirements/questions/<тема>_questions.md` — одна тема в одном файле, без дублирования между файлами; задачи на бэк в эту папку не кладутся.
 - Ревью: `reviews/<тип>/[ГГГГ-ММ-ДД] <артефакт>_<тип>-review.md`; `security-reviewer` → `reviews/security/`, `ui-reviewer` → `reviews/ui/`, `system-analyst` (по явному запросу) → `reviews/quality/`. Устаревшее ревью переносится в `archive/`.
