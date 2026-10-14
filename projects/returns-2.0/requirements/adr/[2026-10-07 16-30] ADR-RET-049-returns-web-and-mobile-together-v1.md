@@ -52,7 +52,7 @@ System Analyst одна описывает и сайт, и мобильные п
 ## Связанные артефакты
 
 - `ADR-RET-050` — [сначала требования, контракты потом](<./[2026-10-07 16-30] ADR-RET-050-requirements-first-contracts-later-v1.md>).
-- [User Stories](../user-story/user-story.md), [SRS сайта](../srs/srs-web.md), [SRS МП](../srs/srs-mobile.md).
+- [User Stories](../user-story/user-story-mvp.md), [SRS сайта](../srs/srs-web-mvp.md), [SRS МП](../srs/srs-mobile-mvp.md).
 
 ## История изменений
 

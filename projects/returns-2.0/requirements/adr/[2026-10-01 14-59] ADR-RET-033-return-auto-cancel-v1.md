@@ -100,7 +100,7 @@ Analyst поправила на 10 дней с момента подачи за�
 - `ADR-RET-017` — [первая итерация без интеграции с курьерскими службами](<./[2026-09-17 15-01] ADR-RET-017-integrated-carrier-request-via-1c-v2.md>).
 - `ADR-RET-029` — [усечённая модель статусов](<./[2026-09-25 13-30] ADR-RET-029-return-status-model-mvp-v1.md>).
 - `RULE-09`, `RULE-10`, `RULE-11`, `FR-10`, `FR-11`, `FR-12`, `FR-26`, `OQ-36`, `OQ-48` — [BRD](../brd.md).
-- US11 «Админка: настройка срока автоотмены по способу возврата» — [User Story](../user-story/user-story.md#us11).
+- US11 «Админка: настройка срока автоотмены по способу возврата» — [User Story](../user-story/user-story-post-mvp.md#us11).
 
 ## История изменений
 

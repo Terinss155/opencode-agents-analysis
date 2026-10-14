@@ -68,7 +68,7 @@
 - `FR-16`, `FR-17`, `FR-26` — [BRD](../brd.md).
 - `ADR-RET-001` — [запрет редактирования заявки](<./[2026-09-10 14-00] ADR-RET-001-no-edit-return-request-v1.md>).
 - `ADR-RET-011` — [без карты отделений Почты России](<./[2026-09-10 14-00] ADR-RET-011-no-russian-post-map-integration-v1.md>).
-- ECOMDEV-2276 US3 — [User Story](../user-story/user-story.md).
+- ECOMDEV-2276 US3 — [User Story](../user-story/user-story-mvp.md).
 
 ## История изменений
 

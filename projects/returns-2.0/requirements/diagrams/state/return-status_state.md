@@ -161,7 +161,7 @@ stateDiagram-v2
 
 - ADR: `ADR-RET-019`, `ADR-RET-028`, `ADR-RET-033`, `ADR-RET-038`, `ADR-RET-039`, `ADR-RET-040`, `ADR-RET-041` — [adr/](../../adr/).
 - BRD: `RULE-09`, `RULE-28`, `RULE-29`, `RULE-30`, `FR-28`, `FR-29`, `FR-31`, `OQ-1` — [brd.md](../../brd.md). `RULE-29` расходится с `ADR-RET-039` — правка BRD ожидает решения.
-- User Story: US1, US3, US4, US6 — [user-story.md](../../user-story/user-story.md).
+- User Story: US1, US3, US4, US6 — [user-story.md](../../user-story/user-story-mvp.md).
 - Модель данных: `cms_return_statuses`, `cms_return_changes`, `cms_return_positions.order_position_id` — [ERD](../erd/return-entity_erd_merged.md). Статусы позиций возврата в ERD есть: справочник `cms_return_position_statuses` (в ERD — «ожидается, получена, принята, отклонена») и история `cms_return_position_status_history`. Набор в ERD (4 статуса) шире, чем на встрече 02.10.2026 (2 статуса, `ADR-RET-040`) — сверить при получении статусной схемы.
 
 ## Источники

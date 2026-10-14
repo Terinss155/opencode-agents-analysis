@@ -68,7 +68,7 @@
 ## Связанные артефакты
 
 - `RULE-18`, `FR-16`, `FR-17` — [выбор точки передачи](../brd.md#7-требования).
-- `US-CR-03` — [выбор способа](../user-story/user-story.md#us-cr-03); `US-CH-05`, `US-CH-07`, `US-CH-09` — [канальные истории](../../archive/user-story-v1/user-story-channels.md).
+- `US-CR-03` — [выбор способа](../user-story/user-story-mvp.md#us-cr-03); `US-CH-05`, `US-CH-07`, `US-CH-09` — [канальные истории](../../archive/user-story-v1/user-story-channels.md).
 - `OQ-38` — источник перечня ПВЗ, принимающих возвраты.
 - `ADR-RET-001` — [запрет редактирования заявки](<./[2026-09-10 14-00] ADR-RET-001-no-edit-return-request-v1.md>).
 

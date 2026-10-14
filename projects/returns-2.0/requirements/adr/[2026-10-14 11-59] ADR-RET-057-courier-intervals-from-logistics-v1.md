@@ -70,7 +70,7 @@
 - `FR-13`, `FR-14`, `FR-42`, `RULE-57` — [BRD](../brd.md).
 - `ADR-RET-054` — [перенос даты курьера через ТК](<./[2026-09-10 14-00] ADR-RET-054-courier-date-change-via-carrier-v1.md>).
 - ECOMDEV-2281 US1, сценарий «Отсутствие свободных дат или интервалов для курьерской доставки» —
-  [User Story](../user-story/user-story.md).
+  [User Story](../user-story/user-story-mvp.md).
 
 ## История изменений
 

@@ -94,7 +94,7 @@
 
 - `ADR-RET-007` — [прежнее решение: интерфейс Дружбы в админке сайта](<./[2026-09-10 14-00] ADR-RET-007-friendship-return-interface-v1.md>) (заменено).
 - `BR-02`, `FR-01`, `RULE-01`, `BR-04` — [BRD](../brd.md).
-- [User Story, «Требуют подтверждения до фиксации», п. 6](../user-story/user-story.md).
+- [User Story, «Требуют подтверждения до фиксации», п. 6](../user-story/user-story-mvp.md).
 
 ## История изменений
 

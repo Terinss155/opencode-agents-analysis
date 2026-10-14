@@ -67,7 +67,7 @@ US2 (список возвратов) и US3 (карточка возврата)
 - `ADR-RET-024` — [электронное заявление не хранится](<./[2026-09-17 15-01] ADR-RET-024-electronic-return-application-storage-v1.md>).
 - `ADR-RET-036` — [номер заявки и QR-код](<./[2026-10-01 14-59] ADR-RET-036-return-numbering-master-v1.md>).
 - `ADR-RET-051` — [возврат в магазине по QR-коду](<./[2026-10-07 16-30] ADR-RET-051-store-walk-in-return-processing-v3.md>).
-- ECOMDEV-2275 US2, ECOMDEV-2276 US3 — [User Story](../user-story/user-story.md).
+- ECOMDEV-2275 US2, ECOMDEV-2276 US3 — [User Story](../user-story/user-story-mvp.md).
 
 ## История изменений
 

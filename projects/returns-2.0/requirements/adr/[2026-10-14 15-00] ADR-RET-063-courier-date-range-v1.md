@@ -67,7 +67,7 @@ BTS).
 - `ADR-RET-034` — [срок возврата Friends & Family](<./[2026-10-01 14-59] ADR-RET-034-fnf-return-period-v1.md>).
 - `FR-13`, `RULE-57` — [BRD](../brd.md).
 - ECOMDEV-2281 US1, сценарий «Выбор даты приезда курьера в последний день срока возврата» —
-  [User Story](../user-story/user-story.md).
+  [User Story](../user-story/user-story-mvp.md).
 
 ## История изменений
 

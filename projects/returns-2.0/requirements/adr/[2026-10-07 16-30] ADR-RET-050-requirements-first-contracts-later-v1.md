@@ -64,7 +64,7 @@ System Analyst одна описывает сайт и МП, уходит в к�
 ## Связанные артефакты
 
 - `ADR-RET-049` — [запуск на сайте и в МП одновременно](<./[2026-10-07 16-30] ADR-RET-049-returns-web-and-mobile-together-v1.md>).
-- [User Stories](../user-story/user-story.md), [Use Cases](../use-case/use-case.md), [задачи на бэк](../backend/).
+- [User Stories](../user-story/user-story-mvp.md), [Use Cases](../use-case/use-case.md), [задачи на бэк](../backend/).
 
 ## История изменений
 

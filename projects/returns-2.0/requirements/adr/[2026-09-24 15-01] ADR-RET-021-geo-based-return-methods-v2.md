@@ -94,7 +94,7 @@
 - `ADR-RET-010` — [предыдущая версия решения](<./[2026-09-10 14-00] ADR-RET-010-geo-based-return-methods-v1.md>).
 - `ADR-RET-017` — [первая итерация без интеграции курьерских служб](<./[2026-09-17 15-01] ADR-RET-017-integrated-carrier-request-via-1c-v2.md>).
 - `FR-16`, `FR-23`, `OQ-38` — [BRD](../brd.md).
-- [User Story, «Требуют подтверждения до фиксации», п. 7](../user-story/user-story.md).
+- [User Story, «Требуют подтверждения до фиксации», п. 7](../user-story/user-story-mvp.md).
 
 ## История изменений
 
