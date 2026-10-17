@@ -64,7 +64,8 @@
 | Индекс возврата | `index_return` | ?string | форма деталей (1126) | — |
 | Дата возврата | `date_return` | string `YYYY-MM-DD` | форма деталей (1126) | — |
 | Доступные даты возврата | `available_dates_return` | string[] `YYYY-MM-DD` | 1239 / 1240, ошибка формы (1126) | — |
-| Остаток изделий позиции, доступных к возврату | `available_return_quantity` | int | карточка заказа МП `items[]` | `return_available_count` (TO-BE шаг 01, рабочее имя) |
+| Сколько изделий позиции клиент может вернуть сейчас: равно `remaining_quantity`, когда возврат по позиции разрешён, иначе 0 | `available_return_quantity` | int | карточка заказа МП `items[]` | `return_available_count` (TO-BE шаг 01, рабочее имя) |
+| Сколько изделий позиции остаётся у клиента: купленное количество минус изделия в активных заявках на возврат (блок «Ваш заказ · N») | `remaining_quantity` | int | карточка заказа МП `items[]`, страница заказа сайта `positions[]` | `not_in_return_quantity`, `not_returned_quantity` |
 | Последний день оформления заявки на возврат | `until_date` (в блоке `return`) | string `YYYY-MM-DD` | карточка заказа МП `return.until_date` | `return_until_date` (TO-BE шаг 01), `return_deadline` (`BL-RET-ELIG-01`) |
 | Код причины возврата | `reason_id` | string | Mobile: создание возврата | `reasonCode` (Web: `save-reason`) |
 | Нужны ли банковские реквизиты | `is_bank_data_required` | bool | Mobile: карточка заказа (`return.is_bank_data_required`) | `need_bank_details` (Web: `order-refund-get-positions`, остаётся там как есть) |

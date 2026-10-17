@@ -917,7 +917,7 @@ int
 - Связана: <ECOMDEV-NNNN — [B][Mobile API] Способы возврата: признак способа заказа `is_order_method`> — завести; способ возврата «как в заказе» определяет `return-method-list` по `order_id`, поэтому тип доставки в карточке не передаётся
 - Основание: [TO-BE шаг 01](../../steps/mobile/01-load-order-card.md), [TO-BE шаг 04](../../steps/mobile/04-prefill-city-method-point.md), [ERD-RET](../../diagrams/erd/return-entity_erd_merged.md), макет [`v2 Создание возврата/MVP/1.png`](<../../../sources/mockups/v2 Создание возврата/MVP/1.png>)
 
-**Трассировка:** `FR-03`, `BR-03`, `RULE-07`, `RULE-10`, `US-CR-01`, `UC-RET-01`, `BL-RET-ELIG-01`, `ADR-RET-034`, `ADR-RET-016`
+**Трассировка:** `FR-03`, `BR-03`, `RULE-07`, `RULE-10`, `US-CR-01`, `BL-RET-ELIG-01`, `ADR-RET-034`, `ADR-RET-016`
 
 #### Цель
 

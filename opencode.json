@@ -19,6 +19,7 @@
       "openapi-spec": "allow",
       "asyncapi-spec": "allow",
       "nfr-requirements": "allow",
+      "process-monitoring": "allow",
       "user-story": "allow",
       "use-case": "allow",
       "brs": "allow",

@@ -1,8 +1,8 @@
-# [B][Web] Карточка заказа. Доработать расчёт доступности возврата и срок оформления возврата
+# [B][Web] Страница заказа. Доработать расчёт доступности возврата, срок оформления возврата и изделия в заявках на возврат
 
 ## Цель
 
-Доработать данные страницы заказа на сайте, чтобы кнопка «Оформить возврат» показывалась с учётом категории клиента и уже созданных заявок — по тем же правилам, что в мобильном приложении (ECOMDEV-2343), — и сайт получал дату, до которой можно оформить возврат.
+Доработать данные страницы заказа на сайте, чтобы кнопка «Оформить возврат» показывалась с учётом категории клиента и уже созданных заявок — по тем же правилам, что в мобильном приложении (ECOMDEV-2343), — сайт получал дату, до которой можно оформить возврат, и изделия в заявках на возврат для блока «Оформлен возврат · N».
 
 **Web**
 - `GET /profile/view/{id}` — страница заказа; данные формируются на сервере и встраиваются в страницу
@@ -12,8 +12,11 @@
 Что требуется изменить:
 
 1. Доработать `GET /profile/view/{id}`.
-2. Добавить новое поле в данные страницы:
+2. Добавить новые поля в данные страницы:
    * `status.request_until_date`
+   * `positions[].remaining_quantity`
+   * `positions[].return_items`
+   * `positions[].return_items[].reason_title`
 3. Изменить расчёт `status.show_refund_button` — подключить общий расчёт доступности возврата из ECOMDEV-2343.
 
 Вне этой задачи:
@@ -42,6 +45,9 @@
 | Поле | Тип данных | Описание |
 |---|---|---|
 | `status.request_until_date` | `string` (`YYYY-MM-DD`) \| `null` | Последний день, когда можно оформить заявку на возврат. `null`, если у заказа нет даты выполнения или статус заказа не допускает возврат |
+| `positions[].remaining_quantity` | `int` | Сколько изделий позиции остаётся у клиента: `positions[].quantity` минус изделия позиции в активных заявках на возврат (заявка в любом статусе, кроме «Возврат отменён»). Для блока «Ваш заказ · N». Рассчитывается для всех позиций заказа при любом сроке и любой доступности возврата. Сколько изделий клиент может вернуть сейчас — в `data.positions[].available_return_quantity` метода `GET /orders/refund/get-positions` |
+| `positions[].return_items` | `array` | Изделия позиции в активных заявках на возврат (заявка в любом статусе, кроме «Возврат отменён»), по одному элементу на изделие. Пустой массив, если активных заявок по позиции нет. Формируется для всех позиций заказа независимо от доступности возврата. `positions[].quantity` не меняется — это купленное количество |
+| `positions[].return_items[].reason_title` | `string` | Причина возврата изделия для клиента. Если причина не выбрана (у группы нет причин) — название группы причин |
 
 {% cut "Пример данных страницы (поля AS-IS без изменений сокращены):" %}
 
@@ -51,7 +57,25 @@
   "status": {
     "show_refund_button": true,
     "request_until_date": "2026-10-15"
-  }
+  },
+  "positions": [
+    {
+      "id": 67890,
+      "quantity": 3,
+      "remaining_quantity": 2,
+      "return_items": [
+        {
+          "reason_title": "Не подходит размер"
+        }
+      ]
+    },
+    {
+      "id": 67891,
+      "quantity": 1,
+      "remaining_quantity": 1,
+      "return_items": []
+    }
+  ]
 }
 ```
 
@@ -77,7 +101,10 @@
 | 6. Доступное количество | Да, без изменений |
 | 7. Признак по позиции | Да, но по позициям в ответ не отдаётся — используется для `status.show_refund_button` |
 | 8. Сообщение `can_be_returned` в `messages[]` | Нет — на сайте текст выводит фронт по `status.request_until_date` |
-| 9. Банковские реквизиты | Нет — на сайте признак отдаётся в попапе возврата, логика не меняется |
+| 9. Банковские реквизиты | Нет — на сайте признак отдаётся в попапе возврата (`GET /orders/refund/get-positions`) |
+| 10. Текст «Возврат средств» | Нет — на сайте отдаётся в попапе возврата |
+| 11. Изделия в заявках на возврат | Да, без изменений → `positions[].return_items[]` |
+| 12. Изделия у клиента | Да, без изменений → `positions[].remaining_quantity` |
 
 {% endcut %}
 
@@ -93,6 +120,20 @@
    1. Значение — дата окончания срока возврата из расчёта (ECOMDEV-2343, шаг 2.7), в формате `YYYY-MM-DD`.
    2. Если срок не рассчитан (статус заказа не допускает возврат или нет `cms_orders.end_date`) — `null`.
 
+4. **Формирование `positions[].return_items`** — так же, как `items[].return_items` в ECOMDEV-2343 (шаг 11): для всех позиций заказа, независимо от результата расчёта доступности возврата.
+   1. Для каждой позиции заказа система выбирает позиции возврата по этой позиции заказа (`cms_return_positions.order_position_id = cms_order_positions.id`) из заявок, кроме заявок в статусе `cancelled` (статус заявки `cms_returns.status_id`, а не статус позиции возврата).
+   2. Каждая найденная позиция возврата — один элемент `positions[].return_items[]`. Порядок элементов — по `cms_return_positions.id` по возрастанию.
+   3. `positions[].return_items[].reason_title`:
+      1. если заполнен `cms_return_positions.reason_id` — `cms_return_reasons.title`;
+      2. иначе (у группы нет причин) — `cms_return_reasons_groups.title` (по `cms_return_positions.reason_group_id`).
+   4. Если позиций возврата нет — `positions[].return_items = []`.
+
+5. **Формирование `positions[].remaining_quantity`** — рассчитывается для всех позиций заказа, так же, как `items[].remaining_quantity` в ECOMDEV-2343 (шаг 12), независимо от доступности возврата
+
+   1. Для каждой позиции заказа `positions[].remaining_quantity = cms_order_positions.quantity - <already_returned_quantity>`, где `<already_returned_quantity>` — число изделий позиции в активных заявках на возврат (те же позиции возврата, что в `positions[].return_items`).
+   2. Если из-за рассинхронизации данных `<already_returned_quantity> > cms_order_positions.quantity`, то `positions[].remaining_quantity = 0`. Значение всегда 0 или больше.
+   3. Если у позиции 0 изделий в активных заявках на возврат — `positions[].remaining_quantity = cms_order_positions.quantity`.
+
 > **AS-IS:** текущий расчёт кнопки (`Order::canBeReturned()`) заменяется общим расчётом. Его проверка срока через `days_can_be_returned` (14 дней) больше не применяется — она заменена проверкой срока с учётом категории клиента (ECOMDEV-2343, шаги 2–3). Остальные проверки страницы заказа не меняются.
 
 {% endcut %}
@@ -103,6 +144,9 @@
 |---|---|---|---|
 | `status.show_refund_button` | boolean | Динамический расчёт (ECOMDEV-2343, шаги 1–7) | — |
 | `status.request_until_date` | string (`YYYY-MM-DD`) \| null | Динамический расчёт: `cms_orders.end_date + INTERVAL <days_limit> DAY` | — |
+| `positions[].remaining_quantity` | int | Динамический расчёт: `cms_order_positions.quantity` минус число позиций возврата по позиции заказа в заявках `cms_returns.status_id` ≠ `cancelled`, минимум 0 | — |
+| `positions[].return_items` | array | `cms_return_positions` (по `cms_return_positions.order_position_id = cms_order_positions.id`, заявки `cms_returns.status_id` ≠ `cancelled`) | — |
+| `positions[].return_items[].reason_title` | string | `cms_return_reasons.title` (по `cms_return_positions.reason_id`); если пусто — `cms_return_reasons_groups.title` (по `cms_return_positions.reason_group_id`) | `varchar` {red}(длина — как в ECOMDEV-2343, сверить с БД) |
 
 {% endcut %}
 

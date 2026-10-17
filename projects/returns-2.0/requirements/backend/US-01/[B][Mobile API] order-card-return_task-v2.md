@@ -21,11 +21,14 @@
 
    * `items[].available_return_quantity`
 
+   * `items[].remaining_quantity`
+
    * `order_delivery`
 
    * `items[].return_items`
 4. Изменить расчёт `items[].can_be_returned`.
 5. Добавить расчёт `items[].return_items` — изделия позиции в активных заявках на возврат с причиной возврата.
+6. Добавить расчёт `items[].remaining_quantity` — сколько изделий позиции остаётся у клиента.
 
 Вне этой задачи:
 * дата «Вернуть до …» (срок передачи изделий по способу возврата) — в методе списка способов возврата `return-method-list`, отдельная задача;
@@ -148,6 +151,19 @@
 |
 
 Причина возврата изделия для клиента. Если причина не выбрана (у группы нет причин) — название группы причин
+
+||
+||
+
+`items[].remaining_quantity`
+
+|
+
+`int`
+
+|
+
+Сколько изделий позиции остаётся у клиента: `items[].count` минус изделия позиции в активных заявках на возврат (заявка в любом статусе, кроме «Возврат отменён»). Для блока «Ваш заказ · N» карточки заказа. Рассчитывается для всех позиций заказа при любом сроке возврата и любом значении `items[].can_be_returned`. Сколько изделий клиент может вернуть сейчас — в `items[].available_return_quantity`
 
 ||
 ||
@@ -436,6 +452,7 @@ int
         "is_present": false,
         "can_be_returned": true,
         "available_return_quantity": 3,
+        "remaining_quantity": 3,
         "return_items": []
       },
       {
@@ -445,6 +462,7 @@ int
         "is_present": false,
         "can_be_returned": false,
         "available_return_quantity": 0,
+        "remaining_quantity": 1,
         "return_items": [
           {
             "reason_title": "Не подходит размер"
@@ -629,13 +647,15 @@ flowchart TD
     V --> Z
     W --> Z
 
-    Z --> X[Рассчитать независимо:<br/>return.is_bank_data_required<br/>по cms_orders.payment_method]
+    Z --> X[Рассчитать независимо:<br/>return.is_bank_data_required<br/>по cms_orders.payment_method<br/>и сумме cms_giftcard_use.amount]
 
     X --> X1[Рассчитать независимо:<br/>return.refund]
 
     X1 --> X2[Для всех позиций заказа:<br/>items.return_items -<br/>позиции возврата по order_position_id<br/>в заявках, кроме статуса cancelled,<br/>с причиной возврата]
 
-    X2 --> Y[Вернуть JSON-ответ]
+    X2 --> X3[Для всех позиций заказа:<br/>items.remaining_quantity =<br/>quantity - изделия в активных заявках,<br/>минимум 0]
+
+    X3 --> Y[Вернуть JSON-ответ]
 ```
 {% endcut %}
 
@@ -717,7 +737,7 @@ flowchart TD
 
    1. Для каждой позиции система рассчитывает `<available_return_quantity> = cms_order_positions.quantity - <already_returned_quantity>`
    2. Если ранее созданных возвратов нет `<already_returned_quantity> = 0`, то `<available_return_quantity> = cms_order_positions.quantity`
-   3. Если из-за рассинхронизации данных `<already_returned_quantity> > cms_order_positions.quantity`, система устанавливает `<available_return_quantity> = 0`. Отрицательное значение не возвращается.
+   3. Если из-за рассинхронизации данных `<already_returned_quantity> > cms_order_positions.quantity`, система устанавливает `<available_return_quantity> = 0`. Значение всегда 0 или больше.
 
 7. **Формирование признака `items[].can_be_returned`**
 
@@ -752,7 +772,7 @@ flowchart TD
 
 9. **Банковские реквизиты — логика не меняется**
 
-   1. Если `cms_orders.payment_method IN (3, 5, 15)` или заказ частично оплачен подарочным сертификатом (поле-признак частичной оплаты сертификатом — уточнить), то в ответе JSON `return.is_bank_data_required = true`, иначе `false`. Признак рассчитывается независимо от `items[].can_be_returned`.
+   1. Если `cms_orders.payment_method IN (3, 5, 15)` или заказ оплачен подарочным сертификатом частично — сумма `cms_giftcard_use.amount` по `cms_giftcard_use.order_id` = `cms_orders.id` больше 0, — то в ответе JSON `return.is_bank_data_required = true`, иначе `false`. Сумма сертификатов по заказу считается так же, как `payment.by_certificate` в ответе метода `GET /получить карточку заказа`. Признак рассчитывается независимо от `items[].can_be_returned`.
 
 10. **Формирование `return.refund`** — рассчитывается независимо от `items[].can_be_returned`
 
@@ -777,6 +797,12 @@ flowchart TD
       1. если заполнен `cms_return_positions.reason_id` — `cms_return_reasons.title`;
       2. иначе (у группы нет причин) — `cms_return_reasons_groups.title` (по `cms_return_positions.reason_group_id`).
    4. Если позиций возврата нет — `items[].return_items = []`.
+
+12. **Формирование `items[].remaining_quantity`** — рассчитывается для всех позиций заказа, независимо от проверок пунктов 1–8 и от доступности возврата
+
+   1. Для каждой позиции заказа `items[].remaining_quantity = cms_order_positions.quantity - <already_returned_quantity>`, где `<already_returned_quantity>` — число изделий позиции в активных заявках на возврат (те же позиции возврата, что в `items[].return_items`).
+   2. Если из-за рассинхронизации данных `<already_returned_quantity> > cms_order_positions.quantity`, то `items[].remaining_quantity = 0`. Значение всегда 0 или больше.
+   3. Если у позиции 0 изделий в активных заявках на возврат — `items[].remaining_quantity = cms_order_positions.quantity`.
 
 {% endcut %}
 
@@ -811,6 +837,23 @@ int
 |
 
 Динамический расчет. Расчёт из `cms_order_positions.quantity` и `cms_return_positions`
+
+|
+
+—
+
+||
+||
+
+`items[].remaining_quantity`
+
+|
+
+int
+
+|
+
+Динамический расчёт: `cms_order_positions.quantity` минус число позиций возврата по позиции заказа в заявках `cms_returns.status_id` ≠ `cancelled`, минимум 0
 
 |
 
@@ -1099,6 +1142,6 @@ string
 |---|---|
 | 1. Заказ без даты выполнения (`cms_orders.end_date IS NULL`): разрешается ли оформление возврата? Какой текст сообщения в этом случае? | Product Manager |
 | 2. Срок действует до времени выполнения заказа или до конца дня? | Product Manager |
-| 3. Тексты «Возврат средств» для остальных способов оплаты. СБП, оплата частями и смешанная оплата (карта + сертификат) решены 07.10.2026 (`ADR-RET-046`). Где хранится признак частичной оплаты сертификатом | Product Manager, бэкенд |
+| 3. Тексты «Возврат средств» для остальных способов оплаты (строка «остальные» в шаге 10). СБП, оплата частями и смешанная оплата (карта + сертификат) решены 07.10.2026 (`ADR-RET-046`) | Product Manager |
 | 4. Длина колонок `cms_return_reasons.title`, `cms_return_reasons_groups.title` и `cms_orders.flat` в ERD не указана — сверить с БД | Бэкенд |
 

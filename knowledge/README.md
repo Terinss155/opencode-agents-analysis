@@ -14,6 +14,7 @@
 | [esb-monorepo/](esb-monorepo/repo-map.md) | `12stz/esb-monorepo` (NestJS/Nx, TypeScript, ветка `master`) — старый шлюз МП `core.12stz.com/api` | `beba6e61`, 2026-10-10 |
 | [mobile-monorepo-go/](mobile-monorepo-go/repo-map.md) | `12stz/mobile-monorepo-go` (Go, ветка `master`) — новый Mobile API Gateway `mobile.12stz.com/api` | `f302aeb`, 2026-10-10 |
 | [12storeez-ios/](12storeez-ios/repo-map.md) | `12stz/12storeez-ios` (Swift, ветка `develop`) — iOS-приложение | `a6de858b`, 2026-10-10 |
+| [esb-protobufs/](esb-protobufs/repo-map.md) | `12stz/esb-protobufs` (`.proto` + сгенерированные Go/TS, ветка `master`) — общие gRPC-контракты шлюзов и микросервисов | `f889483e` (`v0.9.5`), 2026-10-14 |
 
 Сквозные схемы, которые касаются нескольких репозиториев сразу, лежат в [architecture/](architecture/): [call-chain.html](architecture/call-chain.html) — цепочка iOS → шлюзы `core`/`mobile` → монолит → внешние системы (сверено на коммитах всех четырёх репозиториев, 10.10.2026); [web-call-chain.html](architecture/web-call-chain.html) — цепочка сайта: браузер → ServicePipe/nginx → монолит (страницы и AJAX) → внешние системы, плюс сравнение с приложением (коммит `be3cd759d2`, 10.10.2026).
 
@@ -29,6 +30,7 @@
 | Где какой модуль: старый `modules/` или новый `src/`; DI-контейнер | [repo-map.md](12storeez-master-web/repo-map.md) §3–4, [architecture/02-backend.md](12storeez-master-web/architecture/02-backend.md) | `modules/`, `src/Modules/`, `di/ContainerRegister.php` |
 | Почему Yii ID модуля не совпадает с папкой (`productV2`, `mobile-v2`, `user`) | [architecture/02-backend.md](12storeez-master-web/architecture/02-backend.md) «Два стека» | `config/modules.php` |
 | Какие бывают статусы заказа (коды, названия) | [database/order-status-dictionaries.md](12storeez-master-web/database/order-status-dictionaries.md) §3 | `modules/statuses/models/OrderStatus.php`, `src/Modules/Order/Enum/StatusEnum.php` |
+| Как и когда заказ переходит из статуса в статус, кто ставит статус (сайт, 1С, RetailCRM, CMS) | [features/order-status_state.md](12storeez-master-web/features/order-status_state.md) | `src/Modules/Order/Helpers/OrderHelper.php` (`getOrderStartStatus`, `getNewStatus`), `modules/orders/models/Order.php` (`setPaidStatus`, `beforeSave`), `src/Modules/Order/Services/Inbox/OrderUpdateService.php`, `src/Modules/Rcrm/Service/RcrmOrderUpdateService.php`, `modules/orders/console/StatusController.php` |
 | Какие бывают статусы позиций заказа | [database/order-status-dictionaries.md](12storeez-master-web/database/order-status-dictionaries.md) §4 | `modules/statuses/models/OrderPositionStatus.php`, `modules/orders/models/OrderPosition.php` |
 | Как статусы заказа и позиций мапятся на Mindbox | [database/order-status-dictionaries.md](12storeez-master-web/database/order-status-dictionaries.md) §5 | `modules/statuses/models/MbStatusesMap.php`, `src/Modules/Mindbox/Service/MindboxStatusesMapService.php` |
 | Какие бывают WMS-статусы заказа и возврата, откуда они приходят | [database/order-status-dictionaries.md](12storeez-master-web/database/order-status-dictionaries.md) §6–7 | `modules/statuses/models/OrderStatusWms.php`, `modules/statuses/models/OrderReturnStatusWms.php`, `modules/orders/models/Order.php` (`getWmsStatuses()`), `modules/api2/controllers/OrdersController.php` (`actionOrderUpdate`) |
@@ -48,6 +50,7 @@
 | Какие есть способы оплаты и провайдеры | [architecture/03-business-domains.md](12storeez-master-web/architecture/03-business-domains.md) «Платежи» | `src/Modules/Order/Enum/PaymentMethodEnum.php`, `src/Integration/Payment/`, `modules/yandex/`, `modules/payment/` |
 | Где принимаются уведомления от платёжных систем | [architecture/03-business-domains.md](12storeez-master-web/architecture/03-business-domains.md) «Приём уведомлений», [architecture/05-api.md](12storeez-master-web/architecture/05-api.md) «Вебхуки» | `modules/yandex/controllers/PayController.php`, `modules/payment/controllers/TinkoffController.php`, `src/Integration/Payment/Yandex/Controller/NotificationController.php` |
 | Как работает outbox платежей и BNPL (Долями, Подели, Сплит) | [architecture/03-business-domains.md](12storeez-master-web/architecture/03-business-domains.md) «Паттерн outbox для платежей» | `src/Modules/Payment/Service/Outbox/OutboxTransactionService.php`, `docs/diagrams/bnpl/` |
+| Как заказы уходят в 1С, RetailCRM, Mindbox и приходят обратно: RabbitMQ или REST, повторы, очереди | [features/order-integration-exchange.md](12storeez-master-web/features/order-integration-exchange.md) | `src/Modules/Order/Services/Outbox/`, `src/Modules/Order/Services/OrderIntegrationInboxFacade.php`, `modules/api2/controllers/OrdersController.php` (`actionOrderUpdate`), `modules/api/controllers/OrdersNewController.php` |
 | Доставка, ТК, ПВЗ, экспресс-доставка | [architecture/03-business-domains.md](12storeez-master-web/architecture/03-business-domains.md) «Доставка» | `modules/delivery/models/`, `src/Modules/Delivery/Service/DeliveryVariantsService.php`, `src/Modules/Cart/Enum/ExpressDeliveryEnum.php` |
 | Интеграция с Mindbox | [architecture/08-integrations.md](12storeez-master-web/architecture/08-integrations.md) | `src/Modules/Mindbox/`, `modules/mindbox/`, `modules/grpc/Mindbox/` |
 | Интеграция с 1С (заказы, остатки, возвраты из 1С) | [architecture/08-integrations.md](12storeez-master-web/architecture/08-integrations.md), [repo-map.md](12storeez-master-web/repo-map.md) §5.4 | `src/Modules/OneC/`, `src/Modules/Order/Services/Inbox/` |
@@ -83,6 +86,9 @@
 | Какие gRPC-сервисы и внешние системы вызывают шлюзы | [esb-monorepo/repo-map.md](esb-monorepo/repo-map.md) §6, [mobile-monorepo-go/repo-map.md](mobile-monorepo-go/repo-map.md) §4 | `esb-monorepo/libs/*/grpc/`, `mobile-monorepo-go/pkg/grpc_client/` |
 | Обмен с 1С через шлюз `core` (товары, остатки, офлайн-заказы) | [esb-monorepo/repo-map.md](esb-monorepo/repo-map.md) §4.1, §6 | `esb-monorepo/libs/gateway-1c/` |
 | Окружения и хосты шлюзов | [esb-monorepo/repo-map.md](esb-monorepo/repo-map.md) §7, [mobile-monorepo-go/repo-map.md](mobile-monorepo-go/repo-map.md) §6 | `.deploy/helm/*.values.yaml` в каждом репозитории |
+| Какие методы и поля у gRPC-сервиса (geo, mindbox, logistics, orders и др.) | [esb-protobufs/repo-map.md](esb-protobufs/repo-map.md) §3 | `esb-protobufs/proto/` |
+| Кто какой контракт использует и какой версии | [esb-protobufs/repo-map.md](esb-protobufs/repo-map.md) §4 | `esb-monorepo/package.json` (`esb-protobufs`), `mobile-monorepo-go/go.mod`, `12storeez-master-web/modules/grpc/` |
+| Поля возврата в контрактах (новый сервис заказов, чеки возврата) | [esb-protobufs/repo-map.md](esb-protobufs/repo-map.md) §6.1 | `esb-protobufs/proto/order.proto`, `esb-protobufs/proto/receipt.proto` |
 
 ## iOS-приложение: вопрос → файл знаний → код
 
@@ -105,3 +111,4 @@
 - Шлюзы МП описаны только картами репозиториев; отдельных AS-IS-контрактов по их методам нет. Реальные prod-адреса монолита и gRPC — в Vault, в репозиториях их нет.
 - Нет Android-клиента в `12stz`. Ручки Go-шлюза, которые не вызывает iOS, перечислены в [call-chain.html](architecture/call-chain.html); вызывает ли их Android, по коду не проверить.
 - Нет описания Helm-чартов и расписаний cron: они вне этого репозитория.
+- Нет кода серверов gRPC-сервисов (заказы, чеки, логистика, номенклатура, пользователи): в `esb-protobufs` только контракты, реализации вне `12stz`.

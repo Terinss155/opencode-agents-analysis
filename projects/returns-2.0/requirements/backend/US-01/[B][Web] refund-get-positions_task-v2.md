@@ -19,6 +19,7 @@
 
    * `data.refund`
 3. Изменить отбор позиций `data.positions[]` — подключить общий расчёт доступности возврата из ECOMDEV-2343.
+4. Изменить расчёт `data.need_bank_details` — общее с мобильным приложением правило (ECOMDEV-2343, шаг 9).
 
 Вне этой задачи:
 * общий расчёт доступности возврата и параметр `days_can_be_returned_ff` создаются в ECOMDEV-2343;
@@ -39,6 +40,7 @@
 | Параметр | Было | Стало |
 |---|---|---|
 | `data.positions[]` | Позиции заказа в статусе «Добавлен» и не подарок (`price_before_discount > 1`). Статус заказа и срок возврата не проверяются | Позиции заказа в статусе «Добавлен» и не подарок — по признаку `is_present = 0`, как на странице заказа и в мобилке. Дополнительно: статус заказа допускает возврат, срок возврата по категории клиента (14 / 30 дней) не истёк, у позиции остались изделия, не занятые заявками на возврат. Позиции без доступных изделий в список не попадают |
+| `data.need_bank_details` | `true` для всех способов оплаты, кроме онлайн-оплаты | `true`, если `cms_orders.payment_method` IN (3, 5, 15) — оплата курьеру наличными или картой, подарочный сертификат — или заказ оплачен подарочным сертификатом частично (сумма `cms_giftcard_use.amount` по заказу больше 0); иначе `false`. Правило общее с мобильным приложением (ECOMDEV-2343, шаг 9) |
 
 {% endcut %}
 
@@ -64,6 +66,7 @@
 | `data.order_delivery.address.street` | string \| null | Улица |
 | `data.order_delivery.address.house` | string \| null | Дом |
 | `data.order_delivery.address.housing` | string \| null | Корпус |
+| `data.order_delivery.address.flat` | string \| null | Квартира |
 | `data.order_delivery.pvz` | object \| null | Пункт выдачи, куда доставлялся заказ — для проверки в сервисе логистики |
 | `data.order_delivery.pvz.provider` | string | Код службы пункта выдачи |
 | `data.order_delivery.pvz.id` | string | ID пункта выдачи |
@@ -149,7 +152,7 @@
 | 6. Доступное количество | Да, без изменений → `data.positions[].available_return_quantity` |
 | 7. Признак по позиции | Да, но признак в ответ не отдаётся: позиция без доступных изделий не попадает в `data.positions[]` |
 | 8. Сообщение `can_be_returned` в `messages[]` | Нет |
-| 9. Банковские реквизиты | Нет — на сайте `data.need_bank_details` считается по AS-IS-логике сайта, не меняется |
+| 9. Банковские реквизиты | Да, без изменений → `data.need_bank_details`. **Для этого метода правило меняется:** прежнее «все способы оплаты, кроме онлайн-оплаты» заменяется общим правилом |
 
 {% endcut %}
 
@@ -168,9 +171,15 @@
    2. Для позиции из списка `data.positions[].available_return_quantity = <available_return_quantity>`.
    3. Если статус заказа не допускает возврат, срок истёк или ни у одной позиции нет доступных изделий: `data.positions = []`, {red}(ответ сайту при недоступности возврата — `success = true` с пустым списком или `success = false` с текстом — требует согласования.)
 
-4. **Причины возврата и банковские реквизиты — логика не меняется.** `data.reason_groups` и `data.need_bank_details` формируются по AS-IS-логике, независимо от результата расчёта.
+4. **Причины возврата — логика не меняется.** `data.reason_groups` формируется по AS-IS-логике, независимо от результата расчёта.
 
-5. **Формирование `data.refund`** — рассчитывается независимо от результата расчёта доступности возврата. Тексты — те же, что в мобилке (ECOMDEV-2343, шаг 10).
+5. **Формирование `data.need_bank_details`** — рассчитывается независимо от результата расчёта доступности возврата, по общему правилу (ECOMDEV-2343, шаг 9).
+   1. Если `cms_orders.payment_method` IN (3, 5, 15) или заказ оплачен подарочным сертификатом частично — сумма `cms_giftcard_use.amount` по `cms_giftcard_use.order_id` = `cms_orders.id` больше 0 (как в ECOMDEV-2343, шаг 9) → `data.need_bank_details = true`.
+   2. Иначе `data.need_bank_details = false`.
+
+   > **AS-IS:** прежнее правило сайта — `true` для всех способов оплаты, кроме онлайн-оплаты, — больше не применяется и заменяется общим правилом. Сайт и мобильное приложение запрашивают банковские реквизиты в одних и тех же случаях.
+
+6. **Формирование `data.refund`** — рассчитывается независимо от результата расчёта доступности возврата. Тексты — те же, что в мобилке (ECOMDEV-2343, шаг 10).
 
    1. Если `data.need_bank_details = true` → `data.refund = null`.
    2. Иначе `data.refund.message` определяется по способу оплаты заказа `cms_orders.payment_method`:
@@ -184,8 +193,6 @@
       | остальные | {red}(к согласованию) |
 
       Правило по `RULE-37`, `RULE-39`, `FR-45`, `ADR-RET-046` (07.10.2026): все онлайн-оплаты — один текст; при полной или частичной оплате подарочным сертификатом — блок реквизитов, на сертификат деньги не возвращаются.
-
-   > На сайте `data.need_bank_details` шире, чем в мобилке: `true` для всех способов оплаты, кроме онлайн (AS-IS). Поэтому для части способов (например, 2, 4, 9) на сайте будет блок реквизитов, а в мобилке — `refund`, пока правило реквизитов не единое.
 
 {% endcut %}
 
@@ -202,10 +209,12 @@
 | `data.order_delivery.address.street` | string \| null | `cms_orders.street` | `varchar(255)` |
 | `data.order_delivery.address.house` | string \| null | `cms_orders.house` | `varchar(255)` |
 | `data.order_delivery.address.housing` | string \| null | `cms_orders.housing` | `varchar(255)` |
+| `data.order_delivery.address.flat` | string \| null | `cms_orders.flat` | `varchar` {red}(длина — как в ECOMDEV-2343, сверить с БД) |
 | `data.order_delivery.pvz.provider` | string | `cms_delivery_tk.slug` (по `cms_orders.delivery_method` = `cms_delivery_tk.id`) | `varchar(255)` |
 | `data.order_delivery.pvz.id` | string | `cms_orders.pvz_id` | `varchar(32)` |
 | `data.order_delivery.store.store_code` | int | `cms_delivery_tk.store_code` (по `cms_orders.delivery_method` = `cms_delivery_tk.id`) | `smallint(6)` |
-| `data.refund.message` | string | Динамический расчёт по `cms_orders.payment_method` (шаг 5) | — |
+| `data.need_bank_details` | boolean | Динамический расчёт по `cms_orders.payment_method` и сумме `cms_giftcard_use.amount` по заказу (шаг 5) | — |
+| `data.refund.message` | string | Динамический расчёт по `cms_orders.payment_method` (шаг 6) | — |
 
 {% endcut %}
 
@@ -221,5 +230,4 @@
 |---|---|
 | 1. Ответ, если на момент нажатия возврат уже недоступен (истёк срок, все изделия в заявках): пустой список или `success = false` с текстом? Какой текст? | Product Manager, фронт сайта |
 | 2. Нужен ли в `data.positions[]` штрихкод позиции (`barcode`) для метода создания заявки? Сейчас позиция передаётся только `id` | Бэкенд-команда |
-| 3. Тексты «Возврат средств» для остальных способов оплаты — общие с мобилкой (ECOMDEV-2343). СБП, оплата частями и смешанная оплата (карта + сертификат) решены 07.10.2026 (`ADR-RET-046`); `data.need_bank_details = true` также при полной или частичной оплате сертификатом | Product Manager |
-| 4. Правило банковских реквизитов на сайте (все не-онлайн способы) и в мобилке (только оплата курьеру) расходится. Оставить разницу или сделать единым? | Product Manager |
+| 3. Тексты «Возврат средств» для остальных способов оплаты (строка «остальные» в шаге 6) — общие с мобилкой (ECOMDEV-2343). СБП, оплата частями и смешанная оплата (карта + сертификат) решены 07.10.2026 (`ADR-RET-046`) | Product Manager |
