@@ -40,7 +40,7 @@ entity "cms_users_refund\nДанные счёта" as users_refund <<exist>>
 entity "cms_orders\nЗаказы" as orders <<exist>>
 entity "cms_order_positions\nПозиции заказа" as order_positions <<exist>>
 entity "cms_order_receipts\nЧеки заказа" as order_receipts <<exist>>
-entity "cms_payment_types\nСпособы оплаты" as payment_types <<exist>>
+entity "cms_payment_types\nСпособы оплаты" as payment_types <<field>>
 
 ' ---------- Справочники возврата ----------
 entity "cms_return_method\nСпособы возврата" as return_method <<records>>
@@ -61,7 +61,6 @@ entity "cms_order_return_statuses_wms\nСтатус возврата WMS" as ret
 ' ---------- Возврат денег ----------
 entity "cms_return_refunds\nВозврат денег по способам" as return_refunds <<money>>
 entity "cms_refund_methods\nСпособы возврата денег" as refund_methods <<money>>
-entity "cms_payment_type_refund_method\nСпособ оплаты → способ возврата денег" as payment_type_refund_method <<money>>
 
 ' ---------- Связи: доставка ----------
 delivery_types ||--o{ delivery_tk : "тип службы"
@@ -101,8 +100,7 @@ delivery_types ||--o| return_method_delivery_type : "тип доставки"
 returns ||--|{ return_refunds : "куда вернуть деньги"
 refund_methods ||--o{ return_refunds : "способ возврата денег"
 order_receipts ||--o{ return_refunds : "чек оплаты"
-payment_types ||--o{ payment_type_refund_method : "способ оплаты"
-refund_methods ||--o{ payment_type_refund_method : "способ возврата денег"
+refund_methods ||--o{ payment_types : "способ возврата денег"
 
 legend right
   |= Цвет |= Таблица |
@@ -128,12 +126,12 @@ endlegend
 | `cms_return_method_delivery_type` | новая | Соответствие типа доставки способу возврата: какая возвратная служба выполняет способ и какой способ возврата соответствует доставке заказа (способ «как в заказе») |
 | `cms_return_refunds` | новая | Куда и сколько вернуть по заявке: строка на каждый способ возврата денег |
 | `cms_refund_methods` | новая | Справочник способов возврата денег и признак, нужны ли банковские реквизиты |
-| `cms_payment_type_refund_method` | новая | Соответствие способа оплаты заказа способу возврата денег |
 | `cms_return_method` | существует, новые записи | Способы возврата; новые записи «Магазин 12 STOREEZ» и «Почта России» |
 | `cms_delivery_tk` | существует, новые записи | Возвратные службы — отдельные записи со своим типом доставки. Описание способа и инструкция «Что дальше» — в существующих текстовых полях записи возвратной службы |
 | `cms_delivery_types` | существует, новые записи | Тип доставки для возврата |
 | `cms_delivery_city` | существует, новые записи | Города возвратных служб с ФИАС |
 | `cms_catalog_stock` | существует, новое поле | Признак «Принимает возвраты» у магазина |
-| `cms_users_user`, `cms_users_refund`, `cms_orders`, `cms_order_positions`, `cms_order_receipts`, `cms_payment_types` | существует, не меняется | Заказ, клиент, сохранённые реквизиты, чеки и способ оплаты, по которым оформляется заявка и считается возврат денег |
+| `cms_payment_types` | существует, предлагается поле | Предложение: способ возврата денег для способа оплаты. Альтернатива — правило в коде |
+| `cms_users_user`, `cms_users_refund`, `cms_orders`, `cms_order_positions`, `cms_order_receipts` | существует, не меняется | Заказ, клиент, сохранённые реквизиты, чеки и способ оплаты, по которым оформляется заявка и считается возврат денег |
 | `cms_return_reasons`, `cms_return_reasons_groups` | существует, не меняется | Справочник причин возврата |
 | `cms_order_return_statuses_wms` | существует, связь не определена | Статусы возврата из WMS; связь с заявкой зависит от статусной модели возврата |

@@ -69,7 +69,7 @@
 | Существует, не меняется | `cms_delivery_tk` | Службы доставки; служба возврата для курьера, ПВЗ, Почты |
 | Существует, добавляется поле | `cms_delivery_city` | Покрытие служб по городам; из него - какие способы возврата доступны в городе |
 | Существует, добавляется поле | `cms_catalog_stock` | Магазины; список магазинов, принимающих возвраты |
-| Существует, не меняется | `cms_payment_types` | Способы оплаты; по ним определяется способ возврата денег |
+| Существует, предлагается поле | `cms_payment_types` | Способы оплаты; предложение: поле `refund_method_id` - способ возврата денег для способа оплаты. Альтернатива - правило в коде |
 | Существует, не меняется | `cms_order_receipts` | Фискальные чеки заказа; чек возврата (PostMVP) |
 | Существует, не меняется | `cms_giftcard_use` | Списания сертификатов по заказу; доля сертификата в возврате денег |
 | Существует, не меняется | `cms_order_return_statuses_wms` | Справочник статусов возврата на складе |
@@ -86,7 +86,6 @@
 | Новая | `cms_return_position_status_history` | История статусов штуки со склада |
 | Новая | `cms_return_refunds` | Возврат денег по способам: сколько, куда, когда вернули |
 | Новая | `cms_refund_methods` | Справочник способов возврата денег |
-| Новая | `cms_payment_type_refund_method` | Соответствие способа оплаты способу возврата денег |
 | Новая | `cms_return_method_delivery_type` | Соответствие типа доставки заказа способу возврата |
 | Убрана | `cms_return_tk`, `cms_return_tk_city`, `cms_return_status_history` | См. 1.1 |
 
@@ -260,6 +259,7 @@ erDiagram
         varchar(255) code "NULL"
         varchar(255) crm_title "NULL"
         tinyint(1) is_bnpl "NULL 0: BNPL (Долями, Подели)"
+        int(11) refund_method_id FK "NULL: ПРЕДЛОЖЕНИЕ, способ возврата денег"
     }
 
     %% Зачем: списания сертификатов по заказу; доля к возврату на сертификат
@@ -483,12 +483,6 @@ erDiagram
         tinyint(1) active "NOT NULL 1"
     }
 
-    %% Зачем: способ оплаты заказа -> способ возврата денег; одно правило для сайта и МП
-    cms_payment_type_refund_method {
-        int(11) id PK "ID записи"
-        int(11) payment_type FK,UK "NOT NULL"
-        int(11) refund_method_id FK "NOT NULL"
-    }
 
     %% Зачем: возврат денег по заявке в разрезе способов - расчёт и факт
     cms_return_refunds {
@@ -557,8 +551,7 @@ erDiagram
     %% Деньги
     cms_returns ||--|{ cms_return_refunds : "id = return_id"
     cms_refund_methods ||--o{ cms_return_refunds : "id = refund_method_id"
-    cms_refund_methods ||--o{ cms_payment_type_refund_method : "id = refund_method_id"
-    cms_payment_types ||--o| cms_payment_type_refund_method : "internal_id = payment_type"
+    cms_refund_methods ||--o{ cms_payment_types : "id = refund_method_id"
 ```
 
 ## 4. Описание существующих таблиц
@@ -749,15 +742,16 @@ erDiagram
 
 ### 4.12. `cms_payment_types` - способы оплаты
 
-**Зачем нужна:** способы оплаты. Через `cms_payment_type_refund_method` определяют способ возврата денег и нужны ли реквизиты.
+**Зачем нужна:** способы оплаты. По ним определяют способ возврата денег и нужны ли реквизиты: по предлагаемому полю `refund_method_id` или правилом в коде - выбор разработки.
 
 | # | Атрибут | Тип | Ключ | NULL | По умолчанию | Описание |
 |---|---|---|---|---|---|---|
 | 1 | `id` | `int(11)` | PK | Нет | auto_increment | Идентификатор записи |
-| 2 | `internal_id` | `int(11)` | UK | Да | `NULL` | Код способа оплаты (`1` карта онлайн, `3` наличные курьеру ...). На него ссылаются `cms_orders.payment_method` и `cms_payment_type_refund_method.payment_type` |
+| 2 | `internal_id` | `int(11)` | UK | Да | `NULL` | Код способа оплаты (`1` карта онлайн, `3` наличные курьеру ...). На него ссылается `cms_orders.payment_method` |
 | 3 | `code` | `varchar(255)` | | Да | `NULL` | Код |
 | 4 | `crm_title` | `varchar(255)` | | Да | `NULL` | Название в RetailCRM |
 | 5 | `is_bnpl` | `tinyint(1)` | | Да | `0` | BNPL-сервис (Долями, Подели): деньги возвращаются через провайдера |
+| 6 | `refund_method_id` | `int(11)` | FK | Да | `NULL` | **Предложение.** Основной способ возврата денег для этого способа оплаты. Альтернатива - правило в коде: онлайн-оплата - на карту, оплата при получении или подарочным сертификатом - по реквизитам. Сертификат и баллы добавляются отдельными строками `cms_return_refunds`, если были списания.<br>Связь: `cms_payment_types.refund_method_id = cms_refund_methods.id` |
 
 ### 4.13. `cms_giftcard_use` - списания сертификатов
 
@@ -1017,17 +1011,7 @@ erDiagram
 | 5 | `_order` | `int(11)` | | Нет | `0` | Сортировка |
 | 6 | `active` | `tinyint(1)` | | Нет | `1` | Активность |
 
-### 5.9. `cms_payment_type_refund_method` - способ оплаты → способ возврата денег
-
-**Зачем нужна:** по способу оплаты заказа определяет основной способ возврата денег. Одна строка - один способ оплаты. Сертификат и баллы добавляются отдельными строками `cms_return_refunds`, если были списания.
-
-| # | Атрибут | Тип | Ключ | NULL | По умолчанию | Описание |
-|---|---|---|---|---|---|---|
-| 1 | `id` | `int(11)` | PK | Нет | auto_increment | Идентификатор записи |
-| 2 | `payment_type` | `int(11)` | FK, UK | Нет | - | Способ оплаты.<br>Связь: `cms_payment_type_refund_method.payment_type = cms_payment_types.internal_id` |
-| 3 | `refund_method_id` | `int(11)` | FK | Нет | - | Способ возврата денег.<br>Связь: `cms_payment_type_refund_method.refund_method_id = cms_refund_methods.id` |
-
-### 5.10. `cms_return_refunds` - возврат денег по способам
+### 5.9. `cms_return_refunds` - возврат денег по способам
 
 **Зачем нужна:** сколько, куда и когда вернули деньги по заявке. Одна строка - один способ (часть на карту, часть на сертификат, часть баллами). Итоги заявки считаются по этой таблице. `refunded_at` - статус «деньги возвращены», который по комментарию к BRD должен к нам приходить.
 
@@ -1040,7 +1024,7 @@ erDiagram
 | 5 | `refunded_amount` | `decimal(10,2)` | | Да | `NULL` | Фактически возвращено. `NULL` - ещё не возвращали |
 | 6 | `refunded_at` | `datetime` | | Да | `NULL` | Дата фактического возврата |
 
-### 5.11. `cms_return_method_delivery_type` - тип доставки → способ возврата
+### 5.10. `cms_return_method_delivery_type` - тип доставки → способ возврата
 
 **Зачем нужна:** по типу службы доставки заказа подставляет способ возврата «как в заказе». Заменяет константу `ReturnMethodEnum::ORDER_DELIVERY_TYPES_MAP`. Одна строка - один тип доставки.
 
