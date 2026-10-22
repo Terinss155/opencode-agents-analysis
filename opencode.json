@@ -33,7 +33,9 @@
       "traceability-matrix": "allow",
       "gap-analysis": "allow",
       "handoff": "allow",
+      "chat-source-format": "allow",
       "adr": "allow",
+      "meeting-summary-adr": "allow",
       "security-review-checklist": "allow",
       "ui-review-checklist": "allow"
     }

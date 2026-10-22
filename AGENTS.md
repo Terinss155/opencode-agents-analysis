@@ -74,14 +74,14 @@ new/
 
 | Агент | mode | Скиллы |
 |---|---|---|
-| `product-owner` | primary | `user-story`, `backlog-prioritization`, `business-case`, `product-roadmap`, `stakeholder-map`, `adr` |
-| `business-analyst` | primary | `business-process-bpmn`, `brd`, `use-case`, `screen-spec`, `traceability-matrix`, `gap-analysis`, `brs`, `adr` |
-| `system-analyst` | primary | `backend-logic`, `backend-task`, `srs`, `erd-model`, `sequence-diagram`, `flowchart-diagram`, `openapi-spec`, `asyncapi-spec`, `nfr-requirements`, `process-monitoring`, `adr` |
+| `product-owner` | primary | `user-story`, `backlog-prioritization`, `business-case`, `product-roadmap`, `stakeholder-map`, `adr`, `meeting-summary-adr` |
+| `business-analyst` | primary | `business-process-bpmn`, `brd`, `use-case`, `screen-spec`, `traceability-matrix`, `gap-analysis`, `brs`, `adr`, `meeting-summary-adr` |
+| `system-analyst` | primary | `backend-logic`, `backend-task`, `srs`, `erd-model`, `sequence-diagram`, `flowchart-diagram`, `openapi-spec`, `asyncapi-spec`, `nfr-requirements`, `process-monitoring`, `adr`, `meeting-summary-adr` |
 | `repository-researcher` | primary | — (опц. `sequence-diagram` для sequence-схем) |
 | `security-reviewer` | subagent | `security-review-checklist` |
 | `ui-reviewer` | subagent | `ui-review-checklist` |
 
-Скилл `handoff` (передача дел между сессиями) доступен всем агентам.
+Скилл `handoff` (передача дел между сессиями) доступен всем агентам. Скилл `chat-source-format` (оформление присланной переписки как первичного источника для `sources/answers/`) доступен всем агентам. Скилл `meeting-summary-adr` (разбор встречи по транскрибации и ADR по разбору) — всем агентам, которые ведут ADR: `product-owner`, `business-analyst`, `system-analyst`.
 
 ## Структура проекта
 
@@ -92,6 +92,7 @@ projects/<проект>/
 ├── sources/          ← ВХОДЯЩЕЕ, только чтение: транскрибации, ТЗ и BRD заказчика, xlsx, макеты
 │   ├── transcriptions/
 │   └── mockups/
+├── meetings/         ← РАЗБОРЫ ВСТРЕЧ: [ГГГГ-ММ-ДД ЧЧ-ММ] <тема>_summary.md — по одному на транскрибацию (см. «Разборы встреч»)
 ├── as-is/            ← КАК СЕЙЧАС: анализ текущего процесса по коду
 │   ├── 00-overview.md, web/, mobile/   ← пошаговый AS-IS по каналам (+ as-is.bpmn.md, skill/business-process-bpmn)
 │   ├── api/          ← AS-IS разбор эндпоинтов, нужных только этому процессу
@@ -124,6 +125,7 @@ projects/<проект>/
 - **AS-IS и TO-BE:** состояние определяется верхней папкой (`as-is/` — как сейчас, `requirements/` — как будет), а не подпапкой внутри типа. Диаграммы: `as-is/diagrams/<тип>/` и `requirements/diagrams/<тип>/`; объект — по началу имени файла (`return-entity_erd.md`, `return-status_state.md`). На диаграмму без своего ID-префикса ссылаются по пути файла.
 - **ADR:** хранится в `requirements/adr/` и объясняет причину значимого выбора, альтернативы и последствия. ADR не является новым уровнем требований и не добавляется отдельным звеном в цепочку трассировки.
 - **Первичные транскрибации:** неизменённые исходные записи встреч хранятся в `sources/transcriptions/`. Обработанное резюме и ADR не заменяют первичную транскрибацию.
+- **Разборы встреч** (`meetings/`): рабочий контекст анализа, не первоисточник и не артефакт требований. Один файл на транскрибацию; имя — дата и время из имени транскрибации и её тема: `[bandicam 2026-10-21 12-03-14-513] Статусная модель по возвратам.md` → `meetings/[2026-10-21 12-03] Статусная модель по возвратам_summary.md`. Состав: ссылка на транскрибацию, участники с ролями, решения со ссылками на ADR, разбор по темам — кто что сказал с таймкодами и итог (решено / предложено / открыто, где отражено), открытые вопросы с адресатом, особенности процессов и примеры. Когда тему встречи уточняют повторно, разбор дополняется в том же файле. Связанные фрагменты других встреч указываются в теме полным именем транскрибации и таймкодом.
 - Связь между вкладками — только по стабильным ID (см. «Легенда ID-префиксов») и markdown-ссылкам. Содержимое между вкладками не копируется.
 - **Новый проект:** создать `projects/<код-проекта>/` с теми же папками; общие знания не копировать — ссылаться на `knowledge/`.
 
@@ -220,12 +222,15 @@ projects/<проект>/
 - `product-owner`: `requirements/user-story/user-story-mvp.md` (общие разделы вкладки и истории MVP) и `requirements/user-story/user-story-post-mvp.md` (истории Post-MVP; история переносится между файлами при смене объёма), `backlog-priority.md`, `business-case.md`, `roadmap.md`, `stakeholder-map.md`, ADR — как у BA
 - `repository-researcher`: `knowledge/<репозиторий>/repo-map.md`, `knowledge/<репозиторий>/features/<фича>.md`, `knowledge/<репозиторий>/architecture/*.md`
 - Рабочие вопросы (любой агент): `requirements/questions/<тема>_questions.md` — одна тема в одном файле, без дублирования между файлами; задачи на бэк в эту папку не кладутся.
+- Копии для Яндекс Вики (`*_wiki.md`) — чистые: без ссылок и упоминаний ADR, транскрибаций, разборов встреч и файлов `sources/`, без колонок «Источник»/«Основание» и разделов «Связанные артефакты»/«Источники». Содержание правил и вопросов совпадает с основным файлом.
+- Разборы встреч (любой агент): `meetings/[ГГГГ-ММ-ДД ЧЧ-ММ] <тема>_summary.md` — дата, время и тема из имени транскрибации.
 - Ревью: `reviews/<тип>/[ГГГГ-ММ-ДД] <артефакт>_<тип>-review.md`; `security-reviewer` → `reviews/security/`, `ui-reviewer` → `reviews/ui/`, `system-analyst` (по явному запросу) → `reviews/quality/`. Устаревшее ревью переносится в `archive/`.
 
 ## Рабочий процесс
 - PO → ценность и приоритеты (RICE/WSJF/MoSCoW), User Story. BA → процессы AS-IS/TO-BE, BRD, Use Case, матрица трассируемости, Gap-анализ (сверка с исходным BRD и реестр требований вне зоны BA/SA — `skill/gap-analysis`); передаёт SA.
 - SA → технические артефакты: backend-логика, ERD, Sequence, OpenAPI, AsyncAPI, NFR; обеспечивает совместимость с User Story/Use Case.
 - Значимые решения фиксируются через `skill/adr`: PO — продуктовые, BA — процессные и бизнес-правила, SA — архитектурные, интеграционные и системные.
+- Порядок по новой транскрибации — `skill/meeting-summary-adr`: проверка расшифровки, разбор встречи в `meetings/`, самопроверка, подтверждение разбора пользователем, ADR по разбору, согласованность файлов.
 - `repository-researcher` → разбор кодовой базы в `12stz/`, карта интеграций, ведение `knowledge/`; к нему обращаются BA/SA, когда нужно понять, где и как работает логика в коде. Перед поиском по коду — `knowledge/README.md`.
 - `security-reviewer` — ревью ИБ (ISO 27001, NIST, OWASP, PCI DSS, 152-ФЗ; STRIDE/PASTA/DREAD). **Вызывается обязательно** в трёх точках:
   1. перед передачей задачи разработке — SRS, `backend/*_task`, API-контракт: авторизация, проверка владельца, валидация на сервере, утечки в ответах API;
@@ -313,6 +318,7 @@ projects/<проект>/
   - обращения автора к читателю и пояснения, почему раздел выглядит так;
   - подсказки и комментарии из шаблона (строки с `>`, `<!-- ... -->`, «Примечание: ...»).
 - Источник требования или решения указывается ссылкой на файл в `sources/` или на ID ADR, а не пересказом разговора.
+- В артефактах (диаграммы, SRS, ERD, задачи, User Story и т.д.) нет меток встреч («Встреча 21.10»), таймкодов и цитат участников: основание — ID ADR, при его отсутствии — ссылка на файл в `sources/` или на разбор встречи в `meetings/`. Таймкоды допускаются только в разделе «Источники» ADR и в разборах встреч.
 - История изменений ведётся только там, где она есть в формате артефакта: «История изменений» в ADR, версия бандла в `index.md`, таблица истории в BRS. В остальных артефактах её нет; прежние версии хранятся в git и `archive/`.
 - Неподтверждённое выносится в раздел «Открытые вопросы», если он есть в формате артефакта; иначе — в ответ пользователю.
 - Содержимое `handoff/` — рабочий контекст сессии; в артефакты из него ничего не переносится.

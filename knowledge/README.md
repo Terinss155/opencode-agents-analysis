@@ -87,6 +87,7 @@
 | Обмен с 1С через шлюз `core` (товары, остатки, офлайн-заказы) | [esb-monorepo/repo-map.md](esb-monorepo/repo-map.md) §4.1, §6 | `esb-monorepo/libs/gateway-1c/` |
 | Окружения и хосты шлюзов | [esb-monorepo/repo-map.md](esb-monorepo/repo-map.md) §7, [mobile-monorepo-go/repo-map.md](mobile-monorepo-go/repo-map.md) §6 | `.deploy/helm/*.values.yaml` в каждом репозитории |
 | Какие методы и поля у gRPC-сервиса (geo, mindbox, logistics, orders и др.) | [esb-protobufs/repo-map.md](esb-protobufs/repo-map.md) §3 | `esb-protobufs/proto/` |
+| Как запросить даты и интервалы курьера у логистики, какой адрес передавать, можно ли собрать адрес из заказа | [esb-protobufs/api/logistics-intervals.md](esb-protobufs/api/logistics-intervals.md) | `esb-protobufs/proto/logistics/winner.proto` (`Intervals`), `esb-protobufs/proto/geo.proto`, монолит `src/Modules/Order/Traits/OrderGetterTrait.php` |
 | Кто какой контракт использует и какой версии | [esb-protobufs/repo-map.md](esb-protobufs/repo-map.md) §4 | `esb-monorepo/package.json` (`esb-protobufs`), `mobile-monorepo-go/go.mod`, `12storeez-master-web/modules/grpc/` |
 | Поля возврата в контрактах (новый сервис заказов, чеки возврата) | [esb-protobufs/repo-map.md](esb-protobufs/repo-map.md) §6.1 | `esb-protobufs/proto/order.proto`, `esb-protobufs/proto/receipt.proto` |
 

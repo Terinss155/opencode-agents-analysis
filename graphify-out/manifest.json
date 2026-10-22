@@ -1,0 +1,1658 @@
+{
+  ".claude/settings.json": {
+    "mtime": 1792319143.2983673,
+    "seen": 1792321244.0213487,
+    "ast_hash": "61ea6cc9977b5a169dcaf4a6158b6790",
+    "semantic_hash": "61ea6cc9977b5a169dcaf4a6158b6790"
+  },
+  "knowledge/12storeez-master-web/architecture/build-pdf.py": {
+    "mtime": 1789138164.3821025,
+    "seen": 1792321244.0213487,
+    "ast_hash": "d45c46e1bfc13ad9151a20bb2c3d4e59",
+    "semantic_hash": "d45c46e1bfc13ad9151a20bb2c3d4e59"
+  },
+  "opencode.json": {
+    "mtime": 1792178885.4911578,
+    "seen": 1792321244.0213487,
+    "ast_hash": "449ce432cd9702f0de018b699c2f4699",
+    "semantic_hash": "449ce432cd9702f0de018b699c2f4699"
+  },
+  ".claude/CLAUDE.md": {
+    "mtime": 1792319143.2873435,
+    "seen": 1792321244.0213487,
+    "ast_hash": "9b31786b637be3c13978bec4c2330752",
+    "semantic_hash": "9b31786b637be3c13978bec4c2330752"
+  },
+  ".claude/agents/business-analyst.md": {
+    "mtime": 1791592520.1884127,
+    "seen": 1792321244.0213487,
+    "ast_hash": "1180a09af33b36644b4f4a05224821a0",
+    "semantic_hash": "1180a09af33b36644b4f4a05224821a0"
+  },
+  ".claude/agents/product-owner.md": {
+    "mtime": 1791592538.3011768,
+    "seen": 1792321244.0213487,
+    "ast_hash": "a4257a2a33e5e3259bcfe722bf36c34d",
+    "semantic_hash": "a4257a2a33e5e3259bcfe722bf36c34d"
+  },
+  ".claude/agents/repository-researcher.md": {
+    "mtime": 1791591536.085083,
+    "seen": 1792321244.0213487,
+    "ast_hash": "41fe9874a3a73a7e7885724d99ff9230",
+    "semantic_hash": "41fe9874a3a73a7e7885724d99ff9230"
+  },
+  ".claude/agents/security-reviewer.md": {
+    "mtime": 1791578808.8949304,
+    "seen": 1792321244.0213487,
+    "ast_hash": "6e7576a85566cb4f5970a9ec546082a2",
+    "semantic_hash": "6e7576a85566cb4f5970a9ec546082a2"
+  },
+  ".claude/agents/system-analyst.md": {
+    "mtime": 1792178885.9765549,
+    "seen": 1792321244.0213487,
+    "ast_hash": "52c23f045380730e6a491f7e82fc0d37",
+    "semantic_hash": "52c23f045380730e6a491f7e82fc0d37"
+  },
+  ".claude/agents/ui-reviewer.md": {
+    "mtime": 1791596629.143349,
+    "seen": 1792321244.0213487,
+    "ast_hash": "32d30916b2ddb76529184fe47d5046e5",
+    "semantic_hash": "32d30916b2ddb76529184fe47d5046e5"
+  },
+  ".opencode/agents/business-analyst.md": {
+    "mtime": 1791592607.0631545,
+    "seen": 1792321244.0213487,
+    "ast_hash": "5de21fc2f16d056efb1e16851c7df091",
+    "semantic_hash": "5de21fc2f16d056efb1e16851c7df091"
+  },
+  ".opencode/agents/product-owner.md": {
+    "mtime": 1791592616.7953417,
+    "seen": 1792321244.0213487,
+    "ast_hash": "00f0465f450b328915d7eb0a289e2cd6",
+    "semantic_hash": "00f0465f450b328915d7eb0a289e2cd6"
+  },
+  ".opencode/agents/repository-researcher.md": {
+    "mtime": 1791578796.164033,
+    "seen": 1792321244.0213487,
+    "ast_hash": "13e52c8c8dd60f2a30bf38b2f98972b9",
+    "semantic_hash": "13e52c8c8dd60f2a30bf38b2f98972b9"
+  },
+  ".opencode/agents/security-reviewer.md": {
+    "mtime": 1791578796.165537,
+    "seen": 1792321244.0213487,
+    "ast_hash": "6e4647864f0f1b8c97fb275be6e690a5",
+    "semantic_hash": "6e4647864f0f1b8c97fb275be6e690a5"
+  },
+  ".opencode/agents/system-analyst.md": {
+    "mtime": 1792178886.3614688,
+    "seen": 1792321244.0213487,
+    "ast_hash": "b783821d3c2626a788c2956692f762ed",
+    "semantic_hash": "b783821d3c2626a788c2956692f762ed"
+  },
+  ".opencode/agents/ui-reviewer.md": {
+    "mtime": 1791596629.1448536,
+    "seen": 1792321244.0213487,
+    "ast_hash": "12c07248d5d2c81a2b69ac15e9499ead",
+    "semantic_hash": "12c07248d5d2c81a2b69ac15e9499ead"
+  },
+  "AGENTS.md": {
+    "mtime": 1792178885.2329648,
+    "seen": 1792321244.0213487,
+    "ast_hash": "05e84a50f665a82f4a1e905c0618cce7",
+    "semantic_hash": "05e84a50f665a82f4a1e905c0618cce7"
+  },
+  "CLAUDE.md": {
+    "mtime": 1792319143.29537,
+    "seen": 1792321244.0213487,
+    "ast_hash": "8c66f54efb10e1366ec07199bf798db3",
+    "semantic_hash": "8c66f54efb10e1366ec07199bf798db3"
+  },
+  "handoff/2026-10-09_23-00_workspace-setup.md": {
+    "mtime": 1791582953.9903123,
+    "seen": 1792321244.0213487,
+    "ast_hash": "ab5c56d338e1fa1033c9d8f9519634e0",
+    "semantic_hash": "ab5c56d338e1fa1033c9d8f9519634e0"
+  },
+  "handoff/2026-10-13_12-00_srs-mobile-review.md": {
+    "mtime": 1791882037.030481,
+    "seen": 1792321244.0213487,
+    "ast_hash": "865492cfd8f19707c60e89a646ec32fd",
+    "semantic_hash": "865492cfd8f19707c60e89a646ec32fd"
+  },
+  "handoff/2026-10-16_20-00_srs-web-sync.md": {
+    "mtime": 1792170083.7104692,
+    "seen": 1792321244.0213487,
+    "ast_hash": "bd65495999b688d7c4069a8098395f5c",
+    "semantic_hash": "bd65495999b688d7c4069a8098395f5c"
+  },
+  "handoff/2026-10-17_18-00_requirements-audit.md": {
+    "mtime": 1792198179.1723049,
+    "seen": 1792321244.0213487,
+    "ast_hash": "ef6c417501406b6c1cd8051c65583938",
+    "semantic_hash": "ef6c417501406b6c1cd8051c65583938"
+  },
+  "knowledge/12storeez-ios/repo-map.md": {
+    "mtime": 1791587127.1165538,
+    "seen": 1792321244.0213487,
+    "ast_hash": "1648df6bd0375f75d0a87c2fcc692113",
+    "semantic_hash": "1648df6bd0375f75d0a87c2fcc692113"
+  },
+  "knowledge/12storeez-master-web/api/mobile-vs-core-api.md": {
+    "mtime": 1791578848.7598493,
+    "seen": 1792321244.0213487,
+    "ast_hash": "6fac3a832085baf39f7476badf75a440",
+    "semantic_hash": "6fac3a832085baf39f7476badf75a440"
+  },
+  "knowledge/12storeez-master-web/api/mobile/mobile-gateway_swagger.yaml": {
+    "mtime": 1791361243.0123894,
+    "seen": 1792321244.0213487,
+    "ast_hash": "d8426e402467203915b4f50cd6099f1c",
+    "semantic_hash": "d8426e402467203915b4f50cd6099f1c"
+  },
+  "knowledge/12storeez-master-web/api/mobile/order-view_mobile.md": {
+    "mtime": 1791578848.7598493,
+    "seen": 1792321244.0213487,
+    "ast_hash": "be9d00eb7efbc45172589fcd0d6fc4f2",
+    "semantic_hash": "be9d00eb7efbc45172589fcd0d6fc4f2"
+  },
+  "knowledge/12storeez-master-web/api/web/order-view_web.md": {
+    "mtime": 1791573896.733304,
+    "seen": 1792321244.0213487,
+    "ast_hash": "a8e52f0796f2c048af01e814c90e2938",
+    "semantic_hash": "a8e52f0796f2c048af01e814c90e2938"
+  },
+  "knowledge/12storeez-master-web/architecture/01-overview.md": {
+    "mtime": 1788433070.0,
+    "seen": 1792321244.0213487,
+    "ast_hash": "292e0adfbae8298a09019b70b22f89a9",
+    "semantic_hash": "292e0adfbae8298a09019b70b22f89a9"
+  },
+  "knowledge/12storeez-master-web/architecture/02-backend.md": {
+    "mtime": 1788433228.0,
+    "seen": 1792321244.0213487,
+    "ast_hash": "8ffc8f2acc8ddb26b7a3d823d28307d0",
+    "semantic_hash": "8ffc8f2acc8ddb26b7a3d823d28307d0"
+  },
+  "knowledge/12storeez-master-web/architecture/03-business-domains.md": {
+    "mtime": 1791573896.7343042,
+    "seen": 1792321244.0213487,
+    "ast_hash": "96f955fe00d6ae13bb7e81aeb972c259",
+    "semantic_hash": "96f955fe00d6ae13bb7e81aeb972c259"
+  },
+  "knowledge/12storeez-master-web/architecture/04-database.md": {
+    "mtime": 1791578848.762354,
+    "seen": 1792321244.0213487,
+    "ast_hash": "7b868d1f0503f78471603ee0d709ad07",
+    "semantic_hash": "7b868d1f0503f78471603ee0d709ad07"
+  },
+  "knowledge/12storeez-master-web/architecture/05-api.md": {
+    "mtime": 1791578848.7608478,
+    "seen": 1792321244.0213487,
+    "ast_hash": "db3150034ef3e09e29850939a458581b",
+    "semantic_hash": "db3150034ef3e09e29850939a458581b"
+  },
+  "knowledge/12storeez-master-web/architecture/06-frontend.md": {
+    "mtime": 1788433664.0,
+    "seen": 1792321244.0213487,
+    "ast_hash": "f7eff1bcfd461744b0d3777b8c5b5b18",
+    "semantic_hash": "f7eff1bcfd461744b0d3777b8c5b5b18"
+  },
+  "knowledge/12storeez-master-web/architecture/07-infrastructure.md": {
+    "mtime": 1788433810.0,
+    "seen": 1792321244.0213487,
+    "ast_hash": "588986d48107523a88ea2d5d622c1735",
+    "semantic_hash": "588986d48107523a88ea2d5d622c1735"
+  },
+  "knowledge/12storeez-master-web/architecture/08-integrations.md": {
+    "mtime": 1788433973.0,
+    "seen": 1792321244.0213487,
+    "ast_hash": "a95d6ca42e778650b4772a042ddac396",
+    "semantic_hash": "a95d6ca42e778650b4772a042ddac396"
+  },
+  "knowledge/12storeez-master-web/architecture/09-pitfalls.md": {
+    "mtime": 1788434092.0,
+    "seen": 1792321244.0213487,
+    "ast_hash": "a39642903e84615c5921fb8b1040ab3a",
+    "semantic_hash": "a39642903e84615c5921fb8b1040ab3a"
+  },
+  "knowledge/12storeez-master-web/architecture/README.md": {
+    "mtime": 1791578848.7618494,
+    "seen": 1792321244.0213487,
+    "ast_hash": "b2644689c1589ea102686811d2ba43a7",
+    "semantic_hash": "b2644689c1589ea102686811d2ba43a7"
+  },
+  "knowledge/12storeez-master-web/database/order-status-dictionaries.md": {
+    "mtime": 1791573896.7370253,
+    "seen": 1792321244.0213487,
+    "ast_hash": "bbf2f1a0479fe483f48156ea7b5753c4",
+    "semantic_hash": "bbf2f1a0479fe483f48156ea7b5753c4"
+  },
+  "knowledge/12storeez-master-web/database/orders-er.md": {
+    "mtime": 1788443086.1885707,
+    "seen": 1792321244.0213487,
+    "ast_hash": "74195a570fad52981e0d67228d7ffed1",
+    "semantic_hash": "74195a570fad52981e0d67228d7ffed1"
+  },
+  "knowledge/12storeez-master-web/features/order-edit.md": {
+    "mtime": 1788873641.727325,
+    "seen": 1792321244.0213487,
+    "ast_hash": "df1c6b5d61aafa750254e370330909cb",
+    "semantic_hash": "df1c6b5d61aafa750254e370330909cb"
+  },
+  "knowledge/12storeez-master-web/features/order-integration-exchange.md": {
+    "mtime": 1792099239.2715108,
+    "seen": 1792321244.0213487,
+    "ast_hash": "e8689ac485a6816c979c7c5826ec24b5",
+    "semantic_hash": "e8689ac485a6816c979c7c5826ec24b5"
+  },
+  "knowledge/12storeez-master-web/features/order-status_state.md": {
+    "mtime": 1792190471.0126483,
+    "seen": 1792321244.0213487,
+    "ast_hash": "fab2c361569c368b14ec9aea48515988",
+    "semantic_hash": "fab2c361569c368b14ec9aea48515988"
+  },
+  "knowledge/12storeez-master-web/features/order-view.md": {
+    "mtime": 1791578848.762354,
+    "seen": 1792321244.0213487,
+    "ast_hash": "2fc55c85eefdb909d7119072de514856",
+    "semantic_hash": "2fc55c85eefdb909d7119072de514856"
+  },
+  "knowledge/12storeez-master-web/repo-map.md": {
+    "mtime": 1791578848.762354,
+    "seen": 1792321244.0213487,
+    "ast_hash": "c66049ce43152b8fd679722d891f2e4b",
+    "semantic_hash": "c66049ce43152b8fd679722d891f2e4b"
+  },
+  "knowledge/README.md": {
+    "mtime": 1792190480.0693624,
+    "seen": 1792321244.0213487,
+    "ast_hash": "2a72898168da69dfcd3c4a87fb5c103c",
+    "semantic_hash": "2a72898168da69dfcd3c4a87fb5c103c"
+  },
+  "knowledge/architecture/call-chain.html": {
+    "mtime": 1791587669.628826,
+    "seen": 1792321244.0213487,
+    "ast_hash": "16c32ebfc14bc4d7644004124df09ea8",
+    "semantic_hash": "16c32ebfc14bc4d7644004124df09ea8"
+  },
+  "knowledge/architecture/web-call-chain.html": {
+    "mtime": 1791588085.265694,
+    "seen": 1792321244.0213487,
+    "ast_hash": "07d82b65d1eddd76fc44b8620a58f049",
+    "semantic_hash": "07d82b65d1eddd76fc44b8620a58f049"
+  },
+  "knowledge/esb-monorepo/repo-map.md": {
+    "mtime": 1791583447.4134922,
+    "seen": 1792321244.0213487,
+    "ast_hash": "169fe87dac1ecdbe67b1ab89e25309c5",
+    "semantic_hash": "169fe87dac1ecdbe67b1ab89e25309c5"
+  },
+  "knowledge/esb-protobufs/repo-map.md": {
+    "mtime": 1792010448.5954454,
+    "seen": 1792321244.0213487,
+    "ast_hash": "cfaad1f5f5eda5e7242fccb667e254fa",
+    "semantic_hash": "cfaad1f5f5eda5e7242fccb667e254fa"
+  },
+  "knowledge/mobile-monorepo-go/repo-map.md": {
+    "mtime": 1791583454.4474623,
+    "seen": 1792321244.0213487,
+    "ast_hash": "bac27f4293ec5345bf163ef62a353272",
+    "semantic_hash": "bac27f4293ec5345bf163ef62a353272"
+  },
+  "projects/returns-2.0/archive/early-drafts/obshie-biznes-pravila-oformleniya-vozvrata.md": {
+    "mtime": 1788877216.852071,
+    "seen": 1792321244.0213487,
+    "ast_hash": "34841b4bf221c015a50bf4bf27974044",
+    "semantic_hash": "34841b4bf221c015a50bf4bf27974044"
+  },
+  "projects/returns-2.0/archive/early-drafts/opisanie-ui-ekranov.md": {
+    "mtime": 1792012816.1766675,
+    "seen": 1792321244.0213487,
+    "ast_hash": "dfee8b5d18df2a06ce4caf1769acb561",
+    "semantic_hash": "dfee8b5d18df2a06ce4caf1769acb561"
+  },
+  "projects/returns-2.0/archive/early-drafts/vozvrat-cherez-5post-biznes-process-to-be.md": {
+    "mtime": 1788799181.6163201,
+    "seen": 1792321244.0213487,
+    "ast_hash": "cd94449aa255d95fb46e850cfe2aa2e7",
+    "semantic_hash": "cd94449aa255d95fb46e850cfe2aa2e7"
+  },
+  "projects/returns-2.0/archive/early-drafts/vozvrat-cherez-sdek-pvz-biznes-process-to-be.md": {
+    "mtime": 1788799181.6153119,
+    "seen": 1792321244.0213487,
+    "ast_hash": "a9418c38822dc04e2653e1ffd35be7d3",
+    "semantic_hash": "a9418c38822dc04e2653e1ffd35be7d3"
+  },
+  "projects/returns-2.0/archive/early-drafts/vozvrat-kurerom-biznes-process-to-be.md": {
+    "mtime": 1788798473.5931168,
+    "seen": 1792321244.0213487,
+    "ast_hash": "9ddb53ee2a4106b09e8e7bcbdd995792",
+    "semantic_hash": "9ddb53ee2a4106b09e8e7bcbdd995792"
+  },
+  "projects/returns-2.0/archive/id-migration-work.md": {
+    "mtime": 1790200330.1042373,
+    "seen": 1792321244.0213487,
+    "ast_hash": "6aed34e0d2af88c661b4670b709f12db",
+    "semantic_hash": "6aed34e0d2af88c661b4670b709f12db"
+  },
+  "projects/returns-2.0/archive/use-case/use-case.md": {
+    "mtime": 1792003367.9992232,
+    "seen": 1792321244.0213487,
+    "ast_hash": "b8bec50ab1883ce96cf476485a34e149",
+    "semantic_hash": "b8bec50ab1883ce96cf476485a34e149"
+  },
+  "projects/returns-2.0/archive/user-story-before-changes/user-story-channels.v1.md": {
+    "mtime": 1790259386.35989,
+    "seen": 1792321244.0213487,
+    "ast_hash": "721e1fdcd271032803527190048a4220",
+    "semantic_hash": "721e1fdcd271032803527190048a4220"
+  },
+  "projects/returns-2.0/archive/user-story-before-changes/user-story-creation.v1.md": {
+    "mtime": 1791573896.7395306,
+    "seen": 1792321244.0213487,
+    "ast_hash": "3a2f4219f5d63d19f4c099d5a4572cfd",
+    "semantic_hash": "3a2f4219f5d63d19f4c099d5a4572cfd"
+  },
+  "projects/returns-2.0/archive/user-story-before-changes/user-story-lifecycle.v1.md": {
+    "mtime": 1790259585.4750454,
+    "seen": 1792321244.0213487,
+    "ast_hash": "41c79047eeaac426be85d5ef09235acb",
+    "semantic_hash": "41c79047eeaac426be85d5ef09235acb"
+  },
+  "projects/returns-2.0/archive/user-story-before-changes/user-story-view.v1.md": {
+    "mtime": 1790259502.2042131,
+    "seen": 1792321244.0213487,
+    "ast_hash": "e32d1815c5f9373238eda9757d1723d3",
+    "semantic_hash": "e32d1815c5f9373238eda9757d1723d3"
+  },
+  "projects/returns-2.0/archive/user-story-v1/user-story-channels.md": {
+    "mtime": 1790280547.7324963,
+    "seen": 1792321244.0213487,
+    "ast_hash": "5fdc2e3f37af7da724605c6d90f4cb92",
+    "semantic_hash": "5fdc2e3f37af7da724605c6d90f4cb92"
+  },
+  "projects/returns-2.0/archive/user-story-v1/user-story-creation.md": {
+    "mtime": 1790629561.509107,
+    "seen": 1792321244.0213487,
+    "ast_hash": "88268d5718d29f5566a2399661c9aa7f",
+    "semantic_hash": "88268d5718d29f5566a2399661c9aa7f"
+  },
+  "projects/returns-2.0/archive/user-story-v1/user-story-lifecycle.md": {
+    "mtime": 1790241225.383682,
+    "seen": 1792321244.0213487,
+    "ast_hash": "b62d5e19cd52aacdc4edda9dd31fa9f6",
+    "semantic_hash": "b62d5e19cd52aacdc4edda9dd31fa9f6"
+  },
+  "projects/returns-2.0/archive/user-story-v1/user-story-view.md": {
+    "mtime": 1790712441.776618,
+    "seen": 1792321244.0213487,
+    "ast_hash": "b86d54786da03c7436da2824be79fe20",
+    "semantic_hash": "b86d54786da03c7436da2824be79fe20"
+  },
+  "projects/returns-2.0/as-is/00-overview.md": {
+    "mtime": 1792161145.0335999,
+    "seen": 1792321244.0213487,
+    "ast_hash": "0cb559f9256c8ffa620bda283da5d1aa",
+    "semantic_hash": "0cb559f9256c8ffa620bda283da5d1aa"
+  },
+  "projects/returns-2.0/as-is/api/order-refund-get-positions_web.md": {
+    "mtime": 1789138948.4730062,
+    "seen": 1792321244.0213487,
+    "ast_hash": "adfd725ae6e34646c35f632fb56cd4ed",
+    "semantic_hash": "adfd725ae6e34646c35f632fb56cd4ed"
+  },
+  "projects/returns-2.0/as-is/carriers-physical-process.md": {
+    "mtime": 1791573896.7415333,
+    "seen": 1792321244.0213487,
+    "ast_hash": "fa6099356bb7ece9a242064f2f8e4c1a",
+    "semantic_hash": "fa6099356bb7ece9a242064f2f8e4c1a"
+  },
+  "projects/returns-2.0/as-is/mobile/01-load-order-card.md": {
+    "mtime": 1792161145.0346036,
+    "seen": 1792321244.0213487,
+    "ast_hash": "4cf1787e2b82f0030fd3b9f0739e7a1c",
+    "semantic_hash": "4cf1787e2b82f0030fd3b9f0739e7a1c"
+  },
+  "projects/returns-2.0/as-is/mobile/02-select-return-items.md": {
+    "mtime": 1789161957.498098,
+    "seen": 1792321244.0213487,
+    "ast_hash": "66d50c9388a9e0fc7888fa2b450ec987",
+    "semantic_hash": "66d50c9388a9e0fc7888fa2b450ec987"
+  },
+  "projects/returns-2.0/as-is/mobile/03-select-return-reasons.md": {
+    "mtime": 1792161145.0346036,
+    "seen": 1792321244.0213487,
+    "ast_hash": "ad60f9b7c74b1cc5c04a3feafbb89724",
+    "semantic_hash": "ad60f9b7c74b1cc5c04a3feafbb89724"
+  },
+  "projects/returns-2.0/as-is/mobile/04-select-city.md": {
+    "mtime": 1792161145.0346036,
+    "seen": 1792321244.0213487,
+    "ast_hash": "f4a7c3c8cca44a6c73d4dcb0ab9a289d",
+    "semantic_hash": "f4a7c3c8cca44a6c73d4dcb0ab9a289d"
+  },
+  "projects/returns-2.0/as-is/mobile/05-select-return-method.md": {
+    "mtime": 1792161145.0356078,
+    "seen": 1792321244.0213487,
+    "ast_hash": "59376d96d7409342f0794e38fed1a6a6",
+    "semantic_hash": "59376d96d7409342f0794e38fed1a6a6"
+  },
+  "projects/returns-2.0/as-is/mobile/06-confirm-return-details.md": {
+    "mtime": 1792161145.0356078,
+    "seen": 1792321244.0213487,
+    "ast_hash": "974bb9b6a6374d711a2fe5f9c6340503",
+    "semantic_hash": "974bb9b6a6374d711a2fe5f9c6340503"
+  },
+  "projects/returns-2.0/as-is/mobile/07-create-return.md": {
+    "mtime": 1792161145.0366087,
+    "seen": 1792321244.0213487,
+    "ast_hash": "c6ea71888a96c662a79d77f1798c7600",
+    "semantic_hash": "c6ea71888a96c662a79d77f1798c7600"
+  },
+  "projects/returns-2.0/as-is/return-ui-texts_front-vs-back.md": {
+    "mtime": 1791573896.7455335,
+    "seen": 1792321244.0213487,
+    "ast_hash": "0581dce7c4860167a8323fff57b5198a",
+    "semantic_hash": "0581dce7c4860167a8323fff57b5198a"
+  },
+  "projects/returns-2.0/as-is/web/01-entry-and-load-return-form.md": {
+    "mtime": 1792161145.0366087,
+    "seen": 1792321244.0213487,
+    "ast_hash": "6126fe4bbbd60101971be2eae368d485",
+    "semantic_hash": "6126fe4bbbd60101971be2eae368d485"
+  },
+  "projects/returns-2.0/as-is/web/02-select-return-items.md": {
+    "mtime": 1788819132.3464105,
+    "seen": 1792321244.0213487,
+    "ast_hash": "dcfa928dddf9534430774975486f6929",
+    "semantic_hash": "dcfa928dddf9534430774975486f6929"
+  },
+  "projects/returns-2.0/as-is/web/03-select-return-reason.md": {
+    "mtime": 1792161145.037617,
+    "seen": 1792321244.0213487,
+    "ast_hash": "23a60148d8f11d7a43d2a7847d9eb742",
+    "semantic_hash": "23a60148d8f11d7a43d2a7847d9eb742"
+  },
+  "projects/returns-2.0/as-is/web/04-select-city.md": {
+    "mtime": 1792161145.037617,
+    "seen": 1792321244.0213487,
+    "ast_hash": "505b439c19fcf766490dfab489bd169a",
+    "semantic_hash": "505b439c19fcf766490dfab489bd169a"
+  },
+  "projects/returns-2.0/as-is/web/05-select-return-method.md": {
+    "mtime": 1792161145.0386088,
+    "seen": 1792321244.0213487,
+    "ast_hash": "faf799810252798d293454e9238ca203",
+    "semantic_hash": "faf799810252798d293454e9238ca203"
+  },
+  "projects/returns-2.0/as-is/web/06-fill-return-method-details.md": {
+    "mtime": 1792161145.0386088,
+    "seen": 1792321244.0213487,
+    "ast_hash": "ddc526198c0ba747264233bdef6ae3ac",
+    "semantic_hash": "ddc526198c0ba747264233bdef6ae3ac"
+  },
+  "projects/returns-2.0/as-is/web/07-fill-bank-details.md": {
+    "mtime": 1792161145.0386088,
+    "seen": 1792321244.0213487,
+    "ast_hash": "545450be9cf2560e4d49c0ff9def1196",
+    "semantic_hash": "545450be9cf2560e4d49c0ff9def1196"
+  },
+  "projects/returns-2.0/as-is/web/08-confirm-and-create-return.md": {
+    "mtime": 1792161145.039609,
+    "seen": 1792321244.0213487,
+    "ast_hash": "639f24ea9f9ebb0cf37cba8950e508b9",
+    "semantic_hash": "639f24ea9f9ebb0cf37cba8950e508b9"
+  },
+  "projects/returns-2.0/requirements/adr/[2026-09-10 14-00] ADR-RET-001-no-edit-return-request-v1.md": {
+    "mtime": 1792090007.1851118,
+    "seen": 1792321244.0213487,
+    "ast_hash": "29f645c966150e5394862461b29e84d9",
+    "semantic_hash": "29f645c966150e5394862461b29e84d9"
+  },
+  "projects/returns-2.0/requirements/adr/[2026-09-10 14-00] ADR-RET-002-separate-return-request-entity-v1.md": {
+    "mtime": 1792003367.9770696,
+    "seen": 1792321244.0213487,
+    "ast_hash": "88688f7d123a1c07398a69d3dc457e6e",
+    "semantic_hash": "88688f7d123a1c07398a69d3dc457e6e"
+  },
+  "projects/returns-2.0/requirements/adr/[2026-09-10 14-00] ADR-RET-003-integrated-carrier-request-via-1c-v1.md": {
+    "mtime": 1791573915.684716,
+    "seen": 1792321244.0213487,
+    "ast_hash": "33395e6e3f5c76ff92935715d527ead5",
+    "semantic_hash": "33395e6e3f5c76ff92935715d527ead5"
+  },
+  "projects/returns-2.0/requirements/adr/[2026-09-10 14-00] ADR-RET-004-cancel-before-physical-handover-v1.md": {
+    "mtime": 1792003367.9770696,
+    "seen": 1792321244.0213487,
+    "ast_hash": "ae219d9e8d89be8b857b588c441649f7",
+    "semantic_hash": "ae219d9e8d89be8b857b588c441649f7"
+  },
+  "projects/returns-2.0/requirements/adr/[2026-09-10 14-00] ADR-RET-005-select-specific-handover-point-v1.md": {
+    "mtime": 1792003367.9780746,
+    "seen": 1792321244.0213487,
+    "ast_hash": "9bb5cc8b1243ccb80ce93bb95efbd85b",
+    "semantic_hash": "9bb5cc8b1243ccb80ce93bb95efbd85b"
+  },
+  "projects/returns-2.0/requirements/adr/[2026-09-10 14-00] ADR-RET-006-no-category-blocking-in-mvp-v1.md": {
+    "mtime": 1792003367.9780746,
+    "seen": 1792321244.0213487,
+    "ast_hash": "23c8437ed32b37cde12e82bc8d90fd18",
+    "semantic_hash": "23c8437ed32b37cde12e82bc8d90fd18"
+  },
+  "projects/returns-2.0/requirements/adr/[2026-09-10 14-00] ADR-RET-007-friendship-return-interface-v1.md": {
+    "mtime": 1791573915.6867163,
+    "seen": 1792321244.0213487,
+    "ast_hash": "3c4b597bf07f4f3d11834e358f1a4919",
+    "semantic_hash": "3c4b597bf07f4f3d11834e358f1a4919"
+  },
+  "projects/returns-2.0/requirements/adr/[2026-09-10 14-00] ADR-RET-008-prefill-return-method-v1.md": {
+    "mtime": 1792003367.9793973,
+    "seen": 1792321244.0213487,
+    "ast_hash": "7f9232de328e5a736b4932198a246c67",
+    "semantic_hash": "7f9232de328e5a736b4932198a246c67"
+  },
+  "projects/returns-2.0/requirements/adr/[2026-09-10 14-00] ADR-RET-009-return-completeness-v1.md": {
+    "mtime": 1792003367.9809017,
+    "seen": 1792321244.0213487,
+    "ast_hash": "73a193029177dbe8bc8ab9d287b37a23",
+    "semantic_hash": "73a193029177dbe8bc8ab9d287b37a23"
+  },
+  "projects/returns-2.0/requirements/adr/[2026-09-10 14-00] ADR-RET-010-geo-based-return-methods-v1.md": {
+    "mtime": 1792003367.9809017,
+    "seen": 1792321244.0213487,
+    "ast_hash": "f4bdd92a6584156e3f3f1d2e49d3ffbe",
+    "semantic_hash": "f4bdd92a6584156e3f3f1d2e49d3ffbe"
+  },
+  "projects/returns-2.0/requirements/adr/[2026-09-10 14-00] ADR-RET-011-no-russian-post-map-integration-v1.md": {
+    "mtime": 1792090007.1888528,
+    "seen": 1792321244.0213487,
+    "ast_hash": "82e0001629ac46048b3df3447a9975bb",
+    "semantic_hash": "82e0001629ac46048b3df3447a9975bb"
+  },
+  "projects/returns-2.0/requirements/adr/[2026-09-10 14-00] ADR-RET-012-separate-display-for-identical-items-v1.md": {
+    "mtime": 1792003367.9809017,
+    "seen": 1792321244.0213487,
+    "ast_hash": "cc437923f33989522f471a93f9688b67",
+    "semantic_hash": "cc437923f33989522f471a93f9688b67"
+  },
+  "projects/returns-2.0/requirements/adr/[2026-09-10 14-00] ADR-RET-013-no-duplicate-sms-notifications-v1.md": {
+    "mtime": 1792003367.9819071,
+    "seen": 1792321244.0213487,
+    "ast_hash": "0a5fbb46195d102671749d57a50018e6",
+    "semantic_hash": "0a5fbb46195d102671749d57a50018e6"
+  },
+  "projects/returns-2.0/requirements/adr/[2026-09-10 14-00] ADR-RET-054-courier-date-change-via-carrier-v1.md": {
+    "mtime": 1791792741.7954438,
+    "seen": 1792321244.0213487,
+    "ast_hash": "a7e92cbc8b9e4e0c3b281462495ebd6c",
+    "semantic_hash": "a7e92cbc8b9e4e0c3b281462495ebd6c"
+  },
+  "projects/returns-2.0/requirements/adr/[2026-09-11 11-29] ADR-RET-016-prefill-return-method-v2.md": {
+    "mtime": 1792003367.9819071,
+    "seen": 1792321244.0213487,
+    "ast_hash": "e8efca0b2ddd896d2626361e7709697a",
+    "semantic_hash": "e8efca0b2ddd896d2626361e7709697a"
+  },
+  "projects/returns-2.0/requirements/adr/[2026-09-17 15-01] ADR-RET-017-integrated-carrier-request-via-1c-v2.md": {
+    "mtime": 1791984334.6573608,
+    "seen": 1792321244.0213487,
+    "ast_hash": "a6f34531abc1d6c2686e0434b6172dd1",
+    "semantic_hash": "a6f34531abc1d6c2686e0434b6172dd1"
+  },
+  "projects/returns-2.0/requirements/adr/[2026-09-17 15-01] ADR-RET-022-warehouse-return-without-application-v1.md": {
+    "mtime": 1791573896.7536895,
+    "seen": 1792321244.0213487,
+    "ast_hash": "2557a609a06de28564b37584fc67fe36",
+    "semantic_hash": "2557a609a06de28564b37584fc67fe36"
+  },
+  "projects/returns-2.0/requirements/adr/[2026-09-17 15-01] ADR-RET-023-no-duplicate-sms-notifications-v2.md": {
+    "mtime": 1792003367.9829063,
+    "seen": 1792321244.0213487,
+    "ast_hash": "166deed6259175f4334a7e67b493e475",
+    "semantic_hash": "166deed6259175f4334a7e67b493e475"
+  },
+  "projects/returns-2.0/requirements/adr/[2026-09-17 15-01] ADR-RET-024-electronic-return-application-storage-v1.md": {
+    "mtime": 1792090007.1953893,
+    "seen": 1792321244.0213487,
+    "ast_hash": "c461a80d9fe4a01ec5bfb0a85aa5964b",
+    "semantic_hash": "c461a80d9fe4a01ec5bfb0a85aa5964b"
+  },
+  "projects/returns-2.0/requirements/adr/[2026-09-17 15-01] ADR-RET-025-store-walk-in-return-verification-v1.md": {
+    "mtime": 1791573896.7556932,
+    "seen": 1792321244.0213487,
+    "ast_hash": "0e50592682cfca62a1830050ef4338bb",
+    "semantic_hash": "0e50592682cfca62a1830050ef4338bb"
+  },
+  "projects/returns-2.0/requirements/adr/[2026-09-24 15-01] ADR-RET-018-return-master-system-v1.md": {
+    "mtime": 1792090007.1923654,
+    "seen": 1792321244.0213487,
+    "ast_hash": "d12a7aafb1b500f078e78d9259c58461",
+    "semantic_hash": "d12a7aafb1b500f078e78d9259c58461"
+  },
+  "projects/returns-2.0/requirements/adr/[2026-09-24 15-01] ADR-RET-019-return-order-status-separation-v1.md": {
+    "mtime": 1791573896.7566946,
+    "seen": 1792321244.0213487,
+    "ast_hash": "9c9ea26f3cd8580a0980e731c5e2aed4",
+    "semantic_hash": "9c9ea26f3cd8580a0980e731c5e2aed4"
+  },
+  "projects/returns-2.0/requirements/adr/[2026-09-24 15-01] ADR-RET-020-refund-details-minimal-set-v1.md": {
+    "mtime": 1792003367.9839075,
+    "seen": 1792321244.0213487,
+    "ast_hash": "1b5a196fa231e6e6de534e08b962e61d",
+    "semantic_hash": "1b5a196fa231e6e6de534e08b962e61d"
+  },
+  "projects/returns-2.0/requirements/adr/[2026-09-24 15-01] ADR-RET-021-geo-based-return-methods-v2.md": {
+    "mtime": 1792003367.9839075,
+    "seen": 1792321244.0213487,
+    "ast_hash": "dc98f4d0cfdaeb2ddcf8b56010958ece",
+    "semantic_hash": "dc98f4d0cfdaeb2ddcf8b56010958ece"
+  },
+  "projects/returns-2.0/requirements/adr/[2026-09-25 13-30] ADR-RET-015-return-tag-without-order-status-change-v1.md": {
+    "mtime": 1792003367.9839075,
+    "seen": 1792321244.0213487,
+    "ast_hash": "e02c375035fa729f292089bca21786b5",
+    "semantic_hash": "e02c375035fa729f292089bca21786b5"
+  },
+  "projects/returns-2.0/requirements/adr/[2026-09-25 13-30] ADR-RET-026-friendship-return-creation-flow-v1.md": {
+    "mtime": 1791573896.7602,
+    "seen": 1792321244.0213487,
+    "ast_hash": "bd689389a96540aeee017a91356601fb",
+    "semantic_hash": "bd689389a96540aeee017a91356601fb"
+  },
+  "projects/returns-2.0/requirements/adr/[2026-09-25 13-30] ADR-RET-027-return-reason-storage-in-retailcrm-v1.md": {
+    "mtime": 1791573896.7602,
+    "seen": 1792321244.0213487,
+    "ast_hash": "44fdbc59fba06f97348053ac7ed8b45f",
+    "semantic_hash": "44fdbc59fba06f97348053ac7ed8b45f"
+  },
+  "projects/returns-2.0/requirements/adr/[2026-09-25 13-30] ADR-RET-028-identical-items-quantity-in-retailcrm-v1.md": {
+    "mtime": 1791573896.7612045,
+    "seen": 1792321244.0213487,
+    "ast_hash": "e027dcfd872c659ba06d030264ae4ac9",
+    "semantic_hash": "e027dcfd872c659ba06d030264ae4ac9"
+  },
+  "projects/returns-2.0/requirements/adr/[2026-09-25 13-30] ADR-RET-029-return-status-model-mvp-v1.md": {
+    "mtime": 1792003367.9856935,
+    "seen": 1792321244.0213487,
+    "ast_hash": "b882aec026e52785737ed996a658a09c",
+    "semantic_hash": "b882aec026e52785737ed996a658a09c"
+  },
+  "projects/returns-2.0/requirements/adr/[2026-09-25 13-30] ADR-RET-030-returns-integration-gateway-v1.md": {
+    "mtime": 1791573896.7622046,
+    "seen": 1792321244.0213487,
+    "ast_hash": "6a1f5e6ed8696e91c652ea7c95770da7",
+    "semantic_hash": "6a1f5e6ed8696e91c652ea7c95770da7"
+  },
+  "projects/returns-2.0/requirements/adr/[2026-09-25 13-30] ADR-RET-031-refund-details-in-retailcrm-v1.md": {
+    "mtime": 1792003367.9856935,
+    "seen": 1792321244.0213487,
+    "ast_hash": "9c9bbf7821f60e9d875233a26905f357",
+    "semantic_hash": "9c9bbf7821f60e9d875233a26905f357"
+  },
+  "projects/returns-2.0/requirements/adr/[2026-09-25 13-30] ADR-RET-032-store-walk-in-return-processing-v1.md": {
+    "mtime": 1791573896.7632048,
+    "seen": 1792321244.0213487,
+    "ast_hash": "10cf8cb0aba532ad0438a2d362740651",
+    "semantic_hash": "10cf8cb0aba532ad0438a2d362740651"
+  },
+  "projects/returns-2.0/requirements/adr/[2026-10-01 14-59] ADR-RET-014-friendship-return-interface-v2.md": {
+    "mtime": 1792003367.9866989,
+    "seen": 1792321244.0213487,
+    "ast_hash": "75d05a0f3c6ef51224e840c4c57aea04",
+    "semantic_hash": "75d05a0f3c6ef51224e840c4c57aea04"
+  },
+  "projects/returns-2.0/requirements/adr/[2026-10-01 14-59] ADR-RET-033-return-auto-cancel-v1.md": {
+    "mtime": 1792003367.9866989,
+    "seen": 1792321244.0213487,
+    "ast_hash": "d505fe3a68c58699b18244cc3853b3d8",
+    "semantic_hash": "d505fe3a68c58699b18244cc3853b3d8"
+  },
+  "projects/returns-2.0/requirements/adr/[2026-10-01 14-59] ADR-RET-034-fnf-return-period-v1.md": {
+    "mtime": 1791573896.7652044,
+    "seen": 1792321244.0213487,
+    "ast_hash": "52f89bcaf1fe6770f1f3117725bffadf",
+    "semantic_hash": "52f89bcaf1fe6770f1f3117725bffadf"
+  },
+  "projects/returns-2.0/requirements/adr/[2026-10-01 14-59] ADR-RET-035-store-return-acceptance-v1.md": {
+    "mtime": 1791573896.7652044,
+    "seen": 1792321244.0213487,
+    "ast_hash": "09a8a881e809a5b0e0e3748a3e1dea58",
+    "semantic_hash": "09a8a881e809a5b0e0e3748a3e1dea58"
+  },
+  "projects/returns-2.0/requirements/adr/[2026-10-01 14-59] ADR-RET-036-return-numbering-master-v1.md": {
+    "mtime": 1791573896.7667081,
+    "seen": 1792321244.0213487,
+    "ast_hash": "e8394ef46133a152b3a4c1b62901cb7e",
+    "semantic_hash": "e8394ef46133a152b3a4c1b62901cb7e"
+  },
+  "projects/returns-2.0/requirements/adr/[2026-10-01 14-59] ADR-RET-037-warehouse-return-without-application-v2.md": {
+    "mtime": 1791573896.7667081,
+    "seen": 1792321244.0213487,
+    "ast_hash": "200e03e992d82a5c397c60d9cc0a852a",
+    "semantic_hash": "200e03e992d82a5c397c60d9cc0a852a"
+  },
+  "projects/returns-2.0/requirements/adr/[2026-10-01 14-59] ADR-RET-038-store-walk-in-return-processing-v2.md": {
+    "mtime": 1791573896.7677119,
+    "seen": 1792321244.0213487,
+    "ast_hash": "488f9cee01a3bd8833be1672b9e35c0d",
+    "semantic_hash": "488f9cee01a3bd8833be1672b9e35c0d"
+  },
+  "projects/returns-2.0/requirements/adr/[2026-10-02 10-00] ADR-RET-039-return-tag-without-order-status-change-v2.md": {
+    "mtime": 1792090007.198395,
+    "seen": 1792321244.0213487,
+    "ast_hash": "bd1d6146a3f61815119b59320892c7ed",
+    "semantic_hash": "bd1d6146a3f61815119b59320892c7ed"
+  },
+  "projects/returns-2.0/requirements/adr/[2026-10-02 10-00] ADR-RET-040-return-status-model-mvp-v2.md": {
+    "mtime": 1791573896.7677119,
+    "seen": 1792321244.0213487,
+    "ast_hash": "c59d6852c05943c628d68c286fe5f11e",
+    "semantic_hash": "c59d6852c05943c628d68c286fe5f11e"
+  },
+  "projects/returns-2.0/requirements/adr/[2026-10-02 10-00] ADR-RET-041-return-expertise-out-of-scope-v1.md": {
+    "mtime": 1791573896.7692146,
+    "seen": 1792321244.0213487,
+    "ast_hash": "495f2a548add2bbd89a9c4408666b811",
+    "semantic_hash": "495f2a548add2bbd89a9c4408666b811"
+  },
+  "projects/returns-2.0/requirements/adr/[2026-10-02 10-00] ADR-RET-042-return-reason-immutability-v1.md": {
+    "mtime": 1791573896.7697294,
+    "seen": 1792321244.0213487,
+    "ast_hash": "2e56d740c3c1ac761bf8c70fc45fb833",
+    "semantic_hash": "2e56d740c3c1ac761bf8c70fc45fb833"
+  },
+  "projects/returns-2.0/requirements/adr/[2026-10-02 10-00] ADR-RET-043-paper-application-out-of-system-v1.md": {
+    "mtime": 1791573896.7697294,
+    "seen": 1792321244.0213487,
+    "ast_hash": "04ad7e9bbabb9efc95aa6a5cefc15d69",
+    "semantic_hash": "04ad7e9bbabb9efc95aa6a5cefc15d69"
+  },
+  "projects/returns-2.0/requirements/adr/[2026-10-02 10-00] ADR-RET-044-returns-integration-gateway-v2.md": {
+    "mtime": 1792090007.2024066,
+    "seen": 1792321244.0213487,
+    "ast_hash": "ce37e1ce336ec73e1074add3c2e91b2c",
+    "semantic_hash": "ce37e1ce336ec73e1074add3c2e91b2c"
+  },
+  "projects/returns-2.0/requirements/adr/[2026-10-02 10-00] ADR-RET-045-refund-details-in-retailcrm-v2.md": {
+    "mtime": 1791573896.7712727,
+    "seen": 1792321244.0213487,
+    "ast_hash": "0de6bc0849bfa42969c14bde9bbc4652",
+    "semantic_hash": "0de6bc0849bfa42969c14bde9bbc4652"
+  },
+  "projects/returns-2.0/requirements/adr/[2026-10-05 11-03] ADR-RET-065-identical-units-repeat-return-v1.md": {
+    "mtime": 1792089963.6144905,
+    "seen": 1792321244.0213487,
+    "ast_hash": "f02923ec8890f505137d46ef5ede14a7",
+    "semantic_hash": "f02923ec8890f505137d46ef5ede14a7"
+  },
+  "projects/returns-2.0/requirements/adr/[2026-10-05 11-03] ADR-RET-066-store-return-with-existing-request-v1.md": {
+    "mtime": 1792090014.288683,
+    "seen": 1792321244.0213487,
+    "ast_hash": "de6f58c6919c6755e97d83a836854e89",
+    "semantic_hash": "de6f58c6919c6755e97d83a836854e89"
+  },
+  "projects/returns-2.0/requirements/adr/[2026-10-05 11-03] ADR-RET-067-returns-transition-period-v1.md": {
+    "mtime": 1792089964.119117,
+    "seen": 1792321244.0213487,
+    "ast_hash": "b943b9582b631516fa0896aba8b4964d",
+    "semantic_hash": "b943b9582b631516fa0896aba8b4964d"
+  },
+  "projects/returns-2.0/requirements/adr/[2026-10-05 11-03] ADR-RET-068-admin-return-availability-check-v1.md": {
+    "mtime": 1792089964.3380785,
+    "seen": 1792321244.0213487,
+    "ast_hash": "cdd839b0c7ef6d6616d95e952de2ad05",
+    "semantic_hash": "cdd839b0c7ef6d6616d95e952de2ad05"
+  },
+  "projects/returns-2.0/requirements/adr/[2026-10-05 11-03] ADR-RET-069-returns-feature-flag-v1.md": {
+    "mtime": 1792089964.542738,
+    "seen": 1792321244.0213487,
+    "ast_hash": "b0a8a658b7b4cad4ae7a911c4ea97cc1",
+    "semantic_hash": "b0a8a658b7b4cad4ae7a911c4ea97cc1"
+  },
+  "projects/returns-2.0/requirements/adr/[2026-10-07 14-00] ADR-RET-047-order-card-return-block-v1.md": {
+    "mtime": 1791573896.7712727,
+    "seen": 1792321244.0213487,
+    "ast_hash": "cc50f7c1f828b53405fe14ab46a81b28",
+    "semantic_hash": "cc50f7c1f828b53405fe14ab46a81b28"
+  },
+  "projects/returns-2.0/requirements/adr/[2026-10-07 14-00] ADR-RET-048-return-status-history-post-mvp-v1.md": {
+    "mtime": 1791573896.7722764,
+    "seen": 1792321244.0213487,
+    "ast_hash": "a488b30f6e1158092eed31d19b33b7b6",
+    "semantic_hash": "a488b30f6e1158092eed31d19b33b7b6"
+  },
+  "projects/returns-2.0/requirements/adr/[2026-10-07 16-30] ADR-RET-046-refund-for-certificate-payment-v1.md": {
+    "mtime": 1791573896.773276,
+    "seen": 1792321244.0213487,
+    "ast_hash": "9dfae8f5945729b696c84d66e3aa366b",
+    "semantic_hash": "9dfae8f5945729b696c84d66e3aa366b"
+  },
+  "projects/returns-2.0/requirements/adr/[2026-10-07 16-30] ADR-RET-049-returns-web-and-mobile-together-v1.md": {
+    "mtime": 1792003367.9886985,
+    "seen": 1792321244.0213487,
+    "ast_hash": "8d51de28390faf478e22b0bdd75ba581",
+    "semantic_hash": "8d51de28390faf478e22b0bdd75ba581"
+  },
+  "projects/returns-2.0/requirements/adr/[2026-10-07 16-30] ADR-RET-050-requirements-first-contracts-later-v1.md": {
+    "mtime": 1792003367.9886985,
+    "seen": 1792321244.0213487,
+    "ast_hash": "2b65f20e6e5f26c9a8bc178ee416d863",
+    "semantic_hash": "2b65f20e6e5f26c9a8bc178ee416d863"
+  },
+  "projects/returns-2.0/requirements/adr/[2026-10-07 16-30] ADR-RET-051-store-walk-in-return-processing-v3.md": {
+    "mtime": 1791573896.7748528,
+    "seen": 1792321244.0213487,
+    "ast_hash": "59181fee08ae698fc6d57a118514cc67",
+    "semantic_hash": "59181fee08ae698fc6d57a118514cc67"
+  },
+  "projects/returns-2.0/requirements/adr/[2026-10-08 15-01] ADR-RET-052-refund-period-client-message-v1.md": {
+    "mtime": 1791573896.7748528,
+    "seen": 1792321244.0213487,
+    "ast_hash": "9846ca49fe7bdf0a5b8dea7172530218",
+    "semantic_hash": "9846ca49fe7bdf0a5b8dea7172530218"
+  },
+  "projects/returns-2.0/requirements/adr/[2026-10-08 15-01] ADR-RET-053-return-auto-cancel-v2.md": {
+    "mtime": 1792003367.989699,
+    "seen": 1792321244.0213487,
+    "ast_hash": "f24a49b3019f21cb2e52da086bdacc46",
+    "semantic_hash": "f24a49b3019f21cb2e52da086bdacc46"
+  },
+  "projects/returns-2.0/requirements/adr/[2026-10-12 13-01] ADR-RET-070-exchange-via-return-order-v1.md": {
+    "mtime": 1792089964.7463222,
+    "seen": 1792321244.0213487,
+    "ast_hash": "dbd51b5b0e1c9ae4118fc30df7929f03",
+    "semantic_hash": "dbd51b5b0e1c9ae4118fc30df7929f03"
+  },
+  "projects/returns-2.0/requirements/adr/[2026-10-12 13-01] ADR-RET-073-identical-units-repeat-return-v2.md": {
+    "mtime": 1792183769.2897937,
+    "seen": 1792321244.0213487,
+    "ast_hash": "23a7566ffef42980fe28ce1aec4896de",
+    "semantic_hash": "23a7566ffef42980fe28ce1aec4896de"
+  },
+  "projects/returns-2.0/requirements/adr/[2026-10-14 11-59] ADR-RET-055-return-method-instruction-storage-v1.md": {
+    "mtime": 1792003367.989699,
+    "seen": 1792321244.0213487,
+    "ast_hash": "2cbda49b59672b1369b3772d5bce5f26",
+    "semantic_hash": "2cbda49b59672b1369b3772d5bce5f26"
+  },
+  "projects/returns-2.0/requirements/adr/[2026-10-14 11-59] ADR-RET-056-return-point-map-external-app-v1.md": {
+    "mtime": 1792090007.206422,
+    "seen": 1792321244.0213487,
+    "ast_hash": "3f54dfbc12e06a30a1d067d728cf9a42",
+    "semantic_hash": "3f54dfbc12e06a30a1d067d728cf9a42"
+  },
+  "projects/returns-2.0/requirements/adr/[2026-10-14 11-59] ADR-RET-057-courier-intervals-from-logistics-v1.md": {
+    "mtime": 1792090007.2161102,
+    "seen": 1792321244.0213487,
+    "ast_hash": "c8a101f44fa9b857a6228ecb43d44eba",
+    "semantic_hash": "c8a101f44fa9b857a6228ecb43d44eba"
+  },
+  "projects/returns-2.0/requirements/adr/[2026-10-14 11-59] ADR-RET-058-return-documents-separate-story-v1.md": {
+    "mtime": 1792090007.2089233,
+    "seen": 1792321244.0213487,
+    "ast_hash": "38a181f8c2fcfb17ba0654e565c93fdc",
+    "semantic_hash": "38a181f8c2fcfb17ba0654e565c93fdc"
+  },
+  "projects/returns-2.0/requirements/adr/[2026-10-14 11-59] ADR-RET-059-returns-admin-view-only-v1.md": {
+    "mtime": 1791973041.2872188,
+    "seen": 1792321244.0213487,
+    "ast_hash": "c3237ecf9107314a10c88d5b5b86482f",
+    "semantic_hash": "c3237ecf9107314a10c88d5b5b86482f"
+  },
+  "projects/returns-2.0/requirements/adr/[2026-10-14 15-00] ADR-RET-060-geo-based-return-methods-v3.md": {
+    "mtime": 1792073503.4975734,
+    "seen": 1792321244.0213487,
+    "ast_hash": "dde330df3d552c336085638bf1db6860",
+    "semantic_hash": "dde330df3d552c336085638bf1db6860"
+  },
+  "projects/returns-2.0/requirements/adr/[2026-10-14 15-00] ADR-RET-061-return-delivery-type-v1.md": {
+    "mtime": 1791985288.853776,
+    "seen": 1792321244.0213487,
+    "ast_hash": "6c4c6acd1c365957ee065bc9a6d6aa95",
+    "semantic_hash": "6c4c6acd1c365957ee065bc9a6d6aa95"
+  },
+  "projects/returns-2.0/requirements/adr/[2026-10-14 15-00] ADR-RET-062-intervals-request-timezone-v1.md": {
+    "mtime": 1791984275.9375012,
+    "seen": 1792321244.0213487,
+    "ast_hash": "29817e77b73d0954640a907d6b236b4e",
+    "semantic_hash": "29817e77b73d0954640a907d6b236b4e"
+  },
+  "projects/returns-2.0/requirements/adr/[2026-10-14 15-00] ADR-RET-063-courier-date-range-v1.md": {
+    "mtime": 1792003367.9922104,
+    "seen": 1792321244.0213487,
+    "ast_hash": "3eb6b6d37e4b39b7056dba70c1e454ea",
+    "semantic_hash": "3eb6b6d37e4b39b7056dba70c1e454ea"
+  },
+  "projects/returns-2.0/requirements/adr/[2026-10-14 15-00] ADR-RET-064-return-bonus-points-separate-story-v1.md": {
+    "mtime": 1792195760.3254218,
+    "seen": 1792321244.0213487,
+    "ast_hash": "979f4c87a64e88bd1e53a804a2056aec",
+    "semantic_hash": "979f4c87a64e88bd1e53a804a2056aec"
+  },
+  "projects/returns-2.0/requirements/adr/[2026-10-15 15-00] ADR-RET-071-courier-intervals-from-logistics-v2.md": {
+    "mtime": 1792089964.9716692,
+    "seen": 1792321244.0213487,
+    "ast_hash": "8756f7636b2a10bf8518e6a5d89f7129",
+    "semantic_hash": "8756f7636b2a10bf8518e6a5d89f7129"
+  },
+  "projects/returns-2.0/requirements/adr/[2026-10-15 15-00] ADR-RET-072-kaliningrad-returns-to-store-v1.md": {
+    "mtime": 1792089965.18218,
+    "seen": 1792321244.0213487,
+    "ast_hash": "bd8ba2bff2e98b8409806d586a94e751",
+    "semantic_hash": "bd8ba2bff2e98b8409806d586a94e751"
+  },
+  "projects/returns-2.0/requirements/backend/US-01/[B] return-method-instruction-admin_task.md": {
+    "mtime": 1792160294.273,
+    "seen": 1792321244.0213487,
+    "ast_hash": "d3efb5113394cf499dd4cac0c2928907",
+    "semantic_hash": "d3efb5113394cf499dd4cac0c2928907"
+  },
+  "projects/returns-2.0/requirements/backend/US-01/[B][Mobile API] order-card-return_task-v2.md": {
+    "mtime": 1792171233.3671799,
+    "seen": 1792321244.0213487,
+    "ast_hash": "a2d3d219eb510410a936e62f43e6b622",
+    "semantic_hash": "a2d3d219eb510410a936e62f43e6b622"
+  },
+  "projects/returns-2.0/requirements/backend/US-01/[B][Mobile API] order-card-return_task.md": {
+    "mtime": 1792161145.039609,
+    "seen": 1792321244.0213487,
+    "ast_hash": "ff3838415d1e2727ab4221e639321e64",
+    "semantic_hash": "ff3838415d1e2727ab4221e639321e64"
+  },
+  "projects/returns-2.0/requirements/backend/US-01/[B][Web] order-card-return_task-v2.md": {
+    "mtime": 1792169863.7105958,
+    "seen": 1792321244.0213487,
+    "ast_hash": "9b8600cb72ba594d017c4210377b7a5c",
+    "semantic_hash": "9b8600cb72ba594d017c4210377b7a5c"
+  },
+  "projects/returns-2.0/requirements/backend/US-01/[B][Web] order-card-return_task.md": {
+    "mtime": 1791289906.3875768,
+    "seen": 1792321244.0213487,
+    "ast_hash": "87b7d81a81d091d512e318c93d8ba074",
+    "semantic_hash": "87b7d81a81d091d512e318c93d8ba074"
+  },
+  "projects/returns-2.0/requirements/backend/US-01/[B][Web] refund-get-positions_task-v2.md": {
+    "mtime": 1792171229.3544266,
+    "seen": 1792321244.0213487,
+    "ast_hash": "5aa250f0103887b7ec3d3b9d8bf96e07",
+    "semantic_hash": "5aa250f0103887b7ec3d3b9d8bf96e07"
+  },
+  "projects/returns-2.0/requirements/backend/US-01/[B][Web] refund-get-positions_task.md": {
+    "mtime": 1791289951.4442408,
+    "seen": 1792321244.0213487,
+    "ast_hash": "94d07f53f7739aa7723a66da48fd8856",
+    "semantic_hash": "94d07f53f7739aa7723a66da48fd8856"
+  },
+  "projects/returns-2.0/requirements/backend/US-01/stores/[B] return-availability-flags_task.md": {
+    "mtime": 1791378989.5403318,
+    "seen": 1792321244.0213487,
+    "ast_hash": "4f269a67c06d0ed098f6fcb4530a306f",
+    "semantic_hash": "4f269a67c06d0ed098f6fcb4530a306f"
+  },
+  "projects/returns-2.0/requirements/backend/US-01/stores/[B][Mobile API] return-store-detail_task.md": {
+    "mtime": 1791378501.816494,
+    "seen": 1792321244.0213487,
+    "ast_hash": "002b5fa66cac211090d8078757e572bd",
+    "semantic_hash": "002b5fa66cac211090d8078757e572bd"
+  },
+  "projects/returns-2.0/requirements/backend/US-01/stores/[B][Mobile API] return-stores-list_task.md": {
+    "mtime": 1791378989.5801315,
+    "seen": 1792321244.0213487,
+    "ast_hash": "27e0b97e00236507d3215df2bcf3a906",
+    "semantic_hash": "27e0b97e00236507d3215df2bcf3a906"
+  },
+  "projects/returns-2.0/requirements/backend/US-01/stores/[B][Mobile API][Gate] return-store-detail_task.md": {
+    "mtime": 1791378501.8890507,
+    "seen": 1792321244.0213487,
+    "ast_hash": "692bc2a4efe2771a8c98e489b2a93fa1",
+    "semantic_hash": "692bc2a4efe2771a8c98e489b2a93fa1"
+  },
+  "projects/returns-2.0/requirements/backend/US-01/stores/[B][Mobile API][Gate] return-stores-list_task.md": {
+    "mtime": 1791377316.8086598,
+    "seen": 1792321244.0213487,
+    "ast_hash": "76fc57c2e1d5cb50f0c1fa47e05b23a6",
+    "semantic_hash": "76fc57c2e1d5cb50f0c1fa47e05b23a6"
+  },
+  "projects/returns-2.0/requirements/backend/US-01/stores/[B][Web] return-stores-list_task.md": {
+    "mtime": 1791378989.589143,
+    "seen": 1792321244.0213487,
+    "ast_hash": "95d890bd641c8c579e23ece6b12c4c58",
+    "semantic_hash": "95d890bd641c8c579e23ece6b12c4c58"
+  },
+  "projects/returns-2.0/requirements/backend/available-return-quantity_backend.md": {
+    "mtime": 1789147428.6752279,
+    "seen": 1792321244.0213487,
+    "ast_hash": "b99265e2562a4551d8bbe6566a1b23a3",
+    "semantic_hash": "b99265e2562a4551d8bbe6566a1b23a3"
+  },
+  "projects/returns-2.0/requirements/backend/return-eligibility_backend.md": {
+    "mtime": 1792161145.0406084,
+    "seen": 1792321244.0213487,
+    "ast_hash": "6e7f98fc8334d41c1f7a3bde34b03660",
+    "semantic_hash": "6e7f98fc8334d41c1f7a3bde34b03660"
+  },
+  "projects/returns-2.0/requirements/backend/return-entity_data-model_task.md": {
+    "mtime": 1792161188.8314133,
+    "seen": 1792321244.0213487,
+    "ast_hash": "299891f7fe055c9fbd96cfce642e471e",
+    "semantic_hash": "299891f7fe055c9fbd96cfce642e471e"
+  },
+  "projects/returns-2.0/requirements/brd.md": {
+    "mtime": 1792161145.0426078,
+    "seen": 1792321244.0213487,
+    "ast_hash": "8adf0bdd0bb85e103563edafb8aea4a4",
+    "semantic_hash": "8adf0bdd0bb85e103563edafb8aea4a4"
+  },
+  "projects/returns-2.0/requirements/diagrams/erd/return-entity-overview_erd.md": {
+    "mtime": 1792075152.7501647,
+    "seen": 1792321244.0213487,
+    "ast_hash": "c558edf140c16d8690a8f717b63fa995",
+    "semantic_hash": "c558edf140c16d8690a8f717b63fa995"
+  },
+  "projects/returns-2.0/requirements/diagrams/erd/return-entity_erd.md": {
+    "mtime": 1791573896.7805307,
+    "seen": 1792321244.0213487,
+    "ast_hash": "5f20e7aa9247b830aa535b617420cc9f",
+    "semantic_hash": "5f20e7aa9247b830aa535b617420cc9f"
+  },
+  "projects/returns-2.0/requirements/diagrams/erd/return-entity_erd_merged.md": {
+    "mtime": 1791397817.6451957,
+    "seen": 1792321244.0213487,
+    "ast_hash": "89964572ea7571109b8fa607fb1db774",
+    "semantic_hash": "89964572ea7571109b8fa607fb1db774"
+  },
+  "projects/returns-2.0/requirements/diagrams/state/return-status_state.md": {
+    "mtime": 1792191240.215991,
+    "seen": 1792321244.0213487,
+    "ast_hash": "3bbe995aa18503478cdd2787a23da0fb",
+    "semantic_hash": "3bbe995aa18503478cdd2787a23da0fb"
+  },
+  "projects/returns-2.0/requirements/index.md": {
+    "mtime": 1792161145.043607,
+    "seen": 1792321244.0213487,
+    "ast_hash": "6b5cb4e41f4aea49c3de5793700c3a16",
+    "semantic_hash": "6b5cb4e41f4aea49c3de5793700c3a16"
+  },
+  "projects/returns-2.0/requirements/nfr/returns-monitoring_nfr.md": {
+    "mtime": 1792179051.2510068,
+    "seen": 1792321244.0213487,
+    "ast_hash": "167c389c2d819d80c0d0e4e4fced229d",
+    "semantic_hash": "167c389c2d819d80c0d0e4e4fced229d"
+  },
+  "projects/returns-2.0/requirements/questions/refund-bonus_questions.md": {
+    "mtime": 1792195455.4808571,
+    "seen": 1792321244.0213487,
+    "ast_hash": "908425be633696afb8909a8aed66930c",
+    "semantic_hash": "908425be633696afb8909a8aed66930c"
+  },
+  "projects/returns-2.0/requirements/questions/refund-payment_questions.md": {
+    "mtime": 1791995833.5787098,
+    "seen": 1792321244.0213487,
+    "ast_hash": "44f3ae3070d8d29b03d779363a231ce1",
+    "semantic_hash": "44f3ae3070d8d29b03d779363a231ce1"
+  },
+  "projects/returns-2.0/requirements/screen-spec/screen-spec.md": {
+    "mtime": 1792161145.045609,
+    "seen": 1792321244.0213487,
+    "ast_hash": "8c31fe63d4870b86c75b7878e36786a1",
+    "semantic_hash": "8c31fe63d4870b86c75b7878e36786a1"
+  },
+  "projects/returns-2.0/requirements/srs/post mvp/srs-mobile-post-mvp.md": {
+    "mtime": 1792161162.1212416,
+    "seen": 1792321244.0213487,
+    "ast_hash": "19981b419da2df0c82e7dab97152d133",
+    "semantic_hash": "19981b419da2df0c82e7dab97152d133"
+  },
+  "projects/returns-2.0/requirements/srs/post mvp/srs-mobile-post-mvp_wiki.md": {
+    "mtime": 1792161162.1222348,
+    "seen": 1792321244.0213487,
+    "ast_hash": "78f896ad6e7782cf88f97f845c819dad",
+    "semantic_hash": "78f896ad6e7782cf88f97f845c819dad"
+  },
+  "projects/returns-2.0/requirements/srs/post mvp/srs-web-post-mvp.md": {
+    "mtime": 1792161162.1222348,
+    "seen": 1792321244.0213487,
+    "ast_hash": "783452d3c2ecec5771832a80d25fca6e",
+    "semantic_hash": "783452d3c2ecec5771832a80d25fca6e"
+  },
+  "projects/returns-2.0/requirements/srs/srs-mobile-mvp.md": {
+    "mtime": 1792196957.742904,
+    "seen": 1792321244.0213487,
+    "ast_hash": "8520fa80de37b208e5b15bd0d8bc2afb",
+    "semantic_hash": "8520fa80de37b208e5b15bd0d8bc2afb"
+  },
+  "projects/returns-2.0/requirements/srs/srs-mobile-mvp_wiki.md": {
+    "mtime": 1792196957.7449057,
+    "seen": 1792321244.0213487,
+    "ast_hash": "5f5b4151e6c991a0519196af438a8c9a",
+    "semantic_hash": "5f5b4151e6c991a0519196af438a8c9a"
+  },
+  "projects/returns-2.0/requirements/srs/srs-web-mvp.md": {
+    "mtime": 1792196957.7439046,
+    "seen": 1792321244.0213487,
+    "ast_hash": "ed5dfc7949941ac1c9f0968057eea163",
+    "semantic_hash": "ed5dfc7949941ac1c9f0968057eea163"
+  },
+  "projects/returns-2.0/requirements/srs/srs-web-mvp_wiki.md": {
+    "mtime": 1792196957.7459054,
+    "seen": 1792321244.0213487,
+    "ast_hash": "77dff224667b5e80e3b138f4309d561b",
+    "semantic_hash": "77dff224667b5e80e3b138f4309d561b"
+  },
+  "projects/returns-2.0/requirements/steps/mobile/01-load-order-card.md": {
+    "mtime": 1791573896.785033,
+    "seen": 1792321244.0213487,
+    "ast_hash": "d81051db7edd4276cc59291efa86edf6",
+    "semantic_hash": "d81051db7edd4276cc59291efa86edf6"
+  },
+  "projects/returns-2.0/requirements/steps/mobile/04-prefill-city-method-point.md": {
+    "mtime": 1791573915.7081509,
+    "seen": 1792321244.0213487,
+    "ast_hash": "3adaafac3ec35d09c589a153a1ebfdaa",
+    "semantic_hash": "3adaafac3ec35d09c589a153a1ebfdaa"
+  },
+  "projects/returns-2.0/requirements/steps/web/01-entry-and-load-return-form.md": {
+    "mtime": 1791573896.786543,
+    "seen": 1792321244.0213487,
+    "ast_hash": "d9141b428781e66e7ea3df8f648f372a",
+    "semantic_hash": "d9141b428781e66e7ea3df8f648f372a"
+  },
+  "projects/returns-2.0/requirements/traceability.md": {
+    "mtime": 1792161145.0446088,
+    "seen": 1792321244.0213487,
+    "ast_hash": "91eb696b9b0debb9a1b1c662e6e5cf8e",
+    "semantic_hash": "91eb696b9b0debb9a1b1c662e6e5cf8e"
+  },
+  "projects/returns-2.0/requirements/ui/return-creation-mobile-mvp_ui.md": {
+    "mtime": 1792170766.783533,
+    "seen": 1792321244.0213487,
+    "ast_hash": "5a3bd25445a8d099848210a4f91c71ba",
+    "semantic_hash": "5a3bd25445a8d099848210a4f91c71ba"
+  },
+  "projects/returns-2.0/requirements/ui/return-creation-mobile-mvp_ui_wiki.md": {
+    "mtime": 1792170766.987216,
+    "seen": 1792321244.0213487,
+    "ast_hash": "3aa7c7a4f66fbe19977448c102077283",
+    "semantic_hash": "3aa7c7a4f66fbe19977448c102077283"
+  },
+  "projects/returns-2.0/requirements/ui/ui-terms.md": {
+    "mtime": 1792155524.0466235,
+    "seen": 1792321244.0213487,
+    "ast_hash": "ed85f15cba8b7b644ab2397d50905039",
+    "semantic_hash": "ed85f15cba8b7b644ab2397d50905039"
+  },
+  "projects/returns-2.0/requirements/user-story/user-story-mvp.md": {
+    "mtime": 1792197915.9285138,
+    "seen": 1792321244.0213487,
+    "ast_hash": "c17a4802bcd5b5e2ca66399bd5c13201",
+    "semantic_hash": "c17a4802bcd5b5e2ca66399bd5c13201"
+  },
+  "projects/returns-2.0/requirements/user-story/user-story-post-mvp.md": {
+    "mtime": 1792182829.1014059,
+    "seen": 1792321244.0213487,
+    "ast_hash": "13fcfae0a834eb39c9a35d50866caa05",
+    "semantic_hash": "13fcfae0a834eb39c9a35d50866caa05"
+  },
+  "projects/returns-2.0/reviews/gap/brd-original-coverage-audit.md": {
+    "mtime": 1790200295.4750156,
+    "seen": 1792321244.0213487,
+    "ast_hash": "f7dd0847962edca4efde90d7709d1391",
+    "semantic_hash": "f7dd0847962edca4efde90d7709d1391"
+  },
+  "projects/returns-2.0/reviews/gap/brd-requirements-audit.md": {
+    "mtime": 1791573896.7935693,
+    "seen": 1792321244.0213487,
+    "ast_hash": "5bb58b540c9ad240f6b42204d68b51c4",
+    "semantic_hash": "5bb58b540c9ad240f6b42204d68b51c4"
+  },
+  "projects/returns-2.0/reviews/gap/gap-analysis.md": {
+    "mtime": 1791573896.7935693,
+    "seen": 1792321244.0213487,
+    "ast_hash": "910a7413bf8c02b7842ba2c7f85b69a8",
+    "semantic_hash": "910a7413bf8c02b7842ba2c7f85b69a8"
+  },
+  "projects/returns-2.0/reviews/quality/[2026-10-16] requirements-chain_quality-review.md": {
+    "mtime": 1792197915.9713027,
+    "seen": 1792321244.0213487,
+    "ast_hash": "7560d4ada6a7bbc1e4774cc39f5737f1",
+    "semantic_hash": "7560d4ada6a7bbc1e4774cc39f5737f1"
+  },
+  "projects/returns-2.0/reviews/ui/[2026-10-10] SCR-RET-01_ui-review.md": {
+    "mtime": 1791597367.3598988,
+    "seen": 1792321244.0213487,
+    "ast_hash": "cc42fe7fed5e2ad3600ac1ded03dbea9",
+    "semantic_hash": "cc42fe7fed5e2ad3600ac1ded03dbea9"
+  },
+  "projects/returns-2.0/sources/[2026-10-14] Mattermost \u2014 \u0441\u043e\u0433\u043b\u0430\u0441\u043e\u0432\u0430\u043d\u0438\u0435 \u043a\u043d\u043e\u043f\u043a\u0438 \u00ab\u0421\u043c\u043e\u0442\u0440\u0435\u0442\u044c \u043d\u0430 \u043a\u0430\u0440\u0442\u0435\u00bb.md": {
+    "mtime": 1791973596.8271458,
+    "seen": 1792321244.0213487,
+    "ast_hash": "39bf048f7cf39512f565a757aff482a8",
+    "semantic_hash": "39bf048f7cf39512f565a757aff482a8"
+  },
+  "projects/returns-2.0/sources/mockups/v2 \u0421\u043e\u0437\u0434\u0430\u043d\u0438\u0435 \u0432\u043e\u0437\u0432\u0440\u0430\u0442\u0430/README.md": {
+    "mtime": 1791573896.7945695,
+    "seen": 1792321244.0213487,
+    "ast_hash": "ba5a11f85554382d4bc997a4a4abafa5",
+    "semantic_hash": "ba5a11f85554382d4bc997a4a4abafa5"
+  },
+  "projects/returns-2.0/sources/transcriptions/README.md": {
+    "mtime": 1789125581.4221306,
+    "seen": 1792321244.0213487,
+    "ast_hash": "e10b84b98d7fab02b5fde822632a40fc",
+    "semantic_hash": "e10b84b98d7fab02b5fde822632a40fc"
+  },
+  "projects/returns-2.0/sources/transcriptions/[bandicam 2026-09-10 14-00-15-394] PJ \u0412\u043e\u0437\u0432\u0440\u0430\u0442\u044b (\u0434\u043e\u043f \u0432\u043e\u043f\u0440\u043e\u0441\u044b \u043f\u043e \u0441\u0430\u0439\u0442\u0443 \u0438 \u043f\u0440\u0438\u043b\u043e\u0436\u0435\u043d\u0438\u044f\u043c).md": {
+    "mtime": 1789123795.6686227,
+    "seen": 1792321244.0213487,
+    "ast_hash": "e8c54e7ef0af74e26d7022abf49022cc",
+    "semantic_hash": "e8c54e7ef0af74e26d7022abf49022cc"
+  },
+  "projects/returns-2.0/sources/transcriptions/[bandicam 2026-09-11 11-29-22-750] \u0412\u043e\u0437\u0432\u0440\u0430\u0442\u044b 2.0. \u041e\u0431\u0441\u0443\u0436\u0434\u0430\u0435\u043c \u0434\u043e\u0440\u0430\u0431\u043e\u0442\u043a\u0438 \u043c\u0430\u043a\u0435\u0442\u043e\u0432.md": {
+    "mtime": 1789156833.8005016,
+    "seen": 1792321244.0213487,
+    "ast_hash": "d40bf55dbe068b98b9a7de766561d3f3",
+    "semantic_hash": "d40bf55dbe068b98b9a7de766561d3f3"
+  },
+  "projects/returns-2.0/sources/transcriptions/[bandicam 2026-09-17 15-01-00-000] PJ \u0412\u043e\u0437\u0432\u0440\u0430\u0442\u044b (\u0440\u0435\u0433\u0443\u043b\u044f\u0440\u043d\u0430\u044f \u0432\u0441\u0442\u0440\u0435\u0447\u0430 \u043f\u043e \u043f\u0440\u043e\u0435\u043a\u0442\u0430 \u0443 \u0440\u0430\u043c\u043a\u0430\u0445 OKR Q3 ).md": {
+    "mtime": 1790880130.9462504,
+    "seen": 1792321244.0213487,
+    "ast_hash": "41a93b290bea63700fd154e23b30884a",
+    "semantic_hash": "41a93b290bea63700fd154e23b30884a"
+  },
+  "projects/returns-2.0/sources/transcriptions/[bandicam 2026-09-24 15-01-11-768] PJ \u0412\u043e\u0437\u0432\u0440\u0430\u0442\u044b (\u0440\u0435\u0433\u0443\u043b\u044f\u0440\u043d\u0430\u044f \u0432\u0441\u0442\u0440\u0435\u0447\u0430 \u043f\u043e \u043f\u0440\u043e\u0435\u043a\u0442\u0430 \u0443 \u0440\u0430\u043c\u043a\u0430\u0445 OKR Q4).md": {
+    "mtime": 1790842935.7318778,
+    "seen": 1792321244.0213487,
+    "ast_hash": "1799cb7683f5967728cff41a3328de34",
+    "semantic_hash": "1799cb7683f5967728cff41a3328de34"
+  },
+  "projects/returns-2.0/sources/transcriptions/[bandicam 2026-09-25 11-30-41-197] \u041e\u0431\u0441\u0443\u0436\u0434\u0435\u043d\u0438\u0435 \u0441 \u041b\u0435\u043d\u043e\u0439 \u0412\u0430\u0441\u0438\u043b\u044c\u0435\u0432\u043e\u0439 \u043b\u043e\u0433\u0438\u0441\u0442\u0438\u043a\u0438.md": {
+    "mtime": 1790883119.2886767,
+    "seen": 1792321244.0213487,
+    "ast_hash": "65f479d630c49d085207da85333133ea",
+    "semantic_hash": "65f479d630c49d085207da85333133ea"
+  },
+  "projects/returns-2.0/sources/transcriptions/[bandicam 2026-09-25 13-30-52-064] \u0412\u0441\u0442\u0440\u0435\u0447\u0430 \u0441 RCRM.md": {
+    "mtime": 1790846409.2378838,
+    "seen": 1792321244.0213487,
+    "ast_hash": "95cf2ce9a21248cfbaa0c79ed4e1c8d7",
+    "semantic_hash": "95cf2ce9a21248cfbaa0c79ed4e1c8d7"
+  },
+  "projects/returns-2.0/sources/transcriptions/[bandicam 2026-10-01 14-59-24-902] PJ \u0412\u043e\u0437\u0432\u0440\u0430\u0442\u044b (\u0440\u0435\u0433\u0443\u043b\u044f\u0440\u043d\u0430\u044f \u0432\u0441\u0442\u0440\u0435\u0447\u0430 \u043f\u043e \u043f\u0440\u043e\u0435\u043a\u0442\u0430 \u0443 \u0440\u0430\u043c\u043a\u0430\u0445 OKR Q4 ).md": {
+    "mtime": 1790882882.3529787,
+    "seen": 1792321244.0213487,
+    "ast_hash": "d2b60a25442b4291d2152f7fe9da60b0",
+    "semantic_hash": "d2b60a25442b4291d2152f7fe9da60b0"
+  },
+  "projects/returns-2.0/sources/transcriptions/[bandicam 2026-10-02 10-00-25-844] 12storeez & Intaro.ru (\u0432\u043e\u0437\u0432\u0440\u0430\u0442\u044b).md": {
+    "mtime": 1790933384.0077064,
+    "seen": 1792321244.0213487,
+    "ast_hash": "789229a3134d6b02299f0ff0ff18b371",
+    "semantic_hash": "789229a3134d6b02299f0ff0ff18b371"
+  },
+  "projects/returns-2.0/sources/transcriptions/[bandicam 2026-10-05 11-03-25-185] PBR \u0412\u043e\u0437\u0432\u0440\u0430\u0442\u044b 1.md": {
+    "mtime": 1792089112.2543075,
+    "seen": 1792321244.0213487,
+    "ast_hash": "c3b71597a9654f44b11bf160d7f7a6f1",
+    "semantic_hash": "c3b71597a9654f44b11bf160d7f7a6f1"
+  },
+  "projects/returns-2.0/sources/transcriptions/[bandicam 2026-10-07 14-00-18-551]  \u0412\u043e\u0437\u0432\u0440\u0430\u0442\u044b 2.0. \u041c\u0430\u043a\u0435\u0442\u044b.md": {
+    "mtime": 1791384249.6381044,
+    "seen": 1792321244.0213487,
+    "ast_hash": "0c9650a1689e2d6573b9d00f1582472b",
+    "semantic_hash": "0c9650a1689e2d6573b9d00f1582472b"
+  },
+  "projects/returns-2.0/sources/transcriptions/[bandicam 2026-10-07 16-30-04-845]  PJ Returns 2.0 - \u0438\u0442\u043e\u0433\u0438 \u043e\u0446\u0435\u043d\u043e\u043a \u0438 \u0434\u0430\u043b\u044c\u043d\u0435\u0439\u0448\u0435\u0435 \u0434\u0432\u0438\u0436\u0435\u043d\u0438\u0435.md": {
+    "mtime": 1791384085.2810924,
+    "seen": 1792321244.0213487,
+    "ast_hash": "8bfb59b0b9c182ae905bc7bc63d7067e",
+    "semantic_hash": "8bfb59b0b9c182ae905bc7bc63d7067e"
+  },
+  "projects/returns-2.0/sources/transcriptions/[bandicam 2026-10-08 15-01-33-311] PJ \u0412\u043e\u0437\u0432\u0440\u0430\u0442\u044b 2.0 - webapp + \u0438\u043d\u0441\u0442\u0440\u0443\u043a\u0446\u0438\u044f \u0434\u043b\u044f \u043f\u043e\u043b\u044c\u0437\u043e\u0432\u0430\u0442\u0435\u043b\u044f.md": {
+    "mtime": 1791473222.2955222,
+    "seen": 1792321244.0213487,
+    "ast_hash": "bcaec15dc94896fa04d1716c298cd685",
+    "semantic_hash": "bcaec15dc94896fa04d1716c298cd685"
+  },
+  "projects/returns-2.0/sources/transcriptions/[bandicam 2026-10-12 13-01-16-972] 12storeez + intaro.ru (RetailCRM).md": {
+    "mtime": 1791972726.1253312,
+    "seen": 1792321244.0213487,
+    "ast_hash": "de752666768d18edde6d2627cd70a334",
+    "semantic_hash": "de752666768d18edde6d2627cd70a334"
+  },
+  "projects/returns-2.0/sources/transcriptions/[bandicam 2026-10-14 11-59-51-009] PBR \u043f\u043e \u0432\u043e\u0437\u0432\u0440\u0430\u0442\u0430\u043c.md": {
+    "mtime": 1791972843.1589391,
+    "seen": 1792321244.0213487,
+    "ast_hash": "98f5b2b416da9a4244557f575936c3f2",
+    "semantic_hash": "98f5b2b416da9a4244557f575936c3f2"
+  },
+  "projects/returns-2.0/sources/transcriptions/[bandicam 2026-10-14 15-00-46-865] \u0412\u043e\u0437\u0432\u0440\u0430\u0442\u044b 2.0. \u041e\u0431\u0441\u0443\u0434\u0438\u0442\u044c \u0434\u043e\u0440\u0430\u0431\u043e\u0442\u043a\u0438 \u043b\u043e\u0433\u0438\u0441\u0442\u0438\u043a\u0438.md": {
+    "mtime": 1791984014.4818096,
+    "seen": 1792321244.0213487,
+    "ast_hash": "3f566d89930b9bd8113ddd2c0b029300",
+    "semantic_hash": "3f566d89930b9bd8113ddd2c0b029300"
+  },
+  "projects/returns-2.0/sources/transcriptions/[bandicam 2026-10-14 17-03-20-242]  \u0423\u0442\u043e\u0447\u043d\u0435\u043d\u0438\u0435 \u043f\u043e \u0432\u043e\u0437\u0432\u0440\u0430\u0442\u0430\u043c.md": {
+    "mtime": 1792089618.706897,
+    "seen": 1792321244.0213487,
+    "ast_hash": "59ac3b1ddb14be716aac8f924de8f9d2",
+    "semantic_hash": "59ac3b1ddb14be716aac8f924de8f9d2"
+  },
+  "projects/returns-2.0/sources/transcriptions/[bandicam 2026-10-15 15-00-31-732] PJ \u0412\u043e\u0437\u0432\u0440\u0430\u0442\u044b (\u0440\u0435\u0433\u0443\u043b\u044f\u0440\u043d\u0430\u044f \u0432\u0441\u0442\u0440\u0435\u0447\u0430 \u043f\u043e \u043f\u0440\u043e\u0435\u043a\u0442\u0430 \u0443 \u0440\u0430\u043c\u043a\u0430\u0445 OKR Q4).md": {
+    "mtime": 1792071676.865657,
+    "seen": 1792321244.0213487,
+    "ast_hash": "6a8d2266e2966d0029377d13358badd2",
+    "semantic_hash": "6a8d2266e2966d0029377d13358badd2"
+  },
+  "projects/returns-2.0/sources/\u0412\u043e\u0437\u0432\u0440\u0430\u0442\u044b 2.0 \u2014 \u043a\u0430\u0440\u0442\u0430 \u0441\u0438\u0441\u0442\u0435\u043c.html": {
+    "mtime": 1790860878.1685517,
+    "seen": 1792321244.0213487,
+    "ast_hash": "8a177cbecbd637c9fdc01286e5ccea6b",
+    "semantic_hash": "8a177cbecbd637c9fdc01286e5ccea6b"
+  },
+  "projects/returns-2.0/sources/\u0420\u0435\u0437\u044e\u043c\u0435 \u0432\u0441\u0442\u0440\u0435\u0447\u0438 21.08.2026 \u2014 \u0430\u043a\u0442\u0443\u0430\u043b\u044c\u043d\u0430\u044f \u0432\u0435\u0440\u0441\u0438\u044f (04.09.2026).md": {
+    "mtime": 1789072443.5315256,
+    "seen": 1792321244.0213487,
+    "ast_hash": "84bd39b92f658857ffc617cc38625350",
+    "semantic_hash": "84bd39b92f658857ffc617cc38625350"
+  },
+  "projects/returns-2.0/sources/\u0421\u0438\u043d\u0445\u0440\u043e\u043d 7-8.10.md": {
+    "mtime": 1791989367.773622,
+    "seen": 1792321244.0213487,
+    "ast_hash": "c67d3156f643acb7014c825bf8389e07",
+    "semantic_hash": "c67d3156f643acb7014c825bf8389e07"
+  },
+  "projects/returns-2.0/sources/\u0421\u0438\u043d\u0445\u0440\u043e\u043d \u043e\u0442 1.10.md": {
+    "mtime": 1791989544.917737,
+    "seen": 1792321244.0213487,
+    "ast_hash": "11cb239e1f0160c24af13d17961aeb63",
+    "semantic_hash": "11cb239e1f0160c24af13d17961aeb63"
+  },
+  "projects/returns-2.0/sources/\u0424\u0438\u0437\u0438\u0447\u0435\u0441\u043a\u0438\u0435 \u0441\u0446\u0435\u043d\u0430\u0440\u0438\u0438 \u0432\u043e\u0437\u0432\u0440\u0430\u0442\u043e\u0432_3.html": {
+    "mtime": 1789055708.3010862,
+    "seen": 1792321244.0213487,
+    "ast_hash": "25d6dc93b8eeaab542057b8ac68bf0c1",
+    "semantic_hash": "25d6dc93b8eeaab542057b8ac68bf0c1"
+  },
+  "skill/adr/SKILL.md": {
+    "mtime": 1791578796.165537,
+    "seen": 1792321244.0213487,
+    "ast_hash": "409cbad1f3922cdbab3a26903739fd2d",
+    "semantic_hash": "409cbad1f3922cdbab3a26903739fd2d"
+  },
+  "skill/asyncapi-spec/SKILL.md": {
+    "mtime": 1788558348.111741,
+    "seen": 1792321244.0213487,
+    "ast_hash": "e073da9205e0e2f2a6319d543b9fa804",
+    "semantic_hash": "e073da9205e0e2f2a6319d543b9fa804"
+  },
+  "skill/backend-logic/SKILL.md": {
+    "mtime": 1788558370.0091472,
+    "seen": 1792321244.0213487,
+    "ast_hash": "2cc9816351fc722740424969e3863117",
+    "semantic_hash": "2cc9816351fc722740424969e3863117"
+  },
+  "skill/backend-task/SKILL.md": {
+    "mtime": 1792172468.036033,
+    "seen": 1792321244.0213487,
+    "ast_hash": "3d175ca0873e93ce3104ec8f9d07a155",
+    "semantic_hash": "3d175ca0873e93ce3104ec8f9d07a155"
+  },
+  "skill/backend-task/examples/ECOMDEV-1126.md": {
+    "mtime": 1790978472.1996942,
+    "seen": 1792321244.0213487,
+    "ast_hash": "8752f4dc74df4115975205fafe3f5db7",
+    "semantic_hash": "8752f4dc74df4115975205fafe3f5db7"
+  },
+  "skill/backend-task/examples/ECOMDEV-1239.md": {
+    "mtime": 1790965760.6212218,
+    "seen": 1792321244.0213487,
+    "ast_hash": "fef200ea6d255de73fc8325be41d0b5c",
+    "semantic_hash": "fef200ea6d255de73fc8325be41d0b5c"
+  },
+  "skill/backend-task/examples/ECOMDEV-1240.md": {
+    "mtime": 1790965760.6513588,
+    "seen": 1792321244.0213487,
+    "ast_hash": "bb8cd9d7005f97f534c2292dd7343eb5",
+    "semantic_hash": "bb8cd9d7005f97f534c2292dd7343eb5"
+  },
+  "skill/backend-task/examples/ECOMDEV-1241.md": {
+    "mtime": 1790965764.474965,
+    "seen": 1792321244.0213487,
+    "ast_hash": "db1f4057499ab72eb2101a42a7e1885e",
+    "semantic_hash": "db1f4057499ab72eb2101a42a7e1885e"
+  },
+  "skill/backend-task/examples/ECOMDEV-2343.md": {
+    "mtime": 1791288399.7053509,
+    "seen": 1792321244.0213487,
+    "ast_hash": "3ca05ab0ff12dbaad1006d691cb864e2",
+    "semantic_hash": "3ca05ab0ff12dbaad1006d691cb864e2"
+  },
+  "skill/backend-task/references/api-errors_memo.md": {
+    "mtime": 1790974739.4718056,
+    "seen": 1792321244.0213487,
+    "ast_hash": "c1e8a486f1f455f229d5002778cafc87",
+    "semantic_hash": "c1e8a486f1f455f229d5002778cafc87"
+  },
+  "skill/backend-task/references/field-glossary.md": {
+    "mtime": 1792169886.5194461,
+    "seen": 1792321244.0213487,
+    "ast_hash": "aa08b1a4e7048ab5edd84159fb607c88",
+    "semantic_hash": "aa08b1a4e7048ab5edd84159fb607c88"
+  },
+  "skill/backend-task/references/request-response_mobile-api.md": {
+    "mtime": 1790974543.5430307,
+    "seen": 1792321244.0213487,
+    "ast_hash": "cbd29937716aea50d09730ea08ada6e6",
+    "semantic_hash": "cbd29937716aea50d09730ea08ada6e6"
+  },
+  "skill/backend-task/references/request-response_web.md": {
+    "mtime": 1790974546.0699224,
+    "seen": 1792321244.0213487,
+    "ast_hash": "06bfd62c1c12300e19e42b472f11c064",
+    "semantic_hash": "06bfd62c1c12300e19e42b472f11c064"
+  },
+  "skill/backend-task/template.md": {
+    "mtime": 1791288273.6725366,
+    "seen": 1792321244.0213487,
+    "ast_hash": "cfe2f8f161439e6288009e48a898d847",
+    "semantic_hash": "cfe2f8f161439e6288009e48a898d847"
+  },
+  "skill/backlog-prioritization/SKILL.md": {
+    "mtime": 1788558412.701897,
+    "seen": 1792321244.0213487,
+    "ast_hash": "3b109d584bf24d0b5637f172e5969a79",
+    "semantic_hash": "3b109d584bf24d0b5637f172e5969a79"
+  },
+  "skill/brd/SKILL.md": {
+    "mtime": 1791578796.1670413,
+    "seen": 1792321244.0213487,
+    "ast_hash": "388da0e71bd428d53b5942a28642fd18",
+    "semantic_hash": "388da0e71bd428d53b5942a28642fd18"
+  },
+  "skill/brs/SKILL.md": {
+    "mtime": 1791578796.168595,
+    "seen": 1792321244.0213487,
+    "ast_hash": "ca8566d3a10fb69daf854c96392b8221",
+    "semantic_hash": "ca8566d3a10fb69daf854c96392b8221"
+  },
+  "skill/business-case/SKILL.md": {
+    "mtime": 1788560551.1428373,
+    "seen": 1792321244.0213487,
+    "ast_hash": "d1ee0658739c1010a05cffb642bfb994",
+    "semantic_hash": "d1ee0658739c1010a05cffb642bfb994"
+  },
+  "skill/business-process-bpmn/SKILL.md": {
+    "mtime": 1788558457.8486269,
+    "seen": 1792321244.0213487,
+    "ast_hash": "5c32ca7746da918af5b48243fdcc09ed",
+    "semantic_hash": "5c32ca7746da918af5b48243fdcc09ed"
+  },
+  "skill/erd-model/SKILL.md": {
+    "mtime": 1788558477.8518076,
+    "seen": 1792321244.0213487,
+    "ast_hash": "82385e53bcf918d878847e2167c21287",
+    "semantic_hash": "82385e53bcf918d878847e2167c21287"
+  },
+  "skill/flowchart-diagram/SKILL.md": {
+    "mtime": 1792004442.7354307,
+    "seen": 1792321244.0213487,
+    "ast_hash": "72186a30f0e5c6ca901acc8fe41825f8",
+    "semantic_hash": "72186a30f0e5c6ca901acc8fe41825f8"
+  },
+  "skill/gap-analysis/SKILL.md": {
+    "mtime": 1791578796.168595,
+    "seen": 1792321244.0213487,
+    "ast_hash": "1f747ee2ad224ccadbf6910ea1d60de6",
+    "semantic_hash": "1f747ee2ad224ccadbf6910ea1d60de6"
+  },
+  "skill/graphify/SKILL.md": {
+    "mtime": 1792319143.2793388,
+    "seen": 1792321244.0213487,
+    "ast_hash": "1f30d701fab82d2c499014303b927ece",
+    "semantic_hash": "1f30d701fab82d2c499014303b927ece"
+  },
+  "skill/graphify/references/add-watch.md": {
+    "mtime": 1792319077.4315414,
+    "seen": 1792321244.0213487,
+    "ast_hash": "c1f65eb4102ad515149303c7f296b718",
+    "semantic_hash": "c1f65eb4102ad515149303c7f296b718"
+  },
+  "skill/graphify/references/exports.md": {
+    "mtime": 1792319077.4315414,
+    "seen": 1792321244.0213487,
+    "ast_hash": "73968e2842f6eb742f96cf04c1f8db68",
+    "semantic_hash": "73968e2842f6eb742f96cf04c1f8db68"
+  },
+  "skill/graphify/references/extraction-spec.md": {
+    "mtime": 1792319077.4325414,
+    "seen": 1792321244.0213487,
+    "ast_hash": "42fef56a01698118f7fd722acdadea34",
+    "semantic_hash": "42fef56a01698118f7fd722acdadea34"
+  },
+  "skill/graphify/references/github-and-merge.md": {
+    "mtime": 1792319077.4325414,
+    "seen": 1792321244.0213487,
+    "ast_hash": "cde13df085e4c492aeb7ba298a996d0d",
+    "semantic_hash": "cde13df085e4c492aeb7ba298a996d0d"
+  },
+  "skill/graphify/references/hooks.md": {
+    "mtime": 1792319077.4325414,
+    "seen": 1792321244.0213487,
+    "ast_hash": "3f545db6ce646650bb9de588f5512a27",
+    "semantic_hash": "3f545db6ce646650bb9de588f5512a27"
+  },
+  "skill/graphify/references/query.md": {
+    "mtime": 1792319077.4595568,
+    "seen": 1792321244.0213487,
+    "ast_hash": "d650e8b65648aa27c5f99c3742e010c9",
+    "semantic_hash": "d650e8b65648aa27c5f99c3742e010c9"
+  },
+  "skill/graphify/references/transcribe.md": {
+    "mtime": 1792319077.4595568,
+    "seen": 1792321244.0213487,
+    "ast_hash": "67b6a5fa6c0974e18f60db9f8932fbd8",
+    "semantic_hash": "67b6a5fa6c0974e18f60db9f8932fbd8"
+  },
+  "skill/graphify/references/update.md": {
+    "mtime": 1792319077.4605572,
+    "seen": 1792321244.0213487,
+    "ast_hash": "54bb75d63631ba69e65d5908d52fbbd0",
+    "semantic_hash": "54bb75d63631ba69e65d5908d52fbbd0"
+  },
+  "skill/handoff/SKILL.md": {
+    "mtime": 1791578808.890423,
+    "seen": 1792321244.0213487,
+    "ast_hash": "9a31601a67c2fe1fd26e2d26bb444083",
+    "semantic_hash": "9a31601a67c2fe1fd26e2d26bb444083"
+  },
+  "skill/nfr-requirements/SKILL.md": {
+    "mtime": 1788558500.723502,
+    "seen": 1792321244.0213487,
+    "ast_hash": "0eb21949cd8eef6c6455491121f1afde",
+    "semantic_hash": "0eb21949cd8eef6c6455491121f1afde"
+  },
+  "skill/openapi-spec/SKILL.md": {
+    "mtime": 1788558521.1616511,
+    "seen": 1792321244.0213487,
+    "ast_hash": "5004eee60518b3662f1fdebb88d21246",
+    "semantic_hash": "5004eee60518b3662f1fdebb88d21246"
+  },
+  "skill/process-monitoring/SKILL.md": {
+    "mtime": 1792178973.22858,
+    "seen": 1792321244.0213487,
+    "ast_hash": "2280f23b80177f504cd30b4efb4782fe",
+    "semantic_hash": "2280f23b80177f504cd30b4efb4782fe"
+  },
+  "skill/product-roadmap/SKILL.md": {
+    "mtime": 1788560551.8106582,
+    "seen": 1792321244.0213487,
+    "ast_hash": "64e8c5aaf145a5950bf69613ba825c73",
+    "semantic_hash": "64e8c5aaf145a5950bf69613ba825c73"
+  },
+  "skill/screen-spec/SKILL.md": {
+    "mtime": 1789067882.1650145,
+    "seen": 1792321244.0213487,
+    "ast_hash": "6f739304a9e03a1681a365a817fdf6f7",
+    "semantic_hash": "6f739304a9e03a1681a365a817fdf6f7"
+  },
+  "skill/security-review-checklist/SKILL.md": {
+    "mtime": 1791578796.168595,
+    "seen": 1792321244.0213487,
+    "ast_hash": "fd1bc55e50981a42d43a37d21fc51126",
+    "semantic_hash": "fd1bc55e50981a42d43a37d21fc51126"
+  },
+  "skill/sequence-diagram/SKILL.md": {
+    "mtime": 1792004913.688013,
+    "seen": 1792321244.0213487,
+    "ast_hash": "40bd96bd097101861105e8a7a364f85e",
+    "semantic_hash": "40bd96bd097101861105e8a7a364f85e"
+  },
+  "skill/srs/SKILL.md": {
+    "mtime": 1792169813.0845602,
+    "seen": 1792321244.0213487,
+    "ast_hash": "89e01b27abf213f67d4256dbf471f385",
+    "semantic_hash": "89e01b27abf213f67d4256dbf471f385"
+  },
+  "skill/srs/template-wiki.md": {
+    "mtime": 1792076701.8178756,
+    "seen": 1792321244.0213487,
+    "ast_hash": "bccfb75e201ec630c326a0eb99f2a74a",
+    "semantic_hash": "bccfb75e201ec630c326a0eb99f2a74a"
+  },
+  "skill/srs/template.md": {
+    "mtime": 1792076701.8093333,
+    "seen": 1792321244.0213487,
+    "ast_hash": "09944cbb4725248d80c02f6e512bd552",
+    "semantic_hash": "09944cbb4725248d80c02f6e512bd552"
+  },
+  "skill/stakeholder-map/SKILL.md": {
+    "mtime": 1788558600.5474515,
+    "seen": 1792321244.0213487,
+    "ast_hash": "f413ab88eeed21452e691a687b9a605e",
+    "semantic_hash": "f413ab88eeed21452e691a687b9a605e"
+  },
+  "skill/traceability-matrix/SKILL.md": {
+    "mtime": 1792003470.0329962,
+    "seen": 1792321244.0213487,
+    "ast_hash": "0e24a0e32679e25c65ac9c61defd7af3",
+    "semantic_hash": "0e24a0e32679e25c65ac9c61defd7af3"
+  },
+  "skill/ui-review-checklist/SKILL.md": {
+    "mtime": 1791597140.2823799,
+    "seen": 1792321244.0213487,
+    "ast_hash": "9f7d127ef9016b59aea4145d9ba95122",
+    "semantic_hash": "9f7d127ef9016b59aea4145d9ba95122"
+  },
+  "skill/use-case/SKILL.md": {
+    "mtime": 1789067882.168027,
+    "seen": 1792321244.0213487,
+    "ast_hash": "08f8e97bde9103d5eeea073274e21ed8",
+    "semantic_hash": "08f8e97bde9103d5eeea073274e21ed8"
+  },
+  "skill/user-story/SKILL.md": {
+    "mtime": 1789067882.1717522,
+    "seen": 1792321244.0213487,
+    "ast_hash": "256210cef0515a050fe9ff7da1f841d0",
+    "semantic_hash": "256210cef0515a050fe9ff7da1f841d0"
+  }
+}
