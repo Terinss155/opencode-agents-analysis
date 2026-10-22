@@ -6,6 +6,8 @@
 /12storeez-ios-develop/
 # Граф graphify по коду 12stz (содержит фрагменты внешнего кода)
 /graphify-out-12stz/
+# Бэкап настроек, который создаёт graphify
+/.claude/settings.json.graphify-bak
 
 # ============================================================
 # Служебные файлы ОС
