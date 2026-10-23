@@ -373,6 +373,8 @@ erDiagram
         varchar(255) pvz_title "NULL: слепок"
         varchar(512) pvz_address "NULL: слепок"
         varchar(255) pvz_work_time "NULL: слепок"
+        varchar(50) pvz_latitude "NULL: слепок"
+        varchar(50) pvz_longitude "NULL: слепок"
         date return_date "NULL: курьер"
         varchar(32) return_time "NULL: курьер"
         time return_time_from "NULL: курьер"
@@ -729,8 +731,8 @@ erDiagram
 | 4 | `address` | `varchar(255)` | | Да | `NULL` | Адрес. Источник `cms_returns.pvz_address` |
 | 5 | `working_time` | `varchar(255)` | | Да | `NULL` | Режим работы. Источник `cms_returns.pvz_work_time` |
 | 6 | `geo_id` | `varchar(36)` | | Да | `NULL` | Город в геосервисе. Список магазинов: `geo_id` = город возврата |
-| 7 | `latitude` | `varchar(50)` | | Да | `NULL` | Широта |
-| 8 | `longitude` | `varchar(50)` | | Да | `NULL` | Долгота |
+| 7 | `latitude` | `varchar(50)` | | Да | `NULL` | Широта. Источник `cms_returns.pvz_latitude` |
+| 8 | `longitude` | `varchar(50)` | | Да | `NULL` | Долгота. Источник `cms_returns.pvz_longitude` |
 | 9 | `route` | `varchar(500)` | | Да | `NULL` | Как добраться |
 | 10 | `stock_type` | `enum('main','shop','additional')` | | Нет | `shop` | Тип склада. Для возврата - только `shop` |
 | 11 | `_state` | `tinyint(3)` | | Нет | `0` | Активность |
@@ -872,29 +874,31 @@ erDiagram
 | 18 | `return_street` | `varchar(255)` | | Да | `NULL` | Улица. Обязательно для курьера |
 | 19 | `return_house` | `varchar(255)` | | Да | `NULL` | Дом, корпус. Обязательно для курьера |
 | 20 | `return_flat` | `varchar(255)` | | Да | `NULL` | Квартира / офис |
-| 21 | `return_postal` | `varchar(20)` | | Да | `NULL` | Индекс. Обязательно для курьера, если геосервис его не определил |
+| 21 | `return_postal` | `varchar(20)` | | Да | `NULL` | Индекс. Обязательно для курьера: из заказа, геосервиса или введённый клиентом |
 | 22 | `return_address` | `varchar(512)` | | Да | `NULL` | Полный адрес забора одной строкой. Для курьера |
 | 23 | `pvz_id` | `varchar(32)` | | Да | `NULL` | Пункт сдачи в сервисе логистики. Обязательно для ПВЗ. Тип как у `cms_orders.pvz_id` |
 | 24 | `store_code` | `smallint(6) unsigned` | FK, IDX | Да | `NULL` | Магазин сдачи. Обязательно для `store`.<br>Связь: `cms_returns.store_code = cms_catalog_stock.store_code` |
 | 25 | `pvz_title` | `varchar(255)` | | Да | `NULL` | Слепок названия пункта / магазина на момент создания |
 | 26 | `pvz_address` | `varchar(512)` | | Да | `NULL` | Слепок адреса |
 | 27 | `pvz_work_time` | `varchar(255)` | | Да | `NULL` | Слепок режима работы |
-| 28 | `return_date` | `date` | | Да | `NULL` | Плановая дата забора. Обязательно для курьера |
-| 29 | `return_time` | `varchar(32)` | | Да | `NULL` | Интервал текстом для клиента. Обязательно для курьера |
-| 30 | `return_time_from` | `time` | | Да | `NULL` | Начало интервала. `time`, а не строка: интервалы сравниваются и сортируются |
-| 31 | `return_time_to` | `time` | | Да | `NULL` | Конец интервала |
-| 32 | `handover_deadline` | `datetime` | | Да | `NULL` | Крайний срок передачи («Вернуть до») для ПВЗ, магазина, Почты |
-| 33 | `handed_over_at` | `datetime` | | Да | `NULL` | Фактическая передача товара |
-| 34 | `qr_code` | `varchar(255)` | | Да | `NULL` | Наш QR для сдачи в магазин. Обязательно для `store` |
-| 35 | `external_return_id` | `varchar(255)` | | Да | `NULL` | PostMVP. ID заявки у перевозчика |
-| 36 | `track_number` | `varchar(255)` | | Да | `NULL` | PostMVP. Трек-номер |
-| 37 | `waybill_number` | `varchar(255)` | | Да | `NULL` | PostMVP. Номер отправления СДЭК |
-| 38 | `pin_code` | `varchar(32)` | | Да | `NULL` | PostMVP. PIN-код 5Post |
-| 39 | `user_refund` | `text` | | Да | `NULL` | Текущие реквизиты (JSON), шифрованно. Обязательно, если `cms_refund_methods.requires_bank_data = 1`. Источник - `cms_users_refund` |
-| 40 | `receipt_id` | `int(11)` | FK | Да | `NULL` | PostMVP. Чек возврата.<br>Связь: `cms_returns.receipt_id = cms_order_receipts.id` |
-| 41 | `no_refund` | `tinyint(1)` | | Нет | `0` | TBD, предложено (`ADR-RET-086`). Признак «деньги не возвращать» для обмена: `1` — при «Возврат принят» заявка сразу получает «Возврат завершён», клиенту показывается приписка «По этому возврату произведён обмен». Как признак приходит из RetailCRM — не определено |
-| 42 | `created_at` | `timestamp` | | Нет | `current_timestamp()` | Дата оформления |
-| 43 | `updated_at` | `timestamp` | | Нет | `current_timestamp()` | Дата изменения, on update |
+| 28 | `pvz_latitude` | `varchar(50)` | | Да | `NULL` | Слепок широты точки сдачи. Для кнопки «Смотреть на карте» |
+| 29 | `pvz_longitude` | `varchar(50)` | | Да | `NULL` | Слепок долготы точки сдачи. Для кнопки «Смотреть на карте» |
+| 30 | `return_date` | `date` | | Да | `NULL` | Плановая дата забора. Обязательно для курьера |
+| 31 | `return_time` | `varchar(32)` | | Да | `NULL` | Интервал текстом для клиента. Обязательно для курьера |
+| 32 | `return_time_from` | `time` | | Да | `NULL` | Начало интервала. `time`, а не строка: интервалы сравниваются и сортируются |
+| 33 | `return_time_to` | `time` | | Да | `NULL` | Конец интервала |
+| 34 | `handover_deadline` | `datetime` | | Да | `NULL` | Крайний срок передачи («Вернуть до») для ПВЗ, магазина, Почты |
+| 35 | `handed_over_at` | `datetime` | | Да | `NULL` | Фактическая передача товара |
+| 36 | `qr_code` | `varchar(255)` | | Да | `NULL` | Наш QR для сдачи в магазин. Обязательно для `store` |
+| 37 | `external_return_id` | `varchar(255)` | | Да | `NULL` | PostMVP. ID заявки у перевозчика |
+| 38 | `track_number` | `varchar(255)` | | Да | `NULL` | PostMVP. Трек-номер |
+| 39 | `waybill_number` | `varchar(255)` | | Да | `NULL` | PostMVP. Номер отправления СДЭК |
+| 40 | `pin_code` | `varchar(32)` | | Да | `NULL` | PostMVP. PIN-код 5Post |
+| 41 | `user_refund` | `text` | | Да | `NULL` | Текущие реквизиты (JSON), шифрованно. Обязательно, если `cms_refund_methods.requires_bank_data = 1`. Источник - `cms_users_refund` |
+| 42 | `receipt_id` | `int(11)` | FK | Да | `NULL` | PostMVP. Чек возврата.<br>Связь: `cms_returns.receipt_id = cms_order_receipts.id` |
+| 43 | `no_refund` | `tinyint(1)` | | Нет | `0` | TBD, предложено (`ADR-RET-086`). Признак «деньги не возвращать» для обмена: `1` — при «Возврат принят» заявка сразу получает «Возврат завершён», клиенту показывается приписка «По этому возврату произведён обмен». Как признак приходит из RetailCRM — не определено |
+| 44 | `created_at` | `timestamp` | | Нет | `current_timestamp()` | Дата оформления |
+| 45 | `updated_at` | `timestamp` | | Нет | `current_timestamp()` | Дата изменения, on update |
 
 Ограничение по способу: для `store` заполнены `store_code` и `qr_code`, `delivery_tk_id` пусто; для курьера - `delivery_tk_id` и адрес; для ПВЗ - `delivery_tk_id` и `pvz_id`; `store_code` у них пусто.
 
