@@ -19,7 +19,7 @@ new/
 │   ├── README.md           ← навигатор: вопрос → файл знаний → папка в коде
 │   ├── architecture/       ← сквозные схемы, касающиеся нескольких репозиториев (цепочка iOS → шлюзы → монолит)
 │   └── <репозиторий>/      ← зеркально папкам в C:\Users\RobotComp.ru\Desktop\12stz\
-└── projects/<проект>/      ← проекты аналитики, сейчас: returns-2.0 («Возвраты 2.0»)
+└── projects/<проект>/      ← проекты аналитики, сейчас: returns-2.0 («Возвраты 2.0»), orders («Заказы»)
 ```
 
 - Агенты: `mode: primary` — `business-analyst`, `system-analyst`, `product-owner`, `repository-researcher` (редактирование и bash — с подтверждением); `mode: subagent` — `security-reviewer` (пишет только в `projects/<проект>/reviews/security/`), `ui-reviewer` (пишет только в `projects/<проект>/reviews/ui/`).
