@@ -248,7 +248,7 @@ stateDiagram-v2
 
 ## 6. Связанные артефакты
 
-- ADR: `ADR-RET-017`, `ADR-RET-019`, `ADR-RET-039`, `ADR-RET-051`, `ADR-RET-053`, `ADR-RET-065`, `ADR-RET-066` (заменен `ADR-RET-085`), `ADR-RET-070`, `ADR-RET-073`, `ADR-RET-075`, `ADR-RET-080`, `ADR-RET-082`, `ADR-RET-083`, `ADR-RET-085`, `ADR-RET-086` (предложено), `ADR-RET-087`, `ADR-RET-088`, `ADR-RET-089` (заменяет `ADR-RET-074`), `ADR-RET-094` (заменяет `ADR-RET-094`) — [adr/](../../adr/).
+- ADR: `ADR-RET-017`, `ADR-RET-019`, `ADR-RET-039`, `ADR-RET-051`, `ADR-RET-053`, `ADR-RET-065`, `ADR-RET-066` (заменен `ADR-RET-085`), `ADR-RET-070`, `ADR-RET-073`, `ADR-RET-075`, `ADR-RET-080`, `ADR-RET-082`, `ADR-RET-083`, `ADR-RET-085`, `ADR-RET-086` (предложено), `ADR-RET-087`, `ADR-RET-088`, `ADR-RET-089` (заменяет `ADR-RET-074`), `ADR-RET-094` (заменяет `ADR-RET-091`) — [adr/](../../adr/).
 - BRD: `RULE-28`, `RULE-29`, `FR-28`, `FR-29`, `FR-52`, `OQ-1` — [brd.md](../../brd.md).
 - User Story: US1, US3, US4 — [user-story-mvp.md](../../user-story/user-story-mvp.md); US16 — [user-story-post-mvp.md](../../user-story/user-story-post-mvp.md).
 - Модель данных: `cms_return_statuses`, `cms_return_positions`, `cms_return_position_statuses` — [ERD](../erd/return-entity_erd_merged.md).
