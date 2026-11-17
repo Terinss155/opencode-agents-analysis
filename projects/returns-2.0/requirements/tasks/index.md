@@ -133,15 +133,65 @@
 | [ECOMDEV-2282](https://tracker.yandex.ru/ECOMDEV-2282) [Post MVP] Возвраты US8. Просмотр идентификаторов для передачи изделий в ТК (QR / Штрихкоды) | Открыт |
 | [ECOMDEV-2283](https://tracker.yandex.ru/ECOMDEV-2283) [Post MVP] Возвраты US9. Категории Friends & Family | Беклог |
 
-## Задачи логистики, на которые ссылаются задачи бэкенда
+## Задачи BTS
 
-Статус не сверялся; с эпиком напрямую не связаны.
+Сверено с Трекером: 17.11.2026 · очередь TNT · корень аналитики логистики — [TNT-2516](https://tracker.yandex.ru/TNT-2516) [Logistics] [SA] Аналитика. Возвраты 2.0 (Васильева, «Анализ»). С эпиком ECOMDEV-2246 напрямую не связаны.
 
-| Задача | Где упомянута |
-|---|---|
-| [TNT-2837](https://tracker.yandex.ru/TNT-2837) — возвратный поток в методе интервалов (`is_return`, `sending_address`) | ECOMDEV-2590, 2639, 2681 |
-| [TNT-2839](https://tracker.yandex.ru/TNT-2839) — тип доставки с признаком «возвратный» | Переписка о заявке на `sdek-courier-vzt` |
-| [TNT-2876](https://tracker.yandex.ru/TNT-2876) — `sending_address` объектом | ECOMDEV-2590, 2639 |
-| [TNT-2712](https://tracker.yandex.ru/TNT-2712) — признак и фильтр `is_return_available` у ПВЗ | ECOMDEV-2590, 2639 |
-| [TNT-1889](https://tracker.yandex.ru/TNT-1889), [ECOMDEV-1170](https://tracker.yandex.ru/ECOMDEV-1170) — вебхук покрытия городов (прямой поток) | ECOMDEV-2681 |
+### Аналитика
+
+| Задача | Исполнитель | Статус | Что даёт / связь |
+|---|---|---|---|
+| [TNT-2516](https://tracker.yandex.ru/TNT-2516) [Logistics] [SA] Аналитика. Возвраты 2.0 | Васильева | Анализ | Связывает задачи логистики по возвратам |
+| [TNT-2717](https://tracker.yandex.ru/TNT-2717) [Logistics] [SA] Аналитика. Подготовить ADR для проекта Возвраты 2.0 | Васильева | Закрыт | — |
+| [TNT-2718](https://tracker.yandex.ru/TNT-2718) [Logistics] [SA] Аналитика. Подготовить описание настроек в Логистике | Васильева | Закрыт | — |
+| [TNT-2866](https://tracker.yandex.ru/TNT-2866) [Logistics] [SA] Аналитика. Кросскомандные договорённости для возвратов | Васильева | В работе | — |
+
+### Даты и интервалы курьера — метод `Logistics.WinnerService.Intervals`
+
+| Задача | Исполнитель | Статус | Что даёт / связь |
+|---|---|---|---|
+| [TNT-2837](https://tracker.yandex.ru/TNT-2837) [Logistics. Backend] Winner Service. Метод получения интервалов. Возвратный поток: признак возврата и адрес отправки. Получение дат забора посылки от ТК CDEK | Крамаровский | Закрыт (16.11) | `is_return`, `sending_address`; `is_return` сверяется с признаком возвратного типа доставки, иначе 400; даты от СДЭК с ближайшей даты по отсечке 16:00 МСК; один интервал 09:00–18:00; число дат — настройка `delivery_interval_days`; ошибка СДЭК — 400. ECOMDEV-2590, 2639; [courier-intervals_questions.md](../questions/courier-intervals_questions.md) |
+| [TNT-2876](https://tracker.yandex.ru/TNT-2876) [Logistics. Backend] Winner Service. Доработка метода получения интервалов | Крамаровский | Закрыт (13.11) | `delivery_address` и `sending_address` — объект `ClientAddress` (`full_address`, `country_iso`, `region`, `city`, `street`, `house`); без адреса — ручные интервалы. ECOMDEV-2590, 2639 |
+| [TNT-2937](https://tracker.yandex.ru/TNT-2937) [Logistics. Backend] Winner Service. Доработка метода получения интервалов | Крамаровский | Беклог, спринт 113 | Меняет TNT-2876: при включённой интеграции без адреса — ошибка `empty sending address`, без `region`, `city` или `house` — `incomplete sending address`; при выключенной — ручные интервалы. ECOMDEV-2590, 2639 |
+| [TNT-2844](https://tracker.yandex.ru/TNT-2844) [Logistics. Frontend] Админка. Демонстрация. Метод расчёта интервалов для возвратного потока | Ляхов | Закрыт | Админка логистики |
+| [TNT-1905](https://tracker.yandex.ru/TNT-1905) [Logistics. Backend] Winner Service. Метод получения интервалов. Новый параметр для адреса заказа. Получение интервалов от ТК CDEK | Крамаровский | Закрыт | Прямой поток, образец для возвратного |
+| [TNT-1750](https://tracker.yandex.ru/TNT-1750) [Logistics. Backend] Интервалы доставки с учетом таймзон. Метод расчёта интервалов | Крамаровский | Закрыт | Без `timezone` расчёт по Москве; `ADR-RET-062` |
+
+### Возвратный тип доставки
+
+| Задача | Исполнитель | Статус | Что даёт / связь |
+|---|---|---|---|
+| [TNT-2840](https://tracker.yandex.ru/TNT-2840) [Logistics. Backend] Доработка БД. Признак возвратного типа доставки | Крамаровский | Закрыт | `delivery_type.is_return` |
+| [TNT-2839](https://tracker.yandex.ru/TNT-2839) [Logistics. Backend] Админка. Признак возвратного типа доставки | Крамаровский | Закрыт | Тип доставки `sdek-courier-vzt`; [return-carriers_questions.md](../questions/return-carriers_questions.md) |
+| [TNT-2843](https://tracker.yandex.ru/TNT-2843) [Logistics. Frontend] Админка. Признак возвратного типа доставки | Ляхов | Закрыт | — |
+
+### Пункты выдачи, принимающие возвраты
+
+| Задача | Исполнитель | Статус | Что даёт / связь |
+|---|---|---|---|
+| [TNT-2710](https://tracker.yandex.ru/TNT-2710) [Logistics. Backend] Доработка БД и Workers. Хранение признака приёма возвратов | Крамаровский | В работе | — |
+| [TNT-2712](https://tracker.yandex.ru/TNT-2712) [Logistics. Backend] Доработать методы получения списка ПВЗ и деталей ПВЗ. Признак приёма возвратов | Крамаровский | Готово к релизу | Фильтр и признак `is_return_available`. ECOMDEV-2590, 2639, 2359 |
+| [TNT-2713](https://tracker.yandex.ru/TNT-2713) [Logistics. Backend] Админка. Доработать метод для справочников ПВЗ. Признак приёма возврата | Крамаровский | Закрыт | — |
+| [TNT-2714](https://tracker.yandex.ru/TNT-2714) [Logistics. Frontend] Админка. Доработать справочники для ПВЗ. Признак приёма возвратов | Ляхов | Закрыт | — |
+| [TNT-1889](https://tracker.yandex.ru/TNT-1889) Получать инфо от логистики изменения по списку пвз в городе (Яндекс ПВЗ, 5Post, СДЭК ПВЗ) | Васильева | Закрыт | Вебхук покрытия городов, прямой поток (вместе с [ECOMDEV-1170](https://tracker.yandex.ru/ECOMDEV-1170)). ECOMDEV-2681 |
+
+### Возвраты в магазин
+
+| Задача | Исполнитель | Статус | Что даёт / связь |
+|---|---|---|---|
+| [TNT-2862](https://tracker.yandex.ru/TNT-2862) [Logistics. Backend] Админка. Возвраты в магазин | Крамаровский | Ревью | — |
+| [TNT-2863](https://tracker.yandex.ru/TNT-2863) [Logistics. Frontend] Админка. Возвраты в магазин | Ляхов | Беклог | — |
+
+### Метод расчёта победителя (МРП)
+
+| Задача | Исполнитель | Статус | Что даёт / связь |
+|---|---|---|---|
+| [TNT-2845](https://tracker.yandex.ru/TNT-2845) [Logistics. Backend] Winner Service. МРП. Возвратный поток | — | Беклог | — |
+| [TNT-2846](https://tracker.yandex.ru/TNT-2846) [Logistics. Frontend] Админка. Демонстрация. Метод расчёта победителя (МРП) для возвратного потока | — | Беклог | — |
+
+### Mindbox — `mindbox-srv-go`
+
+| Задача | Исполнитель | Статус | Что даёт / связь |
+|---|---|---|---|
+| [TNT-2687](https://tracker.yandex.ru/TNT-2687) Необходимо добавить передачу номера заказа в методе calculate | Крамаровский | Закрыт (14.10) | ID заказа в расчёте; в `mindbox.proto` на `origin/master` поля нет. ECOMDEV-1185; [return-bonus_backend.md](../backend/return-bonus_backend.md), [refund-bonus_questions.md](../questions/refund-bonus_questions.md), вопрос 8 |
 
