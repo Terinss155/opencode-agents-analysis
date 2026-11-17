@@ -28,7 +28,7 @@
 
 В модели данных возврата позиция возврата уже ссылается на позицию заказа
 (`cms_return_positions.order_position_id` → `cms_order_positions.id`,
-[ERD](../../diagrams/erd/return-entity_erd_merged.md)).
+[ERD](../../../archive/erd/return-entity_erd_merged.md)).
 
 ## Решение
 
@@ -90,7 +90,7 @@
 - `FR-28`, `FR-29`, `RULE-29`, `OQ-1`, `OQ-47` — [BRD](../../brd.md).
 - `ADR-RET-002` — [отдельная сущность возврата](<../[2026-09-10 14-00] ADR-RET-002-separate-return-request-entity-v1.md>).
 - [User Story, «Требуют подтверждения до фиксации», п. 16](../../user-story/user-story-mvp.md).
-- Модель данных — [ERD](../../diagrams/erd/return-entity_erd_merged.md), `cms_return_positions.order_position_id`.
+- Модель данных — [ERD](../../../archive/erd/return-entity_erd_merged.md), `cms_return_positions.order_position_id`.
 
 ## История изменений
 

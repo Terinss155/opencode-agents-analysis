@@ -915,7 +915,7 @@ int
 - Связана: <ECOMDEV-NNNN — [B][Mobile API][Gate] Карточка заказа на новом гейте `mobile.12stz.*`> — завести (эндпоинт сейчас только на `core.12stz.*`)
 - Связана: <ECOMDEV-NNNN — [B][Mobile API] Создание заявки на возврат> — повторная проверка остатка в момент создания заявки
 - Связана: <ECOMDEV-NNNN — [B][Mobile API] Способы возврата: признак способа заказа `is_order_method`> — завести; способ возврата «как в заказе» определяет `return-method-list` по `order_id`, поэтому тип доставки в карточке не передаётся
-- Основание: [TO-BE шаг 01](../../steps/mobile/01-load-order-card.md), [TO-BE шаг 04](../../steps/mobile/04-prefill-city-method-point.md), [ERD-RET](../../diagrams/erd/return-entity_erd_merged.md), макет [`v2 Создание возврата/MVP/1.png`](<../../../sources/mockups/v2 Создание возврата/MVP/1.png>)
+- Основание: [TO-BE шаг 01](../../steps/mobile/01-load-order-card.md), [TO-BE шаг 04](../../steps/mobile/04-prefill-city-method-point.md), [ERD-RET](../../diagrams/erd/return-request_erd.md), макет [`v2 Создание возврата/MVP/1.png`](<../../../sources/mockups/v2 Создание возврата/MVP/1.png>)
 
 **Трассировка:** `FR-03`, `BR-03`, `RULE-07`, `RULE-10`, `US-CR-01`, `BL-RET-ELIG-01`, `ADR-RET-034`, `ADR-RET-016`
 
@@ -1219,7 +1219,7 @@ sequenceDiagram
 | `category_id`, `value_type` | Как у `days_can_be_returned` |
 
   Параметр добавляется миграцией — так же, как другие настроечные параметры (`ParameterManager::addSettingParameter()`); откат миграции удаляет строку по `alias`. Значение должно меняться в админке параметров, как у `days_can_be_returned`.
-- Таблицы `cms_returns`, `cms_return_positions`, `cms_return_statuses` создаются задачей на модель данных ([ERD-RET](../../diagrams/erd/return-entity_erd_merged.md)); эта задача от неё зависит.
+- Таблицы `cms_returns`, `cms_return_positions`, `cms_return_statuses` создаются задачей на модель данных ([ERD-RET](../../diagrams/erd/return-request_erd.md)); эта задача от неё зависит.
 
 **Ограничения логики**
 

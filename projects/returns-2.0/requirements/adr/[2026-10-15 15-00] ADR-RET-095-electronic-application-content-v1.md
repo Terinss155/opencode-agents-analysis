@@ -92,7 +92,7 @@
 - `ADR-RET-092` — [баллы к возврату через калькуляцию Mindbox, предложено](<./[2026-10-21 16-30] ADR-RET-092-return-bonus-calculation-mindbox-v1.md>).
 - `RULE-02`, `FR-37`, `NFR-01`, `INT-01`, `OQ-34` — [BRD](../brd.md).
 - US3.1 — [user-story-mvp.md](../user-story/user-story-mvp.md); SRS US 3.1 — [srs-mobile-mvp.md](../srs/srs-mobile-mvp.md), [srs-web-mvp.md](../srs/srs-web-mvp.md).
-- Реквизиты возврата — [ERD](../diagrams/erd/return-entity_erd_merged.md).
+- Реквизиты возврата — [ERD](../diagrams/erd/return-request_erd.md).
 
 ## История изменений
 

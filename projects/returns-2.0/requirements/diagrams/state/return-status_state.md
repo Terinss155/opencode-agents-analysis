@@ -251,14 +251,14 @@ stateDiagram-v2
 - ADR: `ADR-RET-017`, `ADR-RET-019`, `ADR-RET-039`, `ADR-RET-051`, `ADR-RET-053`, `ADR-RET-065`, `ADR-RET-066` (заменен `ADR-RET-085`), `ADR-RET-070`, `ADR-RET-073`, `ADR-RET-075`, `ADR-RET-080`, `ADR-RET-082`, `ADR-RET-083`, `ADR-RET-085`, `ADR-RET-086` (предложено), `ADR-RET-087`, `ADR-RET-088`, `ADR-RET-089` (заменяет `ADR-RET-074`), `ADR-RET-094` (заменяет `ADR-RET-091`) — [adr/](../../adr/).
 - BRD: `RULE-28`, `RULE-29`, `FR-28`, `FR-29`, `FR-52`, `OQ-1` — [brd.md](../../brd.md).
 - User Story: US1, US3, US4 — [user-story-mvp.md](../../user-story/user-story-mvp.md); US16 — [user-story-post-mvp.md](../../user-story/user-story-post-mvp.md).
-- Модель данных: `cms_return_statuses`, `cms_return_positions`, `cms_return_position_statuses` — [ERD](../erd/return-entity_erd_merged.md).
+- Модель данных: `cms_return_statuses`, `cms_return_positions`, `cms_return_position_statuses` — [ERD](../erd/return-request_erd.md).
 - Разборы встреч — [21.10.2026, утро](<../../../meetings/[2026-10-21 12-03] Статусная модель по возвратам_summary.md>), [21.10.2026, вечер](<../../../meetings/[2026-10-21 16-30] Статусная модель. Продолжение_summary.md>), [22.10.2026](<../../../meetings/[2026-10-22 15-00] PJ Возвраты (регулярная встреча по проекта у рамках OKR Q4)_summary.md>).
 
 ## Приложение. Статусы в коде монолита (AS-IS)
 
 Справочно: что сейчас есть в коде монолита и на что повлияют новые статусы. Используется для проверки по коду.
 
-Сущности возврата в монолите нет, она проектируется в [ERD](../erd/return-entity_erd_merged.md).
+Сущности возврата в монолите нет, она проектируется в [ERD](../erd/return-request_erd.md).
 Ниже — статусы заказа и позиций, которые сейчас участвуют в возврате.
 
 ### Где хранится статус позиции заказа

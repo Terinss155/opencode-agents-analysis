@@ -2,7 +2,7 @@
 
 **Тип:** модель данных (ERD), уровень таблиц и связей.
 **Статус:** DRAFT · **Дата:** 15.10.2026
-**Связанные артефакты:** [SRS МП, MVP](../../srs/srs-mobile-mvp.md) — US 1.1, US 1.3, US 1.5, раздел «Логика бэкенда»; `ADR-RET-039`, `ADR-RET-040`, `ADR-RET-044`, `ADR-RET-046`, `ADR-RET-048`, `ADR-RET-055`, `ADR-RET-060`, `ADR-RET-100`.
+**Связанные артефакты:** [SRS МП, MVP](../../requirements/srs/srs-mobile-mvp.md) — US 1.1, US 1.3, US 1.5, раздел «Логика бэкенда»; `ADR-RET-039`, `ADR-RET-040`, `ADR-RET-044`, `ADR-RET-046`, `ADR-RET-048`, `ADR-RET-055`, `ADR-RET-060`, `ADR-RET-100`.
 
 ## 1. Диаграмма
 
