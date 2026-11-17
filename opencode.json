@@ -11,7 +11,7 @@
     "skill": {
       "*": "deny",
       "backend-logic": "allow",
-      "backend-task": "allow",
+      "tracker-task": "allow",
       "srs": "allow",
       "erd-model": "allow",
       "sequence-diagram": "allow",

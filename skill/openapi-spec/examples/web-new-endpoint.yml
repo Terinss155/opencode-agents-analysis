@@ -1,0 +1,410 @@
+# Пример фрагмента swagger для нового эндпоинта сайта — правила: openapi-spec/references/swagger.md, разделы 1–2;
+# контракт — references/web.md. Список отдаётся массивом в data + pagination (web.md, раздел 7; решение 17.11.2026).
+# УСЛОВНЫЙ ресурс «адреса пользователя»: такого эндпоинта в системе нет, коды 20460–20463 условные
+# (реальный номер берётся из свободного диапазона ResponseErrorCode).
+#
+# Куда вставлять в 12storeez-master-web/docs/openapi/frontend.yml (openapi: 3.1.0):
+#   paths            — рядом с путями тега User;
+#   components/...   — в соответствующие разделы components.
+# Общие схемы BaseSuccessResponse, BaseErrorResponse, ValidationErrorResponse и securitySchemes.Bearer
+# в frontend.yml уже есть — их не копировать.
+#
+# У каждого параметра и поля: description, type, format (если применимо), обязательность, example,
+# enum с расшифровкой значений в description (если применимо) — swagger.md, раздел 2.1.
+
+paths:
+  /api/v1/users/me/addresses:
+    get:
+      tags:
+        - User
+      summary: Список сохранённых адресов пользователя
+      description: |-
+        Адреса для выбора в чекауте и в профиле. Возвращаются в порядке добавления, адрес по умолчанию — первым.
+        Без limit / offset возвращается первая страница из 20 адресов.
+      operationId: getUserAddresses
+      security:
+        - Bearer: []
+      parameters:
+        - name: limit
+          in: query
+          required: false
+          description: Количество адресов на странице. Без параметра — 20
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+          example: 20
+        - name: offset
+          in: query
+          required: false
+          description: Сколько адресов пропустить от начала списка — для следующих страниц. Без параметра — 0
+          schema:
+            type: integer
+            minimum: 0
+            default: 0
+          example: 0
+      responses:
+        "200":
+          $ref: "#/components/responses/GetUserAddressesResponse"
+        "400":
+          description: "Некорректный запрос (code 40000): limit или offset вне допустимого диапазона либо не число"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BaseErrorResponse"
+              example:
+                status: "error"
+                message: "Некорректный запрос"
+                code: "40000"
+                errors: [ ]
+        "401":
+          $ref: "#/components/responses/UnauthorizedErrorResponse"
+
+    post:
+      tags:
+        - User
+      summary: Добавление адреса пользователя
+      description: |-
+        Сохраняет адрес, введённый пользователем в форме адреса.
+        Пробелы по краям строковых полей обрезаются до проверки.
+        Если is_default = true, у остальных адресов пользователя признак по умолчанию снимается.
+      operationId: createUserAddress
+      security:
+        - Bearer: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateUserAddressRequest"
+      responses:
+        "200":
+          $ref: "#/components/responses/UserAddressResponse"
+        "400":
+          description: "Некорректный запрос (code 40000): тело не JSON или поле неверного типа"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BaseErrorResponse"
+              example:
+                status: "error"
+                message: "Некорректный запрос"
+                code: "40000"
+                errors: [ ]
+        "401":
+          $ref: "#/components/responses/UnauthorizedErrorResponse"
+        "422":
+          description: |-
+            Ошибка валидации (code 20279). В errors[].code: 20460 — поле не заполнено,
+            20461 — индекс не из 6 цифр, 20462 — превышена длина поля или тип адреса вне списка.
+            Возвращаются все ошибки сразу.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ValidationErrorResponse"
+              example:
+                status: "error"
+                message: "Ошибка валидации данных"
+                code: "20279"
+                errors:
+                  - target: "city"
+                    code: "20460"
+                    message: "Заполните это поле"
+                  - target: "postal_code"
+                    code: "20461"
+                    message: "Индекс должен состоять из 6 цифр"
+
+  /api/v1/users/me/addresses/{address_id}:
+    delete:
+      tags:
+        - User
+      summary: Удаление адреса пользователя
+      description: Адрес по умолчанию удалить нельзя — сначала нужно назначить другой адрес по умолчанию.
+      operationId: deleteUserAddress
+      security:
+        - Bearer: []
+      parameters:
+        - $ref: "#/components/parameters/address_id"
+      responses:
+        "200":
+          description: Адрес удалён
+          headers:
+            X-Response-Id:
+              $ref: "#/components/headers/X-Response-Id"
+            X-Response-Version:
+              $ref: "#/components/headers/X-Response-Version"
+            X-Language:
+              $ref: "#/components/headers/X-Language"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BaseSuccessResponse"
+              example:
+                status: "success"
+                message: "Адрес удалён"
+                data: [ ]
+        "401":
+          $ref: "#/components/responses/UnauthorizedErrorResponse"
+        "404":
+          description: "Адрес не найден или принадлежит другому пользователю (code 40004)"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BaseErrorResponse"
+              example:
+                status: "error"
+                message: "Ресурс не найден"
+                code: "40004"
+                errors: [ ]
+        "409":
+          description: "Адрес по умолчанию удалить нельзя (code 20463)"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BaseErrorResponse"
+              example:
+                status: "error"
+                message: "Нельзя удалить адрес по умолчанию"
+                code: "20463"
+                errors: [ ]
+
+components:
+  parameters:
+    address_id:
+      name: address_id
+      in: path
+      required: true
+      description: ID адреса пользователя — значение data[].id из списка адресов
+      schema:
+        type: integer
+        minimum: 1
+      example: 1024
+
+  # В frontend.yml раздела components/headers пока нет — при первом использовании его нужно добавить.
+  # Если не добавлять, заголовки перечисляются в каждом ответе, как в CartSubscriptionCheckResponse.
+  headers:
+    X-Response-Id:
+      description: Подпись ответа в формате uuid — для поиска запроса в логах
+      schema:
+        type: string
+        format: uuid
+      example: "1f0b3c2e-6a4d-6e10-9c1a-2b7d4e8f0a11"
+    X-Response-Version:
+      description: Версия API, по которой сформирован ответ; равна X-Request-Version запроса, без него — 1.0.0
+      schema:
+        type: string
+      example: "1.0.0"
+    X-Language:
+      description: Язык текстов ответа; равен X-Language запроса, без него — язык сайта по умолчанию
+      schema:
+        type: string
+      example: "ru"
+
+  schemas:
+    CreateUserAddressRequest:
+      type: object
+      required:
+        - city
+        - street
+        - house
+        - postal_code
+      properties:
+        type:
+          type: string
+          enum: [ home, work, other ]
+          default: other
+          description: "Тип адреса — для подписи в списке адресов: home — дом; work — работа; other — другое. Без поля — other"
+          example: "home"
+        city:
+          type: string
+          maxLength: 255
+          description: Город доставки
+          example: "Москва"
+        street:
+          type: string
+          maxLength: 255
+          description: Улица
+          example: "Тверская"
+        house:
+          type: string
+          maxLength: 20
+          description: Дом с корпусом и строением, как ввёл пользователь
+          example: "7к2"
+        apartment:
+          type: [ string, "null" ]
+          maxLength: 20
+          description: Квартира или офис; null или отсутствие поля — частный дом
+          example: "15"
+        postal_code:
+          type: string
+          pattern: "^[0-9]{6}$"
+          description: Почтовый индекс — 6 цифр
+          example: "125009"
+        is_default:
+          type: boolean
+          default: false
+          description: Сделать адресом по умолчанию — он подставляется в чекауте первым. Без поля — false
+          example: true
+
+    UserAddress:
+      type: object
+      description: Сохранённый адрес пользователя
+      required:
+        - id
+        - type
+        - city
+        - street
+        - house
+        - apartment
+        - postal_code
+        - is_default
+      properties:
+        id:
+          type: integer
+          description: ID адреса — передаётся в address_id при удалении
+          example: 1024
+        type:
+          type: string
+          enum: [ home, work, other ]
+          description: "Тип адреса: home — дом; work — работа; other — другое"
+          example: "home"
+        city:
+          type: string
+          description: Город доставки
+          example: "Москва"
+        street:
+          type: string
+          description: Улица
+          example: "Тверская"
+        house:
+          type: string
+          description: Дом с корпусом и строением
+          example: "7к2"
+        apartment:
+          type: [ string, "null" ]
+          description: Квартира или офис; null — не указана (частный дом)
+          example: "15"
+        postal_code:
+          type: string
+          description: Почтовый индекс — 6 цифр
+          example: "125009"
+        is_default:
+          type: boolean
+          description: Адрес по умолчанию; у пользователя не больше одного такого адреса
+          example: true
+
+    Pagination:
+      type: object
+      description: Параметры страницы списка
+      required:
+        - limit
+        - offset
+        - total
+      properties:
+        limit:
+          type: integer
+          description: Размер страницы, применённый к запросу
+          example: 20
+        offset:
+          type: integer
+          description: Смещение, применённое к запросу
+          example: 0
+        total:
+          type: integer
+          description: Общее количество записей без учёта пагинации
+          example: 2
+
+  responses:
+    GetUserAddressesResponse:
+      description: Список адресов пользователя
+      headers:
+        X-Response-Id:
+          $ref: "#/components/headers/X-Response-Id"
+        X-Response-Version:
+          $ref: "#/components/headers/X-Response-Version"
+        X-Language:
+          $ref: "#/components/headers/X-Language"
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: "#/components/schemas/BaseSuccessResponse"
+              - type: object
+                required:
+                  - pagination
+                properties:
+                  data:
+                    type: array
+                    description: Адреса текущей страницы; пустой массив — адресов нет
+                    items:
+                      $ref: "#/components/schemas/UserAddress"
+                  pagination:
+                    $ref: "#/components/schemas/Pagination"
+          example:
+            status: "success"
+            message: ""
+            data:
+              - id: 1024
+                type: "home"
+                city: "Москва"
+                street: "Тверская"
+                house: "7к2"
+                apartment: "15"
+                postal_code: "125009"
+                is_default: true
+              - id: 1031
+                type: "work"
+                city: "Санкт-Петербург"
+                street: "Невский проспект"
+                house: "28"
+                apartment: null
+                postal_code: "191186"
+                is_default: false
+            pagination:
+              limit: 20
+              offset: 0
+              total: 2
+
+    UserAddressResponse:
+      description: Адрес добавлен
+      headers:
+        X-Response-Id:
+          $ref: "#/components/headers/X-Response-Id"
+        X-Response-Version:
+          $ref: "#/components/headers/X-Response-Version"
+        X-Language:
+          $ref: "#/components/headers/X-Language"
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: "#/components/schemas/BaseSuccessResponse"
+              - type: object
+                properties:
+                  data:
+                    $ref: "#/components/schemas/UserAddress"
+          example:
+            status: "success"
+            message: "Адрес добавлен"
+            data:
+              id: 1024
+              type: "home"
+              city: "Москва"
+              street: "Тверская"
+              house: "7к2"
+              apartment: "15"
+              postal_code: "125009"
+              is_default: true
+
+    UnauthorizedErrorResponse:
+      description: "Запрос без авторизации (code 40001)"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/BaseErrorResponse"
+          example:
+            status: "error"
+            message: "Unauthorized"
+            code: "40001"
+            errors: [ ]

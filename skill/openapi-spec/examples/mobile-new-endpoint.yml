@@ -1,0 +1,314 @@
+# Пример фрагмента для 12storeez-master-web/docs/openapi/mobile.yml — правила: openapi-spec/references/swagger.md, разделы 2.2 и 3;
+# контракт — references/mobile.md. Список — массив в result + total (mobile.md, раздел 6; решение 17.11.2026).
+# УСЛОВНЫЙ ресурс «избранные магазины пользователя»: такого эндпоинта в системе нет,
+# предметные коды 20470–20472 условные (реальный номер — из свободного диапазона ResponseErrorCode, общий с сайтом).
+#
+# servers в mobile.yml уже заканчиваются на /mobile, поэтому пути описываются без /mobile:
+#   /favourite-stores  →  фактический путь /mobile/favourite-stores
+#
+# Общие элементы mobile.yml (не копировать, на них ссылаться):
+#   components/parameters/x-version, components/parameters/x-platform,
+#   components/securitySchemes/MobileApiKey, components/securitySchemes/SessionToken,
+#   components/responses/MobileErrorNotAuthVersionOneResponse.
+# Общая схема MobileErrorVersionOneResponseSchema описывает error_code без обёртки success / result (AS-IS-ошибка, swagger.md, раздел 3, п. 4),
+# поэтому ошибки ниже описаны фактической структурой — схема MobileErrorResponse.
+
+paths:
+  /favourite-stores:
+    get:
+      tags:
+        - User
+      summary: Список избранных магазинов пользователя
+      description: |-
+        Магазины, отмеченные пользователем на экране «Магазины», в порядке добавления — последний добавленный первым.
+        Без limit / offset возвращается первая страница из 50 магазинов.
+      operationId: getFavouriteStores
+      security:
+        - MobileApiKey: [ ]
+          SessionToken: [ ]
+      parameters:
+        - $ref: "#/components/parameters/x-version"
+        - $ref: "#/components/parameters/x-platform"
+        - name: limit
+          in: query
+          required: false
+          description: Количество магазинов на странице. Без параметра — 50
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 1000
+            default: 50
+          example: 50
+        - name: offset
+          in: query
+          required: false
+          description: Сколько магазинов пропустить от начала списка — для следующих страниц. Без параметра — 0
+          schema:
+            type: integer
+            minimum: 0
+            maximum: 100000
+            default: 0
+          example: 0
+      responses:
+        "200":
+          description: Список избранных магазинов
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetFavouriteStoresResponse"
+              example:
+                success: true
+                result:
+                  - store_code: 42
+                    title: "12 STOREEZ Цветной"
+                    address: "Москва, Цветной бульвар, 15с1"
+                    work_hours: "10:00–22:00"
+                    is_reservation_available: true
+                  - store_code: 17
+                    title: "12 STOREEZ Невский"
+                    address: "Санкт-Петербург, Невский проспект, 28"
+                    work_hours: null
+                    is_reservation_available: false
+                total: 2
+        "400":
+          description: "Ошибка параметров (error_code 1015): limit или offset вне допустимого диапазона"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MobileErrorResponse"
+              example:
+                success: false
+                result:
+                  error_code: 1015
+                  error_text: "Параметр limit не должен превышать 1000"
+                  error_data: [ ]
+        "401":
+          $ref: "#/components/responses/MobileErrorNotAuthVersionOneResponse"
+
+    post:
+      tags:
+        - User
+      summary: Добавление магазина в избранное
+      description: |-
+        Отмечает магазин избранным для текущего пользователя. Повторное добавление того же магазина не ошибка — ответ 200, запись не дублируется.
+      operationId: addFavouriteStore
+      security:
+        - MobileApiKey: [ ]
+          SessionToken: [ ]
+      parameters:
+        - $ref: "#/components/parameters/x-version"
+        - $ref: "#/components/parameters/x-platform"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AddFavouriteStoreRequest"
+      responses:
+        "200":
+          description: Магазин добавлен в избранное
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FavouriteStoreResponse"
+              example:
+                success: true
+                result:
+                  store_code: 42
+                  title: "12 STOREEZ Цветной"
+                  address: "Москва, Цветной бульвар, 15с1"
+                  work_hours: "10:00–22:00"
+                  is_reservation_available: true
+        "400":
+          description: |-
+            Ошибка валидации (error_code 1015). В error_data[].code: 20470 — store_code не передан,
+            20471 — магазин не найден или закрыт. Возвращаются все ошибки сразу.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MobileErrorResponse"
+              example:
+                success: false
+                result:
+                  error_code: 1015
+                  error_text: "Ошибка валидации данных"
+                  error_data:
+                    - target: "store_code"
+                      code: "20471"
+                      message: "Магазин не найден"
+        "401":
+          $ref: "#/components/responses/MobileErrorNotAuthVersionOneResponse"
+
+  /favourite-stores/{store_code}:
+    delete:
+      tags:
+        - User
+      summary: Удаление магазина из избранного
+      description: Снимает отметку «избранный». Если магазина нет в избранном пользователя — 404.
+      operationId: deleteFavouriteStore
+      security:
+        - MobileApiKey: [ ]
+          SessionToken: [ ]
+      parameters:
+        - $ref: "#/components/parameters/x-version"
+        - $ref: "#/components/parameters/x-platform"
+        - name: store_code
+          in: path
+          required: true
+          description: Код магазина — значение result[].store_code из списка избранных
+          schema:
+            type: integer
+            minimum: 1
+          example: 42
+      responses:
+        "200":
+          description: Магазин удалён из избранного
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MobileSuccessResponseSchema"
+              example:
+                success: true
+                result: { }
+        "401":
+          $ref: "#/components/responses/MobileErrorNotAuthVersionOneResponse"
+        "404":
+          description: "Магазина нет в избранном пользователя (error_code 1009 — Предложение, mobile.md, раздел 4.1, п. 4)"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MobileErrorResponse"
+              example:
+                success: false
+                result:
+                  error_code: 1009
+                  error_text: "Магазин не найден в избранном"
+                  error_data: [ ]
+
+components:
+  schemas:
+    AddFavouriteStoreRequest:
+      type: object
+      required:
+        - store_code
+      properties:
+        store_code:
+          type: integer
+          minimum: 1
+          description: Код магазина из списка магазинов (GET /stores, поле store_code)
+          example: 42
+
+    FavouriteStore:
+      type: object
+      description: Магазин из избранного пользователя
+      required:
+        - store_code
+        - title
+        - address
+        - work_hours
+        - is_reservation_available
+      properties:
+        store_code:
+          type: integer
+          description: Код магазина — передаётся в store_code при удалении из избранного
+          example: 42
+        title:
+          type: string
+          description: Название магазина для карточки
+          example: "12 STOREEZ Цветной"
+        address:
+          type: string
+          description: Адрес магазина одной строкой — город, улица, дом
+          example: "Москва, Цветной бульвар, 15с1"
+        work_hours:
+          type: [ string, "null" ]
+          description: Часы работы сегодня для вывода в карточке; null — магазин сегодня закрыт или часы не заданы в админке
+          example: "10:00–22:00"
+        is_reservation_available:
+          type: boolean
+          description: Можно ли забронировать товар в этом магазине — показывать кнопку «Забронировать»
+          example: true
+
+    GetFavouriteStoresResponse:
+      type: object
+      required:
+        - success
+        - result
+        - total
+      properties:
+        success:
+          type: boolean
+          description: Признак успешного ответа
+          example: true
+        result:
+          type: array
+          description: Избранные магазины текущей страницы; пустой массив — избранных нет
+          items:
+            $ref: "#/components/schemas/FavouriteStore"
+        total:
+          type: integer
+          description: Общее количество избранных магазинов без учёта пагинации
+          example: 2
+
+    FavouriteStoreResponse:
+      type: object
+      required:
+        - success
+        - result
+      properties:
+        success:
+          type: boolean
+          description: Признак успешного ответа
+          example: true
+        result:
+          $ref: "#/components/schemas/FavouriteStore"
+
+    # Фактическая структура ответа с ошибкой монолита. При первом использовании добавить в mobile.yml
+    # (или исправить MobileErrorVersionOneResponseSchema — открытый вопрос, swagger.md, раздел 3, п. 4).
+    MobileErrorResponse:
+      type: object
+      required:
+        - success
+        - result
+      properties:
+        success:
+          type: boolean
+          description: Всегда false для ошибки
+          example: false
+        result:
+          type: object
+          required:
+            - error_code
+            - error_text
+            - error_data
+          properties:
+            error_code:
+              type: integer
+              description: Код ошибки Mobile API (BaseController) — по нему МП выбирает ветку обработки
+              example: 1015
+            error_text:
+              type: string
+              description: Общее сообщение ошибки; для части кодов — фиксированный текст
+              example: "Ошибка валидации данных"
+            error_data:
+              type: array
+              description: Ошибки по полям для форм ввода; пустой массив — ошибка не привязана к полю
+              items:
+                type: object
+                required:
+                  - target
+                  - code
+                  - message
+                properties:
+                  target:
+                    type: string
+                    description: Имя поля запроса с ошибкой; пустая строка — общая ошибка
+                    example: "store_code"
+                  code:
+                    type: string
+                    description: Предметный код из ResponseErrorCode — общий с сайтом
+                    example: "20471"
+                  message:
+                    type: string
+                    description: Текст ошибки для показа под полем
+                    example: "Магазин не найден"

@@ -35,6 +35,7 @@ new/
 - Создавать и изменять файлы в этом репозитории, кроме `projects/*/sources/` (см. ниже).
 - Git в этом репозитории: просмотр (`status`, `log`, `diff`, `show`, `blame`) — свободно; `commit` и `push` — **только по явной просьбе пользователя** в текущем сообщении.
 - БД `12stz_staging` (через MCP-сервер PhpStorm): только одиночные `SELECT` / `SHOW` / `DESCRIBE` / `EXPLAIN` / `WITH`, только к схеме `12stz_staging`.
+- БД прода — подключение `12stz_prod`, схема `12stz_production` (через MCP-сервер PhpStorm): только чтение — одиночные `SELECT` / `SHOW` / `DESCRIBE` / `EXPLAIN` / `WITH`. Запросы — агрегаты и выборки справочников (количества, даты, коды, настройки); персональные данные клиентов (ФИО, телефоны, адреса, e-mail, реквизиты) не выбираются. Тяжёлые запросы по большим таблицам ограничиваются периодом или условием по индексу.
 
 **Запрещено:**
 - Любые изменения в `C:\Users\RobotComp.ru\Desktop\12stz\` (рабочие репозитории): создавать, менять, удалять, переименовывать файлы; `git commit/push/pull/fetch/checkout/switch/reset/merge/rebase/stash/tag/clean`; `composer`, `npm`, `yii`, миграции, сборка. Правки, которые «кажутся» нужными в коде, оформляются как артефакты аналитики в проекте.
@@ -76,7 +77,7 @@ new/
 |---|---|---|
 | `product-owner` | primary | `user-story`, `backlog-prioritization`, `business-case`, `product-roadmap`, `stakeholder-map`, `adr`, `meeting-summary-adr` |
 | `business-analyst` | primary | `business-process-bpmn`, `brd`, `use-case`, `screen-spec`, `traceability-matrix`, `gap-analysis`, `brs`, `adr`, `meeting-summary-adr` |
-| `system-analyst` | primary | `backend-logic`, `backend-task`, `srs`, `erd-model`, `sequence-diagram`, `flowchart-diagram`, `openapi-spec`, `asyncapi-spec`, `nfr-requirements`, `process-monitoring`, `adr`, `meeting-summary-adr` |
+| `system-analyst` | primary | `backend-logic`, `tracker-task`, `srs`, `erd-model`, `sequence-diagram`, `flowchart-diagram`, `openapi-spec`, `asyncapi-spec`, `nfr-requirements`, `process-monitoring`, `adr`, `meeting-summary-adr` |
 | `repository-researcher` | primary | — (опц. `sequence-diagram` для sequence-схем) |
 | `security-reviewer` | subagent | `security-review-checklist` |
 | `ui-reviewer` | subagent | `ui-review-checklist` |
@@ -108,11 +109,12 @@ projects/<проект>/
 │   ├── ui/               ← элементы экранов сценария по каналу: поля, ограничения, состояния, действия (дополняет SRS)
 │   ├── steps/web/, steps/mobile/   ← пошаговый TO-BE по каналам; каждый шаг ссылается на свой AS-IS (+ to-be.bpmn.md)
 │   ├── srs/              ← SRS по каналам, отдельно MVP и Post-MVP: srs-<канал>-mvp.md, srs-<канал>-post-mvp.md (skill/srs)
-│   ├── backend/          ← логика (skill/backend-logic) и задачи в трекер backend/US-NN/ (skill/backend-task)
+│   ├── backend/          ← логика (skill/backend-logic) и задачи в трекер backend/US-NN/ (skill/tracker-task)
 │   ├── diagrams/<тип>/   ← sequence / erd / state целевого состояния
 │   ├── nfr/              ← nfr.md, если есть
 │   ├── questions/        ← рабочие вопросы к бизнесу и смежным командам: <тема>_questions.md, одна тема — один файл (решено + открытые вопросы с адресатом)
-│   └── adr/              ← [ГГГГ-ММ-ДД ЧЧ-ММ] ADR-<ТЕМА>-<NNN>-<решение>-vN.md (skill/adr)
+│   └── adr/              ← [ГГГГ-ММ-ДД ЧЧ-ММ] ADR-<ТЕМА>-<NNN>-<решение>-vN.md (skill/adr), только действующие
+│       └── archive/      ← заменённые версии ADR (статус «Решение изменено»)
 ├── reviews/          ← ПРОВЕРКИ бандла (в git, с датой в имени)
 │   ├── gap/          ← gap-анализ, аудиты BRD (skill/gap-analysis)
 │   ├── security/     ← ревью ИБ (security-reviewer)
@@ -170,7 +172,7 @@ projects/<проект>/
 - Все версии одного решения имеют одинаковое смысловое название `<decision-name>`; первая фиксация — `v1`, каждое изменение — `+1`.
 - Дата и время в имени берутся из имени транскрибации, на которой принято решение или его изменение (`[bandicam 2026-09-11 11-29-22-750] ...` → `[2026-09-11 11-29]`).
 - Новая версия получает новый уникальный ADR-ID (следующий свободный номер) и в шапке указывает `Предыдущая версия: <полное имя файла>` и `Заменяет: ADR-RET-XXX`.
-- В старой версии меняются только метаданные: `Статус: Решение изменено` и `Заменён: <полное имя файла новой версии>`, плюс строка в «Истории изменений».
+- В старой версии меняются только метаданные: `Статус: Решение изменено` и `Заменён: <полное имя файла новой версии>`, плюс строка в «Истории изменений». После этого старая версия переносится в `requirements/adr/archive/`, ссылки на неё и из неё пересчитываются.
 - Ссылки на транскрибации — только полным фактическим именем исходного файла, без сокращений и альтернативных названий.
 - После новой версии актуальные ссылки в документации переводятся на неё; исторические ссылки (журналы изменений, описание состояния на момент старого решения) не переписываются без необходимости.
 
@@ -218,7 +220,7 @@ projects/<проект>/
 ## Конвенция имён файлов
 Пути — от `projects/<проект>/`.
 - `business-analyst`: `requirements/index.md`, `requirements/brd.md`, `requirements/traceability.md`, `as-is/as-is.bpmn.md`, `requirements/steps/to-be.bpmn.md`, `requirements/use-case/use-case.md`, `requirements/screen-spec/screen-spec.md`, `reviews/gap/gap-analysis.md`, `brs.md`, `requirements/adr/[ГГГГ-ММ-ДД ЧЧ-ММ] ADR-<ТЕМА>-<NNN>-<решение>-vN.md`
-- `system-analyst`: `requirements/backend/<объект>_backend.md`, `requirements/backend/US-NN/<теги> <объект>_task.md` (задача на бэк, `skill/backend-task`; папка — User Story из Трекера, например `[B][Mobile API] order-card-return_task.md`), `<объект>_erd.*` + `sql.sql`, `<объект>_sequence.md` (Mermaid), `<объект>_state.md` (в `as-is/diagrams/<тип>/` или `requirements/diagrams/<тип>/`), `openapi.yaml`, `asyncapi.yaml`, `requirements/nfr/nfr.md`, `requirements/srs/srs-<канал>-mvp.md` и `srs-<канал>-post-mvp.md` (канал — `web`, `mobile`; копия для Яндекс Вики — с суффиксом `_wiki`, например `srs-mobile-mvp_wiki.md`), `requirements/ui/<сценарий>-<канал>-mvp_ui.md` (элементы экранов; копия для Яндекс Вики — `_ui_wiki.md`), ADR — как у BA
+- `system-analyst`: `requirements/backend/<объект>_backend.md`, `requirements/backend/US-NN/<номер> <заголовок задачи>.md` (задача на бэк, `skill/tracker-task`; папка — User Story из Трекера, например `ECOMDEV-2359 [B] Добавить признак приёма возвратов cms_catalog_stock.md`; до заведения в Трекер — фиктивный номер `ECOMDEV-X<NN>`), `<объект>_erd.*` + `sql.sql`, `<объект>_sequence.md` (Mermaid), `<объект>_state.md` (в `as-is/diagrams/<тип>/` или `requirements/diagrams/<тип>/`), `openapi.yaml`, `asyncapi.yaml`, `requirements/nfr/nfr.md`, `requirements/srs/srs-<канал>-mvp.md` и `srs-<канал>-post-mvp.md` (канал — `web`, `mobile`; копия для Яндекс Вики — с суффиксом `_wiki`, например `srs-mobile-mvp_wiki.md`), `requirements/ui/<сценарий>-<канал>-mvp_ui.md` (элементы экранов; копия для Яндекс Вики — `_ui_wiki.md`), ADR — как у BA
 - `product-owner`: `requirements/user-story/user-story-mvp.md` (общие разделы вкладки и истории MVP) и `requirements/user-story/user-story-post-mvp.md` (истории Post-MVP; история переносится между файлами при смене объёма), `backlog-priority.md`, `business-case.md`, `roadmap.md`, `stakeholder-map.md`, ADR — как у BA
 - `repository-researcher`: `knowledge/<репозиторий>/repo-map.md`, `knowledge/<репозиторий>/features/<фича>.md`, `knowledge/<репозиторий>/architecture/*.md`
 - Рабочие вопросы (любой агент): `requirements/questions/<тема>_questions.md` — одна тема в одном файле, без дублирования между файлами; задачи на бэк в эту папку не кладутся.
