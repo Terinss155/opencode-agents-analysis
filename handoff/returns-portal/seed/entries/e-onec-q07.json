@@ -1,0 +1,20 @@
+{
+  "assignee": "Катя Филатова (Product Manager), Артем Колосов (1С)",
+  "block": "onec",
+  "body": "",
+  "createdAt": "2026-11-17T12:00:00.000Z",
+  "createdBy": "import",
+  "date": "",
+  "kind": "question",
+  "links": [
+    "e-onec-d05"
+  ],
+  "owner": "",
+  "sources": [
+    "requirements/questions/return-status-model_questions.md, вопрос 6"
+  ],
+  "status": "open",
+  "title": "Согласны ли с предложением сайта: что проверяется до создания заявки, а что после?",
+  "updatedAt": "2026-11-17T12:00:00.000Z",
+  "updatedBy": "import"
+}

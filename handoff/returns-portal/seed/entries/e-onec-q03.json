@@ -1,0 +1,18 @@
+{
+  "assignee": "Артем Колосов (1С), Алена Господинова (RetailCRM)",
+  "block": "onec",
+  "body": "",
+  "createdAt": "2026-11-17T12:00:00.000Z",
+  "createdBy": "import",
+  "date": "",
+  "kind": "question",
+  "links": [],
+  "owner": "",
+  "sources": [
+    "requirements/questions/return-status-model_questions.md, вопрос 1"
+  ],
+  "status": "open",
+  "title": "Кто переводит заявку в «Возврат принят» при утере возврата — 1С учётной приёмкой или Дружба вручную в RetailCRM?",
+  "updatedAt": "2026-11-17T12:00:00.000Z",
+  "updatedBy": "import"
+}

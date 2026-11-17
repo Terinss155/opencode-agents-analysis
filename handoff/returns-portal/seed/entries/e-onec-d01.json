@@ -1,0 +1,18 @@
+{
+  "assignee": "",
+  "block": "onec",
+  "body": "Сайт — точка обмена заявками на возврат с 1С и RetailCRM; схема та же, что у обмена заказами (outbox, очереди, консьюмеры).",
+  "createdAt": "2026-11-17T12:00:00.000Z",
+  "createdBy": "import",
+  "date": "2026-10-02",
+  "kind": "decision",
+  "links": [],
+  "owner": "Head of PMO — Светлана Варцаба; 1C Solution Architect — Артем Колосов",
+  "sources": [
+    "ADR-RET-044 — requirements/adr/[2026-10-02 10-00] ADR-RET-044-returns-integration-gateway-v2.md"
+  ],
+  "status": "agreed",
+  "title": "Обмен возвратами — через сайт как центральную систему, по схеме обмена заказами",
+  "updatedAt": "2026-11-17T12:00:00.000Z",
+  "updatedBy": "import"
+}

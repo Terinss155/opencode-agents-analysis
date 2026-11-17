@@ -1,0 +1,18 @@
+{
+  "assignee": "",
+  "block": "onec",
+  "body": "Учёт и итоговый статус возврата ведёт 1С.",
+  "createdAt": "2026-11-17T12:00:00.000Z",
+  "createdBy": "import",
+  "date": "2026-10-20",
+  "kind": "decision",
+  "links": [],
+  "owner": "Озвучила Project Manager — Катя Тихомирова",
+  "sources": [
+    "ADR-RET-078 — requirements/adr/[2026-10-20 15-29] ADR-RET-078-return-master-system-v2.md"
+  ],
+  "status": "agreed",
+  "title": "Мастер-система возврата — 1С",
+  "updatedAt": "2026-11-17T12:00:00.000Z",
+  "updatedBy": "import"
+}

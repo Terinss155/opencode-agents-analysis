@@ -1,0 +1,19 @@
+{
+  "assignee": "Алена Господинова (RetailCRM), Артем Колосов (1С)",
+  "block": "onec",
+  "body": "",
+  "createdAt": "2026-11-17T12:00:00.000Z",
+  "createdBy": "import",
+  "date": "",
+  "kind": "question",
+  "links": [],
+  "owner": "",
+  "sources": [
+    "requirements/questions/return-status-model_questions.md, вопрос 3",
+    "sources/answers/[2026-10-22] Переписка Лемешева — Колосов (возврат денег до поступления изделий).md"
+  ],
+  "status": "open",
+  "title": "Как заявка переходит в «Возврат принят», если клиенту возвращают деньги до поступления изделий на склад?",
+  "updatedAt": "2026-11-17T12:00:00.000Z",
+  "updatedBy": "import"
+}

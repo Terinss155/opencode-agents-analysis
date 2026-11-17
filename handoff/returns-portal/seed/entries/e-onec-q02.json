@@ -1,0 +1,20 @@
+{
+  "assignee": "1C Solution Architect, TeamLead ERP 1C Development, System Architect",
+  "block": "onec",
+  "body": "",
+  "createdAt": "2026-11-17T12:00:00.000Z",
+  "createdBy": "import",
+  "date": "",
+  "kind": "question",
+  "links": [
+    "e-onec-x02"
+  ],
+  "owner": "",
+  "sources": [
+    "requirements/questions/return-number_questions.md, вопрос 4"
+  ],
+  "status": "open",
+  "title": "Номер «R + порядковый номер» — это GUID 1С или отдельный номер? Когда 1С его присваивает?",
+  "updatedAt": "2026-11-17T12:00:00.000Z",
+  "updatedBy": "import"
+}

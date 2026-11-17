@@ -1,0 +1,20 @@
+{
+  "assignee": "1C Solution Architect, команда веб-разработки",
+  "block": "onec",
+  "body": "",
+  "createdAt": "2026-11-17T12:00:00.000Z",
+  "createdBy": "import",
+  "date": "",
+  "kind": "question",
+  "links": [
+    "e-onec-f01"
+  ],
+  "owner": "",
+  "sources": [
+    "requirements/questions/store-return-courier-request_questions.md, вопрос 0"
+  ],
+  "status": "open",
+  "title": "Когда 1С начинает создавать заявку на сайте при возврате в магазине без заявки клиента?",
+  "updatedAt": "2026-11-17T12:00:00.000Z",
+  "updatedBy": "import"
+}

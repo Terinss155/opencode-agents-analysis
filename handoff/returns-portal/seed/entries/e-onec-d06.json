@@ -1,0 +1,19 @@
+{
+  "assignee": "",
+  "block": "onec",
+  "body": "Статусы позиции заказа нужны сайту, чтобы разрешить или запретить возврат; количество в 1С считается по её данным.",
+  "createdAt": "2026-11-17T12:00:00.000Z",
+  "createdBy": "import",
+  "date": "2026-11-11",
+  "kind": "decision",
+  "links": [],
+  "owner": "",
+  "sources": [
+    "requirements/questions/order-position-split_questions.md, решение 4",
+    "sources/transcriptions/[bandicam 2026-11-11 13-01-55-698] Вопросы по обмену плат. реквизитами.md, 00:40:33–00:40:52"
+  ],
+  "status": "agreed",
+  "title": "1С сама вычисляет количество, доступное к возврату",
+  "updatedAt": "2026-11-17T12:00:00.000Z",
+  "updatedBy": "import"
+}

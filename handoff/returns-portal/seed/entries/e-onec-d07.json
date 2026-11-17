@@ -1,0 +1,18 @@
+{
+  "assignee": "",
+  "block": "onec",
+  "body": "Первая версия — в АРМ маркетинга (1С КА), перенос в «Розницу» — позже.",
+  "createdAt": "2026-11-17T12:00:00.000Z",
+  "createdBy": "import",
+  "date": "2026-10-07",
+  "kind": "decision",
+  "links": [],
+  "owner": "1C Analyst — Антон Самуйлов",
+  "sources": [
+    "ADR-RET-051 — requirements/adr/[2026-10-07 16-30] ADR-RET-051-store-walk-in-return-processing-v3.md"
+  ],
+  "status": "agreed",
+  "title": "Возврат интернет-заказа в магазине — в АРМ маркетинга 1С КА",
+  "updatedAt": "2026-11-17T12:00:00.000Z",
+  "updatedBy": "import"
+}

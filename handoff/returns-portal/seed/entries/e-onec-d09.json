@@ -1,0 +1,19 @@
+{
+  "assignee": "",
+  "block": "onec",
+  "body": "",
+  "createdAt": "2026-11-17T12:00:00.000Z",
+  "createdBy": "import",
+  "date": "2026-10-21",
+  "kind": "decision",
+  "links": [],
+  "owner": "Head of PMO — Светлана Варцаба; предложил Артем Колосов",
+  "sources": [
+    "ADR-RET-088 — requirements/adr/[2026-10-21 16-30] ADR-RET-088-store-partial-handover-v1.md",
+    "sources/answers/[2026-10-22] Переписка Лемешева — Колосов, Варцаба (частичная сдача в магазине).md"
+  ],
+  "status": "agreed",
+  "title": "Частичная сдача по заявке в свой магазин: сданные позиции — «Принято», несданные — «Отменено»",
+  "updatedAt": "2026-11-17T12:00:00.000Z",
+  "updatedBy": "import"
+}

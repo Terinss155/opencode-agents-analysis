@@ -1,0 +1,19 @@
+{
+  "assignee": "",
+  "block": "onec",
+  "body": "Сайт проверяет заполнение полей. 1С проверяет, что нельзя сдать больше, чем куплено: изделие уже возвращено или по нему есть заявка.",
+  "createdAt": "2026-11-17T12:00:00.000Z",
+  "createdBy": "import",
+  "date": "",
+  "kind": "decision",
+  "links": [],
+  "owner": "",
+  "sources": [
+    "requirements/questions/return-status-model_questions.md, решение 6",
+    "sources/answers/[2026-11-12 13-21] Переписка Лемешева — Колосов (проверки 1С по заявке на возврат).md"
+  ],
+  "status": "agreed",
+  "title": "Порядок проверок заявки: сначала сайт, затем 1С",
+  "updatedAt": "2026-11-17T12:00:00.000Z",
+  "updatedBy": "import"
+}

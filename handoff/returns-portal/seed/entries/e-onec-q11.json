@@ -1,0 +1,18 @@
+{
+  "assignee": "1C Solution Architect, лид аналитиков RetailCRM",
+  "block": "onec",
+  "body": "",
+  "createdAt": "2026-11-17T12:00:00.000Z",
+  "createdBy": "import",
+  "date": "",
+  "kind": "question",
+  "links": [],
+  "owner": "",
+  "sources": [
+    "requirements/questions/store-return-courier-request_questions.md, вопрос 1"
+  ],
+  "status": "open",
+  "title": "Какая система рассчитывает статус позиции исходного заказа для возвратов — сайт, 1С или RetailCRM?",
+  "updatedAt": "2026-11-17T12:00:00.000Z",
+  "updatedBy": "import"
+}

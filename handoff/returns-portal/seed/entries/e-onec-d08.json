@@ -1,0 +1,18 @@
+{
+  "assignee": "",
+  "block": "onec",
+  "body": "",
+  "createdAt": "2026-11-17T12:00:00.000Z",
+  "createdBy": "import",
+  "date": "2026-10-21",
+  "kind": "decision",
+  "links": [],
+  "owner": "Head of PMO — Светлана Варцаба; предложил Артем Колосов",
+  "sources": [
+    "ADR-RET-085 — requirements/adr/[2026-10-21 16-30] ADR-RET-085-store-return-with-existing-request-v2.md"
+  ],
+  "status": "agreed",
+  "title": "Магазин не меняет способ возврата в заявке: принимает возврат без заявки, прежнюю заявку отменяют клиент или Дружба",
+  "updatedAt": "2026-11-17T12:00:00.000Z",
+  "updatedBy": "import"
+}

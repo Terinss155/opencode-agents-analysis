@@ -1,0 +1,19 @@
+{
+  "assignee": "Артем Колосов (1С)",
+  "block": "onec",
+  "body": "Предварительный ответ 1C Solution Architect; окончательного подтверждения нет.",
+  "createdAt": "2026-11-17T12:00:00.000Z",
+  "createdBy": "import",
+  "date": "2026-11-12",
+  "kind": "decision",
+  "links": [],
+  "owner": "1C Solution Architect — Артем Колосов",
+  "sources": [
+    "requirements/questions/return-number_questions.md, решение 6",
+    "sources/answers/[2026-11-12 14-00] Переписка Лемешева — Колосов (создание заявки на возврат в 1С и GUID).md"
+  ],
+  "status": "proposed",
+  "title": "1С присваивает GUID заявке сразу при получении, до проверки",
+  "updatedAt": "2026-11-17T12:00:00.000Z",
+  "updatedBy": "import"
+}

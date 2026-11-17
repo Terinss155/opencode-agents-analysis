@@ -1,0 +1,18 @@
+{
+  "assignee": "Катя Филатова (Product Manager), Артем Колосов (1С)",
+  "block": "onec",
+  "body": "",
+  "createdAt": "2026-11-17T12:00:00.000Z",
+  "createdBy": "import",
+  "date": "",
+  "kind": "question",
+  "links": [],
+  "owner": "",
+  "sources": [
+    "requirements/questions/return-status-model_questions.md, вопрос 7"
+  ],
+  "status": "open",
+  "title": "Согласны ли с тем, что клиент отменяет заявку в любом статусе до «Возврат принят», включая «Заявка создана», «Заявка обработана» и «Заявка на проверке в 1С»?",
+  "updatedAt": "2026-11-17T12:00:00.000Z",
+  "updatedBy": "import"
+}

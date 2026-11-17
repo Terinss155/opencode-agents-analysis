@@ -1,0 +1,18 @@
+{
+  "assignee": "",
+  "block": "onec",
+  "body": "Действие системы определяется статусом; отказ от «Ожидает проверки 1С» и «Ошибки проверки в 1С»; одна строка заказа делится при частичном возврате. Статус ADR — «Предложено».",
+  "createdAt": "2026-11-17T12:00:00.000Z",
+  "createdBy": "import",
+  "date": "2026-11-13",
+  "kind": "decision",
+  "links": [],
+  "owner": "1C Solution Architect — Артем Колосов (архитектор проекта)",
+  "sources": [
+    "ADR-RET-099 — requirements/adr/[2026-11-13 13-30] ADR-RET-099-return-status-model-mvp-v8.md"
+  ],
+  "status": "proposed",
+  "title": "Статусная модель MVP v8: заявка проходит проверку сайта и 1С, ошибки исправляет Дружба",
+  "updatedAt": "2026-11-17T12:00:00.000Z",
+  "updatedBy": "import"
+}

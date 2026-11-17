@@ -1,0 +1,20 @@
+{
+  "assignee": "",
+  "block": "onec",
+  "body": "",
+  "createdAt": "2026-11-17T12:00:00.000Z",
+  "createdBy": "import",
+  "date": "2026-11-12",
+  "kind": "source",
+  "links": [
+    "e-onec-d04"
+  ],
+  "owner": "",
+  "sources": [
+    "sources/answers/[2026-11-12 14-00] Переписка Лемешева — Колосов (создание заявки на возврат в 1С и GUID).md"
+  ],
+  "status": "active",
+  "title": "Переписка Лемешева — Колосов: создание заявки на возврат в 1С и GUID, 12.11.2026",
+  "updatedAt": "2026-11-17T12:00:00.000Z",
+  "updatedBy": "import"
+}

@@ -1,0 +1,23 @@
+{
+  "assignee": "Оля Свистунова (Backend), Катя Лемешева (SA)",
+  "block": "onec",
+  "body": "В ECOMDEV-2587 начальные значения cms_return_statuses: pending, accepted, confirmation, sent, received, completed, cancelled — по статусной модели v3 от 12.11.2026.\nADR-RET-099 (v8, 13.11.2026) вводит статусы до «Заявка на возврат принята» и проверку заявки в 1С. Черновик входящего метода validation-result от 1С опирается на v8.\nНужно сверить справочник статусов в задаче с v8 до выкатки модели данных.",
+  "createdAt": "2026-11-17T12:00:00.000Z",
+  "createdBy": "import",
+  "date": "2026-11-17",
+  "kind": "discrepancy",
+  "links": [
+    "e-onec-d12",
+    "e-onec-t01"
+  ],
+  "owner": "",
+  "sources": [
+    "ECOMDEV-2587",
+    "ADR-RET-099",
+    "requirements/diagrams/erd/return-request_erd.md, раздел 2.4"
+  ],
+  "status": "open",
+  "title": "Справочник статусов заявки в ECOMDEV-2587 — по модели v3, действует модель v8 (ADR-RET-099)",
+  "updatedAt": "2026-11-17T12:00:00.000Z",
+  "updatedBy": "import"
+}

@@ -1,0 +1,24 @@
+{
+  "assignee": "Оля Свистунова (Backend), Катя Лемешева (SA)",
+  "block": "onec",
+  "body": "В ECOMDEV-2587 number — уникальный внутренний номер сайта, onec_id — идентификатор заявки в 1С; где хранится номер «R…» — открытый вопрос задачи.\nПо ADR-RET-098 клиент, RetailCRM и 1С видят один сквозной номер «R + порядковый номер» от 1С.\nНужно решить, в каком поле хранится номер R… и что лежит в number до ответа 1С.",
+  "createdAt": "2026-11-17T12:00:00.000Z",
+  "createdBy": "import",
+  "date": "2026-11-17",
+  "kind": "discrepancy",
+  "links": [
+    "e-onec-d03",
+    "e-onec-q02",
+    "e-onec-t01"
+  ],
+  "owner": "",
+  "sources": [
+    "ECOMDEV-2587",
+    "ADR-RET-098",
+    "requirements/questions/return-number_questions.md, вопрос 4"
+  ],
+  "status": "open",
+  "title": "Номер заявки: в ECOMDEV-2587 поле number — внутренний номер сайта, по ADR-RET-098 сквозной номер R… присваивает 1С",
+  "updatedAt": "2026-11-17T12:00:00.000Z",
+  "updatedBy": "import"
+}

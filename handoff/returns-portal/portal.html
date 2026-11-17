@@ -1,0 +1,608 @@
+<title>Портал Возвраты 2.0</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&family=Onest:wght@500;600;700&display=swap">
+<style>
+/* Layout: рабочий стол аналитика — колонка навигации слева, лента записей справа; на телефоне навигация сверху */
+:root {
+  --bg: #f6f7f9; --panel: #ffffff; --ink: #18202b; --muted: #5d6878; --line: #dde2e9;
+  --accent: #1f5fbf; --accent-soft: #e6eefb;
+  --ok: #1d7a4a; --ok-soft: #e3f3ea; --warn: #9a5b00; --warn-soft: #fbf0dc;
+  --bad: #b3261e; --bad-soft: #fbe6e4; --info: #5b4bb5; --info-soft: #ece9f9;
+  --f-display: "Onest", "Segoe UI", system-ui, sans-serif;
+  --f-body: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  --f-mono: "IBM Plex Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #11151b; --panel: #181e26; --ink: #e5e9ef; --muted: #98a3b3; --line: #2a323d;
+  --accent: #7aa7ec; --accent-soft: #1d2a3f;
+  --ok: #6bc99a; --ok-soft: #173126; --warn: #e6b05c; --warn-soft: #34291a;
+  --bad: #f08a80; --bad-soft: #3a1f1d; --info: #b1a6f2; --info-soft: #262245; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #11151b; --panel: #181e26; --ink: #e5e9ef; --muted: #98a3b3; --line: #2a323d;
+  --accent: #7aa7ec; --accent-soft: #1d2a3f;
+  --ok: #6bc99a; --ok-soft: #173126; --warn: #e6b05c; --warn-soft: #34291a;
+  --bad: #f08a80; --bad-soft: #3a1f1d; --info: #b1a6f2; --info-soft: #262245; color-scheme: dark }
+* { box-sizing: border-box }
+body { background: var(--bg); color: var(--ink); font: 14px/1.55 var(--f-body); }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--panel) }
+a { color: var(--accent) }
+button, input, select, textarea { font: inherit; color: inherit }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px }
+.top { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--panel); border-bottom: 1px solid var(--line);
+  padding-block: 10px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+  display: flex; gap: 12px; align-items: center; flex-wrap: wrap }
+.brand { font: 700 17px/1.2 var(--f-display); letter-spacing: -.01em; white-space: nowrap }
+.brand small { display: block; font: 500 11px var(--f-body); color: var(--muted); letter-spacing: .04em; text-transform: uppercase }
+.search { flex: 1 1 260px; min-width: 0; display: flex }
+.search input { width: 100%; padding: 8px 12px; border: 1px solid var(--line); border-radius: 8px; background: var(--bg) }
+.who { font-size: 12px; color: var(--muted); display: flex; gap: 8px; align-items: center; flex-wrap: wrap }
+.pill { display: inline-flex; align-items: center; gap: 6px; padding: 2px 9px; border-radius: 999px; font-size: 12px; font-weight: 500; white-space: nowrap; border: 1px solid transparent }
+.dot { width: 7px; height: 7px; border-radius: 50% }
+.wrap { display: grid; grid-template-columns: 240px minmax(0, 1fr); gap: 20px;
+  padding-block: 18px 40px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); max-width: 1280px; margin: 0 auto }
+nav h4 { font: 600 11px var(--f-body); text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin: 16px 0 6px }
+nav h4:first-child { margin-top: 0 }
+nav a { display: flex; justify-content: space-between; gap: 8px; padding: 6px 10px; border-radius: 6px; color: var(--ink); text-decoration: none }
+nav a:hover { background: var(--accent-soft) }
+nav a.on { background: var(--accent-soft); color: var(--accent); font-weight: 600 }
+nav a .n { font: 500 12px var(--f-mono); color: var(--muted); font-variant-numeric: tabular-nums }
+nav a.empty { color: var(--muted) }
+main { min-width: 0 }
+h1 { font: 700 24px/1.25 var(--f-display); margin: 0 0 4px; text-wrap: balance; letter-spacing: -.015em }
+h2 { font: 600 17px/1.3 var(--f-display); margin: 26px 0 10px }
+h3 { font: 600 14px var(--f-body); margin: 0 }
+.lead { color: var(--muted); margin: 0 0 16px; max-width: 70ch }
+.grid2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px }
+.card { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; min-width: 0 }
+.list { display: flex; flex-direction: column; gap: 8px }
+.item { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; display: flex; flex-direction: column; gap: 6px; min-width: 0; cursor: pointer; text-align: left }
+.item:hover { border-color: var(--accent) }
+.item .meta { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; font-size: 12px; color: var(--muted) }
+.item .ttl { font-weight: 600; overflow-wrap: anywhere }
+.item .excerpt { color: var(--muted); font-size: 13px; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical }
+.k-question { background: var(--warn-soft); color: var(--warn) } .k-decision { background: var(--ok-soft); color: var(--ok) }
+.k-discrepancy { background: var(--bad-soft); color: var(--bad) } .k-proposal { background: var(--info-soft); color: var(--info) }
+.k-fact { background: var(--accent-soft); color: var(--accent) } .k-source, .k-task { background: var(--bg); color: var(--muted); border-color: var(--line) }
+.s { border-color: var(--line); color: var(--muted) } .s.att { border-color: var(--warn); color: var(--warn) } .s.done { border-color: var(--ok); color: var(--ok) }
+.mono { font-family: var(--f-mono); font-size: 12px }
+.filters { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px }
+.filters select, .filters input { padding: 6px 8px; border: 1px solid var(--line); border-radius: 7px; background: var(--panel); min-width: 0; max-width: 100% }
+.btn { padding: 7px 13px; border-radius: 7px; border: 1px solid var(--line); background: var(--panel); cursor: pointer; font-weight: 500 }
+.btn.primary { background: var(--accent); color: var(--panel); border-color: var(--accent) }
+.btn:disabled { opacity: .5; cursor: not-allowed }
+.row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center }
+.between { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; align-items: flex-start }
+form.f { display: grid; gap: 10px; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px }
+form.f label { display: grid; gap: 4px; font-size: 12px; color: var(--muted); font-weight: 500 }
+form.f input, form.f select, form.f textarea { padding: 8px 10px; border: 1px solid var(--line); border-radius: 7px; background: var(--bg); color: var(--ink); width: 100%; min-width: 0 }
+form.f textarea { min-height: 110px; resize: vertical }
+.two { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px }
+.body { white-space: pre-wrap; overflow-wrap: anywhere; max-width: 78ch }
+.feed { display: flex; flex-direction: column }
+.feed .ev { display: grid; grid-template-columns: 92px minmax(0, 1fr); gap: 10px; padding: 8px 0; border-bottom: 1px solid var(--line); font-size: 13px }
+.feed .ev time { color: var(--muted); font: 12px var(--f-mono); font-variant-numeric: tabular-nums }
+.feed .ev a { cursor: pointer }
+.note { padding: 10px 14px; border-radius: 8px; background: var(--warn-soft); color: var(--warn); font-size: 13px; margin-bottom: 14px }
+.note.info { background: var(--accent-soft); color: var(--accent) }
+.empty-state { color: var(--muted); padding: 18px; border: 1px dashed var(--line); border-radius: 10px; text-align: center }
+.stat { display: flex; flex-direction: column; gap: 2px }
+.stat b { font: 700 22px var(--f-display); font-variant-numeric: tabular-nums }
+.stat span { font-size: 12px; color: var(--muted) }
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin-bottom: 8px }
+.stats .card { cursor: pointer }
+.answer { border-left: 3px solid var(--line); padding: 6px 12px; display: flex; flex-direction: column; gap: 4px }
+.chips { display: flex; gap: 6px; flex-wrap: wrap }
+.toast { position: fixed; right: max(16px, env(safe-area-inset-right, 0px)); bottom: calc(16px + env(safe-area-inset-bottom, 0px)); background: var(--ink); color: var(--panel); padding: 9px 14px; border-radius: 8px; font-size: 13px; z-index: 20 }
+textarea.export { width: 100%; min-height: 160px; font: 12px var(--f-mono) }
+@media (max-width: 760px) { .wrap { grid-template-columns: minmax(0, 1fr) } nav { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 4px } nav h4 { display: none } nav a { white-space: nowrap; border: 1px solid var(--line) } }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important } }
+</style>
+
+<header class="top">
+  <div class="brand">Возвраты 2.0<small>база знаний SA и разработки</small></div>
+  <div class="search"><input id="q" type="search" placeholder="Поиск по записям, ответам и источникам" autocomplete="off"></div>
+  <div class="who" id="who"><span class="pill s">Подключение…</span></div>
+</header>
+
+<div class="wrap">
+  <nav id="nav" aria-label="Разделы"></nav>
+  <main id="main"><div class="empty-state">Загружаю записи…</div></main>
+</div>
+<div class="toast" id="toast" hidden></div>
+
+<script>
+(function () {
+  "use strict";
+  // ---------- справочники структуры ----------
+  const BLOCKS = [
+    { id: "overview", t: "Обзор проекта", g: "Разделы" },
+    { id: "logic", t: "Бизнес-логика", g: "Разделы" },
+    { id: "statuses", t: "Статусная модель", g: "Разделы" },
+    { id: "api", t: "API", g: "Разделы" },
+    { id: "data", t: "Модель данных", g: "Разделы" },
+    { id: "tasks", t: "Задачи", g: "Разделы" },
+    { id: "onec", t: "1С", g: "Интеграции" },
+    { id: "rcrm", t: "RetailCRM", g: "Интеграции" },
+    { id: "mindbox", t: "Mindbox", g: "Интеграции" },
+    { id: "logistics", t: "Логистика и службы", g: "Интеграции" }
+  ];
+  const KINDS = {
+    question: { t: "Вопрос", many: "Открытые вопросы", st: [["open", "Открыт"], ["answered", "Есть ответ"], ["closed", "Закрыт"]], att: ["open", "answered"] },
+    discrepancy: { t: "Расхождение", many: "Расхождения", st: [["open", "Открыто"], ["inwork", "В работе"], ["resolved", "Устранено"]], att: ["open", "inwork"] },
+    decision: { t: "Решение", many: "Журнал решений", st: [["proposed", "Предложено"], ["agreed", "Согласовано"], ["replaced", "Заменено"]], att: ["proposed"] },
+    proposal: { t: "Предложение", many: "Предложения", st: [["new", "Новое"], ["accepted", "Принято"], ["rejected", "Отклонено"]], att: ["new"] },
+    fact: { t: "Новые сведения", many: "Новые сведения", st: [["new", "Новое"], ["confirmed", "Подтверждено"]], att: ["new"] },
+    task: { t: "Задача", many: "Задачи", st: [["backlog", "Беклог"], ["inwork", "В работе"], ["paused", "Пауза"], ["done", "Готово"]], att: [] },
+    source: { t: "Источник", many: "Источники", st: [["active", "Действует"], ["outdated", "Устарел"]], att: [] }
+  };
+  const KIND_ORDER = ["discrepancy", "question", "proposal", "fact", "decision", "task", "source"];
+  const DONE = ["closed", "resolved", "agreed", "accepted", "confirmed", "done", "rejected", "replaced", "outdated"];
+  const REGISTRIES = [
+    { id: "questions", kind: "question", t: "Открытые вопросы" },
+    { id: "discrepancies", kind: "discrepancy", t: "Расхождения" },
+    { id: "decisions", kind: "decision", t: "Журнал решений" },
+    { id: "sources", kind: "source", t: "Источники" },
+    { id: "all", kind: "", t: "Все записи" }
+  ];
+
+  // ---------- состояние ----------
+  const S = { entries: new Map(), answers: [], changes: [], blocks: new Map(), loaded: false, failed: "", me: null, canWrite: null,
+    profiles: {}, db: null, user: null, assets: null, downloads: null, view: "home", filters: {}, editing: null };
+  const $ = (s, r = document) => r.querySelector(s);
+  const esc = (v) => String(v == null ? "" : v).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  const now = () => new Date().toISOString();
+  const newId = (p) => p + Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+  const kindT = (k) => (KINDS[k] ? KINDS[k].t : k);
+  const stT = (k, s) => { const x = KINDS[k] && KINDS[k].st.find((p) => p[0] === s); return x ? x[1] : (s || "—"); };
+  const blockT = (b) => { const x = BLOCKS.find((y) => y.id === b); return x ? x.t : (b || "Без раздела"); };
+  const fmt = (iso) => { if (!iso) return ""; const d = new Date(iso); if (isNaN(d)) return iso; return d.toLocaleString("ru-RU", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" }); };
+  const isAtt = (e) => KINDS[e.kind] && KINDS[e.kind].att.includes(e.status);
+  function who(id) {
+    if (!id) return "—";
+    if (id === "import") return "Импорт из материалов проекта";
+    const p = S.profiles[id];
+    return (p && p.name) || (S.me && id === S.me ? "Вы" : "Участник");
+  }
+  function toast(t) { const el = $("#toast"); el.textContent = t; el.hidden = false; clearTimeout(toast._t); toast._t = setTimeout(() => (el.hidden = true), 2600); }
+  function linkify(text) {
+    let h = esc(text);
+    h = h.replace(/https?:\/\/[^\s<]+/g, (u) => '<a href="' + u + '" target="_blank" rel="noopener">' + u + "</a>");
+    h = h.replace(/\b((?:ECOMDEV|TNT|DEVIOS|DEVANDROID|SUP|ITGENERAL)-\d+)\b/g, '<a href="https://tracker.yandex.ru/$1" target="_blank" rel="noopener">$1</a>');
+    return h;
+  }
+  function entryList() { return Array.from(S.entries.values()); }
+  function answersOf(id) { return S.answers.filter((a) => a.entryId === id).sort((a, b) => (a.at || "").localeCompare(b.at || "")); }
+
+  // ---------- маршрутизация ----------
+  function route() {
+    const h = (location.hash || "#home").slice(1);
+    S.view = h || "home";
+    render();
+    window.scrollTo(0, 0);
+  }
+  window.addEventListener("hashchange", () => { S.editing = null; route(); });
+  function go(h) { if (location.hash === "#" + h) route(); else location.hash = h; }
+
+  // ---------- навигация ----------
+  function renderNav() {
+    const all = entryList();
+    const count = (f) => all.filter(f).length;
+    let h = '<h4>Главная</h4><a href="#home" class="' + (S.view === "home" ? "on" : "") + '">Последние изменения<span class="n">' + count(isAtt) + "</span></a>";
+    ["Разделы", "Интеграции"].forEach((g) => {
+      h += "<h4>" + g + "</h4>";
+      BLOCKS.filter((b) => b.g === g).forEach((b) => {
+        const n = count((e) => e.block === b.id);
+        h += '<a href="#block-' + b.id + '" class="' + (S.view === "block-" + b.id ? "on " : "") + (n ? "" : "empty") + '">' + esc(b.t) + '<span class="n">' + (n || "") + "</span></a>";
+      });
+    });
+    h += "<h4>Реестры</h4>";
+    REGISTRIES.forEach((r) => {
+      const n = r.kind ? count((e) => e.kind === r.kind && (r.kind === "decision" || r.kind === "source" || isAtt(e))) : all.length;
+      h += '<a href="#' + r.id + '" class="' + (S.view === r.id ? "on" : "") + '">' + esc(r.t) + '<span class="n">' + n + "</span></a>";
+    });
+    h += "<h4>Работа с Claude Code</h4>" + '<a href="#export" class="' + (S.view === "export" ? "on" : "") + '">Выгрузка</a>';
+    $("#nav").innerHTML = h;
+  }
+
+  function renderWho() {
+    let h = "";
+    if (S.failed) h = '<span class="pill s att">' + esc(S.failed) + "</span>";
+    else if (!S.loaded) h = '<span class="pill s">Подключение…</span>';
+    else {
+      h = '<span class="pill s done"><span class="dot" style="background:var(--ok)"></span>Общая база</span>';
+      h += '<span>' + esc(S.me ? who(S.me) : "Гость") + "</span>";
+      if (S.canWrite === false) h += '<span class="pill s att">Только чтение</span>';
+    }
+    $("#who").innerHTML = h;
+  }
+
+  // ---------- карточки ----------
+  function itemHtml(e) {
+    const na = answersOf(e.id).length;
+    return '<button class="item" data-open="' + esc(e.id) + '">' +
+      '<div class="meta"><span class="pill k-' + esc(e.kind) + '">' + esc(kindT(e.kind)) + '</span>' +
+      '<span class="pill s ' + (isAtt(e) ? "att" : DONE.includes(e.status) ? "done" : "") + '">' + esc(stT(e.kind, e.status)) + "</span>" +
+      "<span>" + esc(blockT(e.block)) + "</span>" +
+      (e.assignee ? "<span>Кому: " + esc(e.assignee) + "</span>" : "") +
+      (na ? "<span>Ответов: " + na + "</span>" : "") +
+      (e.date ? '<span class="mono">' + esc(e.date) + "</span>" : "") + "</div>" +
+      '<div class="ttl">' + esc(e.title) + "</div>" +
+      (e.body ? '<div class="excerpt">' + esc(e.body) + "</div>" : "") + "</button>";
+  }
+  function listHtml(arr, emptyText) {
+    if (!arr.length) return '<div class="empty-state">' + esc(emptyText) + "</div>";
+    return '<div class="list">' + arr.map(itemHtml).join("") + "</div>";
+  }
+  function sortEntries(arr) {
+    return arr.sort((a, b) => (isAtt(b) - isAtt(a)) || (b.updatedAt || "").localeCompare(a.updatedAt || ""));
+  }
+
+  // ---------- главная ----------
+  function viewHome() {
+    const all = entryList();
+    const att = sortEntries(all.filter(isAtt));
+    const c = (k) => all.filter((e) => e.kind === k && isAtt(e)).length;
+    let h = '<h1>Возвраты 2.0</h1><p class="lead">Общая база системного аналитика и разработки: решения, вопросы, расхождения и источники по всему проекту. Записи видят все, у кого есть доступ к странице, и меняют участники с правом редактирования.</p>';
+    if (S.canWrite === false) h += '<div class="note">У вас доступ только для чтения. Чтобы добавлять записи и ответы, владельцу страницы нужно выдать вам право редактирования.</div>';
+    h += '<div class="stats">' +
+      stat(c("question"), "вопросов ждут ответа или закрытия", "questions") +
+      stat(c("discrepancy"), "расхождений не устранено", "discrepancies") +
+      stat(c("proposal") + c("fact"), "новых предложений и сведений", "all") +
+      stat(all.filter((e) => e.kind === "decision" && e.status === "proposed").length, "решений на согласовании", "decisions") + "</div>";
+    h += '<div class="grid2"><section><h2>Требует внимания</h2>' + listHtml(att.slice(0, 12), "Сейчас ничего не ждёт ответа.") + "</section>";
+    h += "<section><h2>Последние изменения</h2>" + feedHtml(S.changes.slice(0, 30)) + "</section></div>";
+    h += "<h2>Разделы</h2><div class=\"stats\">" + BLOCKS.map((b) => {
+      const n = all.filter((e) => e.block === b.id).length;
+      return '<div class="card" data-go="block-' + b.id + '"><div class="stat"><b>' + n + "</b><span>" + esc(b.t) + (n ? "" : " · не заполнен") + "</span></div></div>";
+    }).join("") + "</div>";
+    return h;
+  }
+  function stat(n, label, target) { return '<div class="card" data-go="' + target + '"><div class="stat"><b>' + n + "</b><span>" + esc(label) + "</span></div></div>"; }
+  function feedHtml(arr) {
+    if (!arr.length) return '<div class="empty-state">Изменений пока нет.</div>';
+    return '<div class="feed">' + arr.map((c) => {
+      const e = S.entries.get(c.entryId);
+      const ttl = e ? '<a data-open="' + esc(e.id) + '">' + esc(e.title) + "</a>" : esc(c.title || "");
+      return '<div class="ev"><time>' + esc(fmt(c.at)) + "</time><div><b>" + esc(who(c.by)) + "</b> " + esc(c.summary || c.action) + (ttl ? ": " + ttl : "") + "</div></div>";
+    }).join("") + "</div>";
+  }
+
+  // ---------- раздел ----------
+  function viewBlock(bid) {
+    const b = BLOCKS.find((x) => x.id === bid);
+    if (!b) return '<div class="empty-state">Раздел не найден.</div>';
+    const info = S.blocks.get(bid) || {};
+    const ents = entryList().filter((e) => e.block === bid);
+    let h = '<div class="between"><div><h1>' + esc(b.g === "Интеграции" ? "Интеграция: " + b.t : b.t) + "</h1>" +
+      (info.updatedAt ? '<p class="lead">Описание обновлено ' + esc(fmt(info.updatedAt)) + " · " + esc(who(info.updatedBy)) + "</p>" : '<p class="lead">Описание раздела пока не заполнено.</p>') + "</div>" +
+      '<div class="row">' + writeBtn("Добавить запись", "new-" + bid) + writeBtn("Изменить описание", "editblock-" + bid) + "</div></div>";
+    if (S.editing === "editblock-" + bid) h += blockForm(bid, info);
+    if (S.editing === "new-" + bid) h += entryForm({ block: bid });
+    h += '<div class="grid2">' + section("Кратко", info.summary) + section("Как сейчас", info.asIs) + section("Как будет", info.toBe) + "</div>";
+    KIND_ORDER.forEach((k) => {
+      const arr = sortEntries(ents.filter((e) => e.kind === k));
+      if (arr.length) h += "<h2>" + esc(KINDS[k].many) + " · " + arr.length + "</h2>" + listHtml(arr, "");
+    });
+    if (!ents.length) h += '<h2>Записи</h2><div class="empty-state">В разделе пока нет записей. Нажмите «Добавить запись», чтобы внести первое решение, вопрос или сведения.</div>';
+    return h;
+  }
+  function section(t, txt) { return '<div class="card"><h3>' + esc(t) + "</h3>" + (txt ? '<div class="body">' + linkify(txt) + "</div>" : '<p class="lead" style="margin:6px 0 0">Не заполнено.</p>') + "</div>"; }
+  function writeBtn(t, key) { return '<button class="btn" data-edit="' + esc(key) + '"' + (S.canWrite === false ? " disabled" : "") + ">" + esc(t) + "</button>"; }
+
+  // ---------- реестры ----------
+  function viewRegistry(r) {
+    const f = S.filters[r.id] || (S.filters[r.id] = { block: "", status: "", kind: r.kind, assignee: "" });
+    let arr = entryList();
+    if (f.kind) arr = arr.filter((e) => e.kind === f.kind);
+    if (f.block) arr = arr.filter((e) => e.block === f.block);
+    if (f.status === "att") arr = arr.filter(isAtt); else if (f.status) arr = arr.filter((e) => e.status === f.status);
+    if (f.assignee) arr = arr.filter((e) => (e.assignee || "").toLowerCase().includes(f.assignee.toLowerCase()));
+    if (r.kind === "decision") arr.sort((a, b) => (b.date || "").localeCompare(a.date || "")); else sortEntries(arr);
+    const kinds = r.kind ? [r.kind] : Object.keys(KINDS);
+    const statuses = f.kind ? KINDS[f.kind].st : [];
+    let h = '<div class="between"><div><h1>' + esc(r.t) + '</h1><p class="lead">' + arr.length + " записей по фильтру.</p></div>" + writeBtn("Добавить запись", "new-reg-" + r.id) + "</div>";
+    if (S.editing === "new-reg-" + r.id) h += entryForm({ kind: r.kind || "fact" });
+    h += '<div class="filters" data-reg="' + r.id + '">' +
+      (r.kind ? "" : sel("kind", [["", "Все типы"]].concat(kinds.map((k) => [k, KINDS[k].t])), f.kind)) +
+      sel("block", [["", "Все разделы"]].concat(BLOCKS.map((b) => [b.id, b.t])), f.block) +
+      sel("status", [["", "Все статусы"], ["att", "Требуют внимания"]].concat(statuses), f.status) +
+      '<input name="assignee" placeholder="Кому / ответственный" value="' + esc(f.assignee) + '"></div>';
+    h += listHtml(arr, "По фильтру ничего не найдено.");
+    return h;
+  }
+  function sel(name, opts, val) { return '<select name="' + name + '">' + opts.map((o) => '<option value="' + esc(o[0]) + '"' + (o[0] === val ? " selected" : "") + ">" + esc(o[1]) + "</option>").join("") + "</select>"; }
+
+  // ---------- запись ----------
+  function viewEntry(id) {
+    const e = S.entries.get(id);
+    if (!e) return '<div class="empty-state">Запись не найдена или ещё загружается.</div>';
+    const ans = answersOf(id);
+    const hist = S.changes.filter((c) => c.entryId === id);
+    let h = '<div class="meta row" style="margin-bottom:6px"><span class="pill k-' + esc(e.kind) + '">' + esc(kindT(e.kind)) + '</span><span class="pill s ' + (isAtt(e) ? "att" : DONE.includes(e.status) ? "done" : "") + '">' + esc(stT(e.kind, e.status)) + '</span><a href="#block-' + esc(e.block) + '">' + esc(blockT(e.block)) + '</a><span class="mono">' + esc(e.id) + "</span></div>";
+    h += '<div class="between"><h1>' + esc(e.title) + '</h1><div class="row">' + writeBtn("Изменить", "edit-" + id) + statusButtons(e) + "</div></div>";
+    if (S.editing === "edit-" + id) h += entryForm(e);
+    h += '<div class="grid2"><div class="card"><h3>Содержание</h3><div class="body">' + (e.body ? linkify(e.body) : "—") + "</div></div>";
+    h += '<div class="card"><h3>Сведения</h3><div class="list" style="gap:4px;margin-top:6px">' +
+      kv("Кому / ответственный", e.assignee) + kv(e.kind === "decision" ? "Дата решения" : "Дата", e.date) + kv("Владелец / автор решения", e.owner) +
+      kv("Создал", who(e.createdBy) + (e.createdAt ? " · " + fmt(e.createdAt) : "")) + kv("Изменил", who(e.updatedBy) + (e.updatedAt ? " · " + fmt(e.updatedAt) : "")) +
+      (e.assetUrl ? kv("Файл", '<a href="' + esc(e.assetUrl) + '" target="_blank" rel="noopener">' + esc(e.assetName || "Открыть") + "</a>", true) : "") + "</div></div></div>";
+    if (e.sources && e.sources.length) h += "<h2>Источники</h2><div class=\"card\"><ul style=\"margin:0;padding-left:18px\">" + e.sources.map((s) => "<li>" + linkify(s) + "</li>").join("") + "</ul></div>";
+    const linked = (e.links || []).map((l) => S.entries.get(l)).filter(Boolean);
+    const back = entryList().filter((x) => (x.links || []).includes(id));
+    h += "<h2>Связанные записи</h2>" + listHtml(linked.concat(back.filter((b) => !linked.includes(b))), "Связей пока нет.");
+    if (S.canWrite !== false) h += linkForm(e);
+    h += "<h2>Ответы и обсуждение · " + ans.length + "</h2>";
+    h += ans.length ? '<div class="list">' + ans.map((a) => '<div class="answer card"><div class="meta row" style="font-size:12px;color:var(--muted)"><b>' + esc(who(a.by)) + "</b><span>" + esc(fmt(a.at)) + '</span></div><div class="body">' + linkify(a.text) + "</div></div>").join("") + "</div>" : '<div class="empty-state">Ответов пока нет.</div>';
+    if (S.canWrite !== false) h += '<form class="f" id="answerForm" style="margin-top:10px"><label for="ansText">Ответ или комментарий</label><textarea id="ansText" name="text" required placeholder="Ответ, уточнение или ссылка на источник"></textarea><div class="row"><button class="btn primary" type="submit">Отправить ответ</button>' + (e.kind === "question" ? '<label class="row" style="font-size:13px"><input type="checkbox" name="close" id="ansClose"> Закрыть вопрос</label>' : "") + "</div></form>";
+    h += "<h2>История записи</h2>" + feedHtml(hist);
+    return h;
+  }
+  function kv(k, v, raw) { return '<div><span style="color:var(--muted);font-size:12px">' + esc(k) + "</span><div>" + (raw ? v : esc(v || "—")) + "</div></div>"; }
+  function statusButtons(e) {
+    if (!KINDS[e.kind] || S.canWrite === false) return "";
+    return '<select data-status="' + esc(e.id) + '" aria-label="Статус">' + KINDS[e.kind].st.map((s) => '<option value="' + s[0] + '"' + (s[0] === e.status ? " selected" : "") + ">" + esc(s[1]) + "</option>").join("") + "</select>";
+  }
+  function linkForm(e) {
+    const opts = entryList().filter((x) => x.id !== e.id && !(e.links || []).includes(x.id)).sort((a, b) => a.title.localeCompare(b.title));
+    if (!opts.length) return "";
+    return '<form class="row" id="linkForm" style="margin-top:8px"><select name="target" aria-label="Связать с записью" style="flex:1 1 260px;min-width:0;padding:6px 8px;border:1px solid var(--line);border-radius:7px;background:var(--panel)">' +
+      opts.map((x) => '<option value="' + esc(x.id) + '">' + esc(kindT(x.kind) + " · " + x.title) + "</option>").join("") + '</select><button class="btn" type="submit">Связать</button></form>';
+  }
+
+  // ---------- формы ----------
+  function entryForm(e) {
+    const isNew = !e.id;
+    const kind = e.kind || "fact";
+    return '<form class="f" id="entryForm" data-id="' + esc(e.id || "") + '" style="margin-bottom:16px"><h3>' + (isNew ? "Новая запись" : "Изменить запись") + '</h3>' +
+      '<div class="two"><label>Тип' + sel("kind", Object.keys(KINDS).map((k) => [k, KINDS[k].t]), kind) + "</label>" +
+      "<label>Раздел" + sel("block", BLOCKS.map((b) => [b.id, b.t]), e.block || "overview") + "</label>" +
+      '<label>Статус<select name="status">' + KINDS[kind].st.map((s) => '<option value="' + s[0] + '"' + (s[0] === (e.status || KINDS[kind].st[0][0]) ? " selected" : "") + ">" + esc(s[1]) + "</option>").join("") + "</select></label></div>" +
+      '<label>Заголовок<input name="title" required value="' + esc(e.title || "") + '"></label>' +
+      '<label>Содержание<textarea name="body">' + esc(e.body || "") + "</textarea></label>" +
+      '<div class="two"><label>Кому / ответственный<input name="assignee" value="' + esc(e.assignee || "") + '" placeholder="например, Оля Свистунова (Backend)"></label>' +
+      '<label>Дата (решения, встречи)<input name="date" value="' + esc(e.date || "") + '" placeholder="ГГГГ-ММ-ДД"></label>' +
+      '<label>Владелец / автор решения<input name="owner" value="' + esc(e.owner || "") + '"></label></div>' +
+      '<label>Источники — по одному в строке: ADR, файл, задача, ссылка<textarea name="sources" style="min-height:70px">' + esc((e.sources || []).join("\n")) + "</textarea></label>" +
+      (S.assets ? '<label>Файл источника (транскрибация, переписка, PDF)<input type="file" name="file"></label>' : "") +
+      '<div class="row"><button class="btn primary" type="submit">' + (isNew ? "Добавить" : "Сохранить") + '</button><button class="btn" type="button" data-cancel>Отмена</button></div></form>';
+  }
+  function blockForm(bid, info) {
+    return '<form class="f" id="blockForm" data-block="' + esc(bid) + '" style="margin-bottom:16px"><h3>Описание раздела</h3>' +
+      '<label>Кратко<textarea name="summary">' + esc(info.summary || "") + "</textarea></label>" +
+      '<label>Как сейчас<textarea name="asIs">' + esc(info.asIs || "") + "</textarea></label>" +
+      '<label>Как будет<textarea name="toBe">' + esc(info.toBe || "") + "</textarea></label>" +
+      '<div class="row"><button class="btn primary" type="submit">Сохранить</button><button class="btn" type="button" data-cancel>Отмена</button></div></form>';
+  }
+
+  // ---------- поиск ----------
+  function viewSearch(term) {
+    const t = term.toLowerCase();
+    const hit = (s) => (s || "").toLowerCase().includes(t);
+    const ansHit = new Set(S.answers.filter((a) => hit(a.text)).map((a) => a.entryId));
+    const arr = sortEntries(entryList().filter((e) => hit(e.title) || hit(e.body) || hit(e.assignee) || hit(e.owner) || (e.sources || []).some(hit) || ansHit.has(e.id)));
+    const blocks = BLOCKS.filter((b) => { const i = S.blocks.get(b.id) || {}; return hit(b.t) || hit(i.summary) || hit(i.asIs) || hit(i.toBe); });
+    let h = "<h1>Поиск: " + esc(term) + '</h1><p class="lead">Записей: ' + arr.length + (blocks.length ? " · разделов: " + blocks.length : "") + "</p>";
+    if (blocks.length) h += '<div class="chips" style="margin-bottom:12px">' + blocks.map((b) => '<a class="pill s" href="#block-' + b.id + '">' + esc(b.t) + "</a>").join("") + "</div>";
+    return h + listHtml(arr, "Ничего не найдено.");
+  }
+
+  // ---------- выгрузка ----------
+  function exportData() {
+    return {
+      project: "Возвраты 2.0", exportedAt: now(),
+      blocks: BLOCKS.map((b) => Object.assign({ id: b.id, title: b.t, group: b.g }, S.blocks.get(b.id) || {})),
+      entries: entryList().map((e) => Object.assign({}, e, { createdByName: who(e.createdBy), updatedByName: who(e.updatedBy), answers: answersOf(e.id).map((a) => ({ text: a.text, by: who(a.by), at: a.at })) })),
+      changes: S.changes.map((c) => Object.assign({}, c, { byName: who(c.by) }))
+    };
+  }
+  function exportMd() {
+    const d = exportData();
+    let m = "# Возвраты 2.0 — выгрузка базы знаний\n\nВыгружено: " + d.exportedAt + "\n";
+    BLOCKS.forEach((b) => {
+      const info = S.blocks.get(b.id) || {};
+      const ents = d.entries.filter((e) => e.block === b.id);
+      if (!ents.length && !info.summary) return;
+      m += "\n## " + b.t + "\n";
+      if (info.summary) m += "\n**Кратко.** " + info.summary + "\n";
+      if (info.asIs) m += "\n**Как сейчас.** " + info.asIs + "\n";
+      if (info.toBe) m += "\n**Как будет.** " + info.toBe + "\n";
+      KIND_ORDER.forEach((k) => {
+        const arr = ents.filter((e) => e.kind === k);
+        if (!arr.length) return;
+        m += "\n### " + KINDS[k].many + "\n";
+        arr.forEach((e) => {
+          m += "\n- **" + e.title + "** — " + stT(e.kind, e.status) + (e.assignee ? "; кому: " + e.assignee : "") + (e.date ? "; дата: " + e.date : "") + " (`" + e.id + "`)\n";
+          if (e.body) m += "  " + e.body.replace(/\n/g, "\n  ") + "\n";
+          if (e.sources && e.sources.length) m += "  Источники: " + e.sources.join("; ") + "\n";
+          e.answers.forEach((a) => { m += "  - Ответ (" + a.by + ", " + a.at + "): " + a.text.replace(/\n/g, " ") + "\n"; });
+        });
+      });
+    });
+    return m;
+  }
+  function viewExport() {
+    return '<h1>Выгрузка для Claude Code</h1><p class="lead">Структурированная выгрузка всех записей, ответов и истории. Сохраните файл в рабочий каталог — Claude Code прочитает его как обычный файл. Markdown удобнее читать, JSON — обрабатывать.</p>' +
+      '<div class="row" style="margin-bottom:12px"><button class="btn primary" data-export="md">Сохранить Markdown</button><button class="btn" data-export="json">Сохранить JSON</button><button class="btn" data-copy="md">Скопировать Markdown</button></div>' +
+      '<div class="note info">Прямой доступ: Claude Code с подключённым claude.ai читает и пишет записи этой страницы через инструмент ArtifactData по её ссылке — от имени того, кто работает в Claude Code, с его правами на страницу. Коллекции: <span class="mono">entries</span>, <span class="mono">answers</span>, <span class="mono">changes</span>, <span class="mono">blocks</span>.</div>' +
+      '<textarea class="export" id="exportPreview" readonly aria-label="Предпросмотр выгрузки">' + esc(exportMd().slice(0, 20000)) + "</textarea>";
+  }
+
+  // ---------- отрисовка ----------
+  function render() {
+    renderNav(); renderWho();
+    const v = S.view;
+    let h;
+    if (S.failed && !S.loaded) h = '<div class="note">' + esc(S.failed) + "</div>";
+    else if (!S.loaded) h = '<div class="empty-state">Загружаю записи из общей базы…</div>';
+    else if (v === "search" && $("#q").value.trim()) h = viewSearch($("#q").value.trim());
+    else if (v.startsWith("block-")) h = viewBlock(v.slice(6));
+    else if (v.startsWith("entry-")) h = viewEntry(v.slice(6));
+    else if (v === "export") h = viewExport();
+    else { const r = REGISTRIES.find((x) => x.id === v); h = r ? viewRegistry(r) : viewHome(); }
+    $("#main").innerHTML = h;
+  }
+
+  // ---------- запись в базу ----------
+  async function logChange(entryId, action, summary, title) {
+    try { await S.db.collection("changes").doc(newId("c")).set({ entryId: entryId || "", action, summary, title: title || "", by: S.me || "", at: now() }); } catch (err) { /* журнал не обязателен для основной записи */ }
+  }
+  function writeError(err) {
+    const code = err && err.code;
+    if (code === "not_granted") { S.canWrite = false; render(); toast("Нет права на изменение. Попросите владельца выдать доступ на редактирование."); }
+    else toast("Не сохранилось: " + ((err && err.message) || "ошибка базы") + ". Повторите позже.");
+  }
+  async function saveEntry(form) {
+    const fd = new FormData(form);
+    const id = form.dataset.id;
+    const old = id ? S.entries.get(id) : null;
+    const data = {
+      kind: fd.get("kind"), block: fd.get("block"), status: fd.get("status"), title: String(fd.get("title") || "").trim(), body: String(fd.get("body") || "").trim(),
+      assignee: String(fd.get("assignee") || "").trim(), date: String(fd.get("date") || "").trim(), owner: String(fd.get("owner") || "").trim(),
+      sources: String(fd.get("sources") || "").split("\n").map((s) => s.trim()).filter(Boolean), updatedAt: now(), updatedBy: S.me || ""
+    };
+    if (!data.title) { toast("Заполните заголовок."); return; }
+    if (!KINDS[data.kind].st.some((s) => s[0] === data.status)) data.status = KINDS[data.kind].st[0][0];
+    const file = fd.get("file");
+    try {
+      if (file && file.size && S.assets) {
+        const up = await S.assets.upload(file);
+        data.assetId = up.id; data.assetUrl = up.url; data.assetName = file.name;
+      }
+      if (old) {
+        const changed = ["kind", "block", "status", "title", "body", "assignee", "date", "owner"].filter((k) => (old[k] || "") !== (data[k] || ""));
+        if (JSON.stringify(old.sources || []) !== JSON.stringify(data.sources)) changed.push("sources");
+        await S.db.collection("entries").doc(id).update(data);
+        await logChange(id, "edit", changed.includes("status") ? "изменил(а) статус на «" + stT(data.kind, data.status) + "»" : "изменил(а) запись", data.title);
+        S.editing = null; toast("Сохранено"); go("entry-" + id);
+      } else {
+        const nid = newId("e");
+        await S.db.collection("entries").doc(nid).set(Object.assign(data, { links: [], createdAt: data.updatedAt, createdBy: S.me || "" }));
+        await logChange(nid, "add", "добавил(а) " + kindT(data.kind).toLowerCase(), data.title);
+        S.editing = null; toast("Запись добавлена"); go("entry-" + nid);
+      }
+    } catch (err) { writeError(err); }
+  }
+
+  // ---------- события ----------
+  document.addEventListener("click", (ev) => {
+    const t = ev.target.closest("[data-open],[data-go],[data-edit],[data-cancel],[data-export],[data-copy]");
+    if (!t) return;
+    if (t.dataset.open) { ev.preventDefault(); go("entry-" + t.dataset.open); }
+    else if (t.dataset.go) go(t.dataset.go);
+    else if (t.dataset.edit) { S.editing = S.editing === t.dataset.edit ? null : t.dataset.edit; render(); }
+    else if (t.hasAttribute("data-cancel")) { S.editing = null; render(); }
+    else if (t.dataset.export) doExport(t.dataset.export);
+    else if (t.dataset.copy) {
+      const text = exportMd();
+      try { navigator.clipboard.writeText(text).then(() => toast("Скопировано"), () => selectPreview()); } catch (e) { selectPreview(); }
+    }
+  });
+  function selectPreview() { const ta = $("#exportPreview"); if (ta) { ta.focus(); ta.select(); toast("Выделено — скопируйте вручную"); } }
+  async function doExport(kind) {
+    const stamp = new Date().toISOString().slice(0, 10);
+    const filename = kind === "json" ? "returns-portal-" + stamp + ".json" : "returns-portal-" + stamp + ".md";
+    const data = kind === "json" ? JSON.stringify(exportData(), null, 2) : exportMd();
+    if (!S.downloads) { selectPreview(); return; }
+    try { await S.downloads.save({ filename, data }); toast("Файл сохранён"); }
+    catch (err) { if (!(err && err.code === "declined")) toast("Не удалось сохранить файл, скопируйте текст из поля."); selectPreview(); }
+  }
+  document.addEventListener("submit", async (ev) => {
+    const f = ev.target;
+    ev.preventDefault();
+    if (!S.db) return;
+    if (f.id === "entryForm") saveEntry(f);
+    else if (f.id === "blockForm") {
+      const fd = new FormData(f), bid = f.dataset.block;
+      try {
+        await S.db.collection("blocks").doc(bid).set({ summary: String(fd.get("summary") || ""), asIs: String(fd.get("asIs") || ""), toBe: String(fd.get("toBe") || ""), updatedAt: now(), updatedBy: S.me || "" });
+        await logChange("", "block", "обновил(а) описание раздела «" + blockT(bid) + "»", "");
+        S.editing = null; toast("Описание сохранено"); render();
+      } catch (err) { writeError(err); }
+    } else if (f.id === "answerForm") {
+      const id = S.view.slice(6), e = S.entries.get(id);
+      const text = String(new FormData(f).get("text") || "").trim();
+      if (!text || !e) return;
+      const close = $("#ansClose") && $("#ansClose").checked;
+      try {
+        await S.db.collection("answers").doc(newId("a")).set({ entryId: id, text, by: S.me || "", at: now() });
+        if (e.kind === "question") {
+          const st = close ? "closed" : (e.status === "open" ? "answered" : e.status);
+          if (st !== e.status) await S.db.collection("entries").doc(id).update({ status: st, updatedAt: now(), updatedBy: S.me || "" });
+        }
+        await logChange(id, "answer", close ? "ответил(а) и закрыл(а) вопрос" : "ответил(а)", e.title);
+        f.reset(); document.activeElement && document.activeElement.blur(); render(); toast("Ответ добавлен");
+      } catch (err) { writeError(err); }
+    } else if (f.id === "linkForm") {
+      const id = S.view.slice(6), e = S.entries.get(id), target = new FormData(f).get("target");
+      if (!e || !target) return;
+      try {
+        await S.db.collection("entries").doc(id).update({ links: (e.links || []).concat([target]), updatedAt: now(), updatedBy: S.me || "" });
+        await logChange(id, "link", "связал(а) с «" + ((S.entries.get(target) || {}).title || target) + "»", e.title);
+        render(); toast("Связь добавлена");
+      } catch (err) { writeError(err); }
+    }
+  });
+  document.addEventListener("change", async (ev) => {
+    const t = ev.target;
+    if (t.matches("[data-status]")) {
+      const e = S.entries.get(t.dataset.status);
+      if (!e || t.value === e.status) return;
+      try {
+        await S.db.collection("entries").doc(e.id).update({ status: t.value, updatedAt: now(), updatedBy: S.me || "" });
+        await logChange(e.id, "status", "изменил(а) статус на «" + stT(e.kind, t.value) + "»", e.title);
+        toast("Статус изменён");
+      } catch (err) { writeError(err); }
+    } else if (t.closest(".filters")) {
+      const reg = t.closest(".filters").dataset.reg;
+      S.filters[reg][t.name] = t.value;
+      if (t.name === "kind") S.filters[reg].status = "";
+      render();
+    } else if (t.form && t.form.id === "entryForm" && t.name === "kind") {
+      const stSel = t.form.querySelector('[name="status"]');
+      stSel.innerHTML = KINDS[t.value].st.map((s) => '<option value="' + s[0] + '">' + esc(s[1]) + "</option>").join("");
+    }
+  });
+  document.addEventListener("input", (ev) => {
+    if (ev.target.closest(".filters") && ev.target.name === "assignee") {
+      const reg = ev.target.closest(".filters").dataset.reg;
+      S.filters[reg].assignee = ev.target.value;
+      clearTimeout(document._ft); document._ft = setTimeout(() => { render(); const i = $('.filters input[name="assignee"]'); if (i) { i.focus(); i.setSelectionRange(i.value.length, i.value.length); } }, 300);
+    }
+  });
+  $("#q").addEventListener("keydown", (ev) => { if (ev.key === "Enter") { go(ev.target.value.trim() ? "search" : "home"); } });
+
+  // ---------- подключение ----------
+  async function resolveNames() {
+    if (!S.user) return;
+    const ids = new Set();
+    entryList().forEach((e) => { ids.add(e.createdBy); ids.add(e.updatedBy); });
+    S.answers.forEach((a) => ids.add(a.by)); S.changes.forEach((c) => ids.add(c.by));
+    Array.from(S.blocks.values()).forEach((b) => ids.add(b.updatedBy));
+    const list = Array.from(ids).filter((x) => x && x !== "import" && !S.profiles[x]);
+    if (!list.length) return;
+    try { Object.assign(S.profiles, await S.user.profiles(list)); render(); } catch (e) { /* имена необязательны */ }
+  }
+  let renderQueued = false;
+  function queueRender() { if (renderQueued) return; renderQueued = true; requestAnimationFrame(() => { renderQueued = false; if (!document.querySelector("form.f:focus-within, #answerForm:focus-within")) render(); else { renderNav(); renderWho(); } resolveNames(); }); }
+
+  async function start() {
+    route();
+    if (!window.claude || !window.claude.use) { S.failed = "Страница открыта вне claude.ai: общая база недоступна."; render(); return; }
+    const timer = setTimeout(() => { if (!S.loaded) { S.failed = "Общая база не ответила за 10 секунд. Обновите страницу."; render(); } }, 10000);
+    const [db, user, assets, downloads] = await Promise.all(["db", "user", "assets", "downloads"].map((n) => window.claude.use(n).catch(() => null)));
+    S.db = db; S.user = user; S.assets = assets; S.downloads = downloads;
+    if (!db) { clearTimeout(timer); S.failed = "Общая база недоступна: войдите в claude.ai под рабочей учётной записью или попросите доступ к странице."; render(); return; }
+    if (user) { try { S.me = await user.id(); } catch (e) { S.me = null; } try { const c = await user.can("data.write"); S.canWrite = c === null ? null : !!c; } catch (e) { S.canWrite = null; } }
+    let pending = 4;
+    const ready = () => { if (--pending === 0 || S.loaded) { clearTimeout(timer); S.loaded = true; S.failed = ""; queueRender(); } };
+    const fail = (err) => { clearTimeout(timer); S.failed = "Ошибка общей базы: " + ((err && err.message) || "нет доступа"); render(); };
+    let seen = { e: false, a: false, c: false, b: false };
+    db.collection("entries").onSnapshot((snap) => { S.entries = new Map(snap.docs.map((d) => [d.id, Object.assign({ id: d.id }, d.data())])); if (!seen.e) { seen.e = true; ready(); } else queueRender(); }, fail);
+    db.collection("answers").onSnapshot((snap) => { S.answers = snap.docs.map((d) => Object.assign({ id: d.id }, d.data())); if (!seen.a) { seen.a = true; ready(); } else queueRender(); }, fail);
+    db.collection("changes").orderBy("at", "desc").limit(300).onSnapshot((snap) => { S.changes = snap.docs.map((d) => Object.assign({ id: d.id }, d.data())); if (!seen.c) { seen.c = true; ready(); } else queueRender(); }, fail);
+    db.collection("blocks").onSnapshot((snap) => { S.blocks = new Map(snap.docs.map((d) => [d.id, d.data()])); if (!seen.b) { seen.b = true; ready(); } else queueRender(); }, fail);
+  }
+  start();
+})();
+</script>

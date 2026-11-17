@@ -1,0 +1,20 @@
+{
+  "assignee": "Артем Колосов (1С), Оля Свистунова (Backend)",
+  "block": "onec",
+  "body": "Методы, которыми 1С передаёт на сайт изменения заявки (версия 0.1.0):\n- POST /api2/returns/store-create — создать заявку при возврате в магазине;\n- POST /api2/returns/validation-result — результат проверки в 1С (подтвердила / отказала);\n- POST /api2/returns/status-update — приёмка, отмена или возврат денег.\nПередаются только поля заявки, поля заказа не передаются. Контракт с 1С не согласован.",
+  "createdAt": "2026-11-17T12:00:00.000Z",
+  "createdBy": "import",
+  "date": "",
+  "kind": "fact",
+  "links": [
+    "e-onec-d12"
+  ],
+  "owner": "",
+  "sources": [
+    "requirements/onec-returns-inbound_openapi.yaml"
+  ],
+  "status": "new",
+  "title": "Черновик контракта входящих методов 1С → сайт",
+  "updatedAt": "2026-11-17T12:00:00.000Z",
+  "updatedBy": "import"
+}

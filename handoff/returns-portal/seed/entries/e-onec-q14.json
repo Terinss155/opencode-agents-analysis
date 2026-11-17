@@ -1,0 +1,18 @@
+{
+  "assignee": "Бухгалтерия, 1С",
+  "block": "onec",
+  "body": "",
+  "createdAt": "2026-11-17T12:00:00.000Z",
+  "createdBy": "import",
+  "date": "",
+  "kind": "question",
+  "links": [],
+  "owner": "",
+  "sources": [
+    "requirements/questions/refund-payment_questions.md, вопрос 5"
+  ],
+  "status": "open",
+  "title": "Если сайт и 1С посчитали сумму возврата по-разному, какая сумма правильная?",
+  "updatedAt": "2026-11-17T12:00:00.000Z",
+  "updatedBy": "import"
+}

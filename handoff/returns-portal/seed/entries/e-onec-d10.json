@@ -1,0 +1,18 @@
+{
+  "assignee": "",
+  "block": "onec",
+  "body": "",
+  "createdAt": "2026-11-17T12:00:00.000Z",
+  "createdBy": "import",
+  "date": "2026-09-17",
+  "kind": "decision",
+  "links": [],
+  "owner": "Head of PMO — Светлана Варцаба",
+  "sources": [
+    "ADR-RET-017 — requirements/adr/[2026-09-17 15-01] ADR-RET-017-integrated-carrier-request-via-1c-v2.md"
+  ],
+  "status": "agreed",
+  "title": "Первая итерация — без интеграции с курьерскими службами, без бумажного заявления",
+  "updatedAt": "2026-11-17T12:00:00.000Z",
+  "updatedBy": "import"
+}

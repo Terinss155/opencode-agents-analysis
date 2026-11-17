@@ -27,7 +27,8 @@
 | [ECOMDEV-2642](https://tracker.yandex.ru/ECOMDEV-2642) [B] Возвраты. Обновить справочник причин возврата | Лемешева | — | Беклог | `US-01/ECOMDEV-2642 …md` |
 | [ECOMDEV-2665](https://tracker.yandex.ru/ECOMDEV-2665) [QA] Подготовка тестовой документации. Возвраты US1. Создание возврата | Ватанин | Ватанин | Беклог | — |
 | [ECOMDEV-2677](https://tracker.yandex.ru/ECOMDEV-2677) [B] Возвраты. Не создавать заказ на сайте из возврата RetailCRM | Свистунова | Свистунова | Беклог | — |
-| [ECOMDEV-2681](https://tracker.yandex.ru/ECOMDEV-2681) [B] Возвраты. Города для возвратных служб СДЭК и 5Post: вебхук логистики, первичная загрузка | Свистунова | Свистунова | Беклог | [return-carriers_questions.md](../questions/return-carriers_questions.md) |
+| [ECOMDEV-2681](https://tracker.yandex.ru/ECOMDEV-2681) [B] Возвраты. Города приёма возвратов СДЭК и 5Post: вебхук логистики, первичная загрузка | Свистунова | Свистунова | Разработка (17.11) | [return-carriers_questions.md](../questions/return-carriers_questions.md) |
+| [ECOMDEV-2712](https://tracker.yandex.ru/ECOMDEV-2712) [B] Возвраты. Админка городов приёма возвратов | Свистунова | — | Разработка (17.11) | [return-carriers_questions.md](../questions/return-carriers_questions.md) |
 | [ECOMDEV-2683](https://tracker.yandex.ru/ECOMDEV-2683) [B] Возвраты. Статусы позиции заказа для возвратов | Свистунова | Свистунова | Беклог | — |
 | [ECOMDEV-2684](https://tracker.yandex.ru/ECOMDEV-2684) [B] Возвраты. Способы возврата для города | Свистунова | Свистунова | Беклог | [return-carriers_questions.md](../questions/return-carriers_questions.md) |
 | [ECOMDEV-2685](https://tracker.yandex.ru/ECOMDEV-2685) [B] Возвраты. Создание заявки на возврат | Свистунова | Свистунова | Беклог | — |

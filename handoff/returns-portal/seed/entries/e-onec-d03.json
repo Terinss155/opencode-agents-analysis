@@ -1,0 +1,19 @@
+{
+  "assignee": "",
+  "block": "onec",
+  "body": "Один номер для сайта, МП, RetailCRM и 1С; он же в QR-коде. Кроме него у каждой системы свой внутренний идентификатор.",
+  "createdAt": "2026-11-17T12:00:00.000Z",
+  "createdBy": "import",
+  "date": "2026-11-12",
+  "kind": "decision",
+  "links": [],
+  "owner": "Project Manager — Катя Тихомирова (формат номера)",
+  "sources": [
+    "ADR-RET-098 — requirements/adr/[2026-11-12 14-59] ADR-RET-098-return-numbering-master-v2.md",
+    "requirements/questions/return-number_questions.md, решения 1, 3"
+  ],
+  "status": "agreed",
+  "title": "Сквозной номер заявки «R + порядковый номер» присваивает 1С",
+  "updatedAt": "2026-11-17T12:00:00.000Z",
+  "updatedBy": "import"
+}

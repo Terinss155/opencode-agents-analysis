@@ -1,0 +1,18 @@
+{
+  "assignee": "Алена Господинова (RetailCRM), Артем Колосов (1С)",
+  "block": "onec",
+  "body": "",
+  "createdAt": "2026-11-17T12:00:00.000Z",
+  "createdBy": "import",
+  "date": "",
+  "kind": "question",
+  "links": [],
+  "owner": "",
+  "sources": [
+    "requirements/questions/return-status-model_questions.md, вопрос 2"
+  ],
+  "status": "open",
+  "title": "Может ли магазин отменить заявку на возврат в свой магазин, если клиент принёс не те изделия или магазин их не принял?",
+  "updatedAt": "2026-11-17T12:00:00.000Z",
+  "updatedBy": "import"
+}

@@ -1,0 +1,20 @@
+{
+  "assignee": "Команда веб-разработки, 1C Solution Architect",
+  "block": "onec",
+  "body": "",
+  "createdAt": "2026-11-17T12:00:00.000Z",
+  "createdBy": "import",
+  "date": "",
+  "kind": "question",
+  "links": [
+    "e-onec-t03"
+  ],
+  "owner": "",
+  "sources": [
+    "requirements/questions/store-return-courier-request_questions.md, вопрос 5"
+  ],
+  "status": "open",
+  "title": "С какой задержкой заявка на возврат должна попадать с сайта в 1С?",
+  "updatedAt": "2026-11-17T12:00:00.000Z",
+  "updatedBy": "import"
+}

@@ -1,0 +1,18 @@
+{
+  "assignee": "",
+  "block": "onec",
+  "body": "Механизм отключения магазина не определён.",
+  "createdAt": "2026-11-17T12:00:00.000Z",
+  "createdBy": "import",
+  "date": "2026-10-01",
+  "kind": "decision",
+  "links": [],
+  "owner": "Head of PMO — Светлана Варцаба",
+  "sources": [
+    "ADR-RET-035 — requirements/adr/[2026-10-01 14-59] ADR-RET-035-store-return-acceptance-v1.md"
+  ],
+  "status": "agreed",
+  "title": "Магазины без собственных касс компании («Цветной») не принимают возвраты",
+  "updatedAt": "2026-11-17T12:00:00.000Z",
+  "updatedBy": "import"
+}

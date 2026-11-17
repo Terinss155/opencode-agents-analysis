@@ -1,0 +1,19 @@
+{
+  "assignee": "Оля Свистунова (разработчик), Александр Ватанин (тестирование)",
+  "block": "onec",
+  "body": "Таблицы заявки, изделий, статусов, способов возврата денег, реквизитов и истории версий. Пауза — требует информации (с 11.11.2026).",
+  "createdAt": "2026-11-17T12:00:00.000Z",
+  "createdBy": "import",
+  "date": "",
+  "kind": "task",
+  "links": [],
+  "owner": "",
+  "sources": [
+    "ECOMDEV-2587",
+    "requirements/diagrams/erd/return-request_erd.md"
+  ],
+  "status": "paused",
+  "title": "ECOMDEV-2587 [B] Возвраты. Модель данных заявки на возврат",
+  "updatedAt": "2026-11-17T12:00:00.000Z",
+  "updatedBy": "import"
+}
