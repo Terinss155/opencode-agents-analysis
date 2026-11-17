@@ -109,7 +109,8 @@ projects/<проект>/
 │   ├── ui/               ← элементы экранов сценария по каналу: поля, ограничения, состояния, действия (дополняет SRS)
 │   ├── steps/web/, steps/mobile/   ← пошаговый TO-BE по каналам; каждый шаг ссылается на свой AS-IS (+ to-be.bpmn.md)
 │   ├── srs/              ← SRS по каналам, отдельно MVP и Post-MVP: srs-<канал>-mvp.md, srs-<канал>-post-mvp.md (skill/srs)
-│   ├── backend/          ← логика (skill/backend-logic) и задачи в трекер backend/US-NN/ (skill/tracker-task)
+│   ├── backend/          ← описания логики в системах: как работает сейчас и как будет (skill/backend-logic); задачи в Трекер сюда не кладутся
+│   ├── tasks/            ← задачи в Трекер (skill/tracker-task), локальная копия = Трекер: index.md — реестр задач (дерево, статусы на дату сверки, наш файл); US-NN/<номер> <заголовок задачи>.md — задачи одной User Story; этапы вне историй — своя подпапка (stage-0/)
 │   ├── diagrams/<тип>/   ← sequence / erd / state целевого состояния
 │   ├── nfr/              ← nfr.md, если есть
 │   ├── questions/        ← рабочие вопросы к бизнесу и смежным командам: <тема>_questions.md, одна тема — один файл (решено + открытые вопросы с адресатом)
@@ -123,7 +124,7 @@ projects/<проект>/
 └── archive/          ← устаревшее (см. «Архив»)
 ```
 
-- **Правило размещения:** тип артефакта, у которого может быть больше одного файла (user story, use case, спецификация экрана, задачи для бэка, диаграммы, шаги), всегда лежит в своей подпапке — даже если сейчас файл один. В корне `requirements/` — только `index.md`, `brd.md`, `traceability.md` и, если ведутся, продуктовые `business-case.md` / `backlog-priority.md`.
+- **Правило размещения:** тип артефакта, у которого может быть больше одного файла (user story, use case, спецификация экрана, описание логики, диаграммы, шаги), всегда лежит в своей подпапке — даже если сейчас файл один. Задачи в Трекер лежат отдельно от описаний логики — в `requirements/tasks/` — и ссылаются на требования (SRS, описание логики `BL-*`, ADR), а не пересказывают их; канон того, как работает процесс, — описания логики, SRS и ADR, а не задачи. В корне `requirements/` — только `index.md`, `brd.md`, `traceability.md` и, если ведутся, продуктовые `business-case.md` / `backlog-priority.md`.
 - **AS-IS и TO-BE:** состояние определяется верхней папкой (`as-is/` — как сейчас, `requirements/` — как будет), а не подпапкой внутри типа. Диаграммы: `as-is/diagrams/<тип>/` и `requirements/diagrams/<тип>/`; объект — по началу имени файла (`return-entity_erd.md`, `return-status_state.md`). На диаграмму без своего ID-префикса ссылаются по пути файла.
 - **ADR:** хранится в `requirements/adr/` и объясняет причину значимого выбора, альтернативы и последствия. ADR не является новым уровнем требований и не добавляется отдельным звеном в цепочку трассировки.
 - **Первичные транскрибации:** неизменённые исходные записи встреч хранятся в `sources/transcriptions/`. Обработанное резюме и ADR не заменяют первичную транскрибацию.
@@ -220,7 +221,7 @@ projects/<проект>/
 ## Конвенция имён файлов
 Пути — от `projects/<проект>/`.
 - `business-analyst`: `requirements/index.md`, `requirements/brd.md`, `requirements/traceability.md`, `as-is/as-is.bpmn.md`, `requirements/steps/to-be.bpmn.md`, `requirements/use-case/use-case.md`, `requirements/screen-spec/screen-spec.md`, `reviews/gap/gap-analysis.md`, `brs.md`, `requirements/adr/[ГГГГ-ММ-ДД ЧЧ-ММ] ADR-<ТЕМА>-<NNN>-<решение>-vN.md`
-- `system-analyst`: `requirements/backend/<объект>_backend.md`, `requirements/backend/US-NN/<номер> <заголовок задачи>.md` (задача на бэк, `skill/tracker-task`; папка — User Story из Трекера, например `ECOMDEV-2359 [B] Добавить признак приёма возвратов cms_catalog_stock.md`; до заведения в Трекер — фиктивный номер `ECOMDEV-X<NN>`), `<объект>_erd.*` + `sql.sql`, `<объект>_sequence.md` (Mermaid), `<объект>_state.md` (в `as-is/diagrams/<тип>/` или `requirements/diagrams/<тип>/`), `openapi.yaml`, `asyncapi.yaml`, `requirements/nfr/nfr.md`, `requirements/srs/srs-<канал>-mvp.md` и `srs-<канал>-post-mvp.md` (канал — `web`, `mobile`; копия для Яндекс Вики — с суффиксом `_wiki`, например `srs-mobile-mvp_wiki.md`), `requirements/ui/<сценарий>-<канал>-mvp_ui.md` (элементы экранов; копия для Яндекс Вики — `_ui_wiki.md`), ADR — как у BA
+- `system-analyst`: `requirements/backend/<объект>_backend.md` (описание логики), `requirements/tasks/US-NN/<номер> <заголовок задачи>.md` и реестр `requirements/tasks/index.md` (задача в Трекер, `skill/tracker-task`; папка — User Story из Трекера, например `ECOMDEV-2359 [B] Добавить признак приёма возвратов cms_catalog_stock.md`; до заведения в Трекер — фиктивный номер `ECOMDEV-X<NN>`), `<объект>_erd.*` + `sql.sql`, `<объект>_sequence.md` (Mermaid), `<объект>_state.md` (в `as-is/diagrams/<тип>/` или `requirements/diagrams/<тип>/`), `openapi.yaml`, `asyncapi.yaml`, `requirements/nfr/nfr.md`, `requirements/srs/srs-<канал>-mvp.md` и `srs-<канал>-post-mvp.md` (канал — `web`, `mobile`; копия для Яндекс Вики — с суффиксом `_wiki`, например `srs-mobile-mvp_wiki.md`), `requirements/ui/<сценарий>-<канал>-mvp_ui.md` (элементы экранов; копия для Яндекс Вики — `_ui_wiki.md`), ADR — как у BA
 - `product-owner`: `requirements/user-story/user-story-mvp.md` (общие разделы вкладки и истории MVP) и `requirements/user-story/user-story-post-mvp.md` (истории Post-MVP; история переносится между файлами при смене объёма), `backlog-priority.md`, `business-case.md`, `roadmap.md`, `stakeholder-map.md`, ADR — как у BA
 - `repository-researcher`: `knowledge/<репозиторий>/repo-map.md`, `knowledge/<репозиторий>/features/<фича>.md`, `knowledge/<репозиторий>/architecture/*.md`
 - Рабочие вопросы (любой агент): `requirements/questions/<тема>_questions.md` — одна тема в одном файле, без дублирования между файлами; задачи на бэк в эту папку не кладутся.
@@ -235,7 +236,7 @@ projects/<проект>/
 - Порядок по новой транскрибации — `skill/meeting-summary-adr`: проверка расшифровки, разбор встречи в `meetings/`, самопроверка, подтверждение разбора пользователем, ADR по разбору, согласованность файлов.
 - `repository-researcher` → разбор кодовой базы в `12stz/`, карта интеграций, ведение `knowledge/`; к нему обращаются BA/SA, когда нужно понять, где и как работает логика в коде. Перед поиском по коду — `knowledge/README.md`.
 - `security-reviewer` — ревью ИБ (ISO 27001, NIST, OWASP, PCI DSS, 152-ФЗ; STRIDE/PASTA/DREAD). **Вызывается обязательно** в трёх точках:
-  1. перед передачей задачи разработке — SRS, `backend/*_task`, API-контракт: авторизация, проверка владельца, валидация на сервере, утечки в ответах API;
+  1. перед передачей задачи разработке — SRS, задачи из `requirements/tasks/`, API-контракт: авторизация, проверка владельца, валидация на сервере, утечки в ответах API;
   2. при изменении модели данных (ERD) с персональными или платёжными данными: что хранится, где, кто видит, сроки хранения, маскирование;
   3. перед отправкой версии бандла на бизнес-ревью — сквозная проверка интеграций, ролей, журналирования.
   Не вызывается для формулировок BRD, макетов без данных, ADR о сроках и процессах. Каждое замечание переносится в бандл: требование `NFR-SEC-<n>` (или `NFR-NN` в BRD) либо открытый вопрос `OQ-<n>`, и попадает в матрицу трассируемости; отчёт — `reviews/security/`.

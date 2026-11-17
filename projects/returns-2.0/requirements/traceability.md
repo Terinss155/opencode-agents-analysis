@@ -23,7 +23,7 @@ sequence → экран → NFR → тест`. Связывает идентиф
 | `US-CR-NN`, `US-VW-NN`, `US-LC-NN`, `US-CH-NN` | User Story: оформление / просмотр / жизненный цикл / каналы | [user-story/](./user-story/) (вкладка 01) |
 | SRS | Сценарий истории со стороны МП и сайта — по номеру истории (US 1.1 … US 4) | [srs/](./srs/) |
 | `BL-RET-<...>` | backend-логика | `./backend/*.md` (skill/backend-logic) — см. таблицу 3 |
-| `TASK-RET-DATA` | задача проектирования модели данных сущности «возврат» | `./backend/return-entity_data-model_task.md` (skill/backend-logic, skill/erd-model) |
+| `ERD-RET` | модель данных заявки на возврат | `./diagrams/erd/return-request_erd.md` + SQL (skill/erd-model) |
 | `API-<...>` | API-контракт / метод | `reference/api/web/`, `reference/api/mobile/` (skill/openapi-spec) — см. таблицу 3 |
 | `SEQ-RET-<...>` | sequence-диаграмма | `./diagrams/sequence/as-is/*.plantuml` (skill/sequence-diagram) — см. таблицу 3 |
 | `SCR-RET-<n>` | спецификация экрана восприятия | [screen-spec/screen-spec.md](./screen-spec/screen-spec.md) |
@@ -42,7 +42,7 @@ sequence → экран → NFR → тест`. Связывает идентиф
 | — | PP-15 | BR-01 | Эпик «Оформление возврата товара» (контейнер историй, не US) | SRS US 1.1–1.5 | Черновик |
 | BO-1, BO-5 | PP-16 | RULE-10, FR-03, RULE-29, FR-28, FR-29 | [US-CR-01](./user-story/user-story-mvp.md#us-cr-01) Просмотр условий и возможности возврата по заказу, позиции с оформленным возвратом в карточке заказа | — | Черновик (механизм пометки позиции — `ADR-RET-039`, исследование) |
 | BO-1 | PP-15, PP-20 | BR-03, FR-02, FR-32, FR-33, FR-34, FR-35 | [US-CR-02](./user-story/user-story-mvp.md#us-cr-02) Выбор изделий и причин возврата | SRS US 1.2 | Черновик |
-| BO-1 | PP-7, PP-15 | RULE-15, RULE-16, RULE-22, RULE-23, RULE-24, RULE-25, RULE-26, FR-18, FR-19, FR-20, FR-21, FR-22, FR-24, FR-42, FR-43, FR-44, FR-46 | [US-CR-03](./user-story/user-story-mvp.md#us-cr-03) Определение города и списка доступных способов возврата | SRS US 1.3 | Черновик (даты и интервалы курьера — `ADR-RET-057`; способы по городу — на сайте, логистика в объёме прямого потока — `ADR-RET-060`; тип доставки возврата — `ADR-RET-061`) |
+| BO-1 | PP-7, PP-15 | RULE-15, RULE-16, RULE-22, RULE-23, RULE-24, RULE-25, RULE-26, FR-18, FR-19, FR-20, FR-21, FR-22, FR-24, FR-42, FR-43, FR-44, FR-46 | [US-CR-03](./user-story/user-story-mvp.md#us-cr-03) Определение города и списка доступных способов возврата | SRS US 1.3 | Черновик (даты и интервалы курьера — `ADR-RET-057`; способы по городу — на сайте, логистика в объёме прямого потока — `ADR-RET-060`; тип доставки возврата — `ADR-RET-100`) |
 | BO-6 | PP-11 | RULE-33, RULE-34, RULE-35, RULE-36, RULE-37, RULE-38, RULE-39, RULE-40, RULE-41, RULE-42, FR-37, FR-45, FR-47 | [US-CR-04](./user-story/user-story-mvp.md#us-cr-04) Определение способа возврата денежных средств | SRS US 1.4 | Черновик |
 | BO-3 | PP-1 | RULE-02, FR-04, FR-05 | [US-CR-05](./user-story/user-story-mvp.md#us-cr-05) Просмотр информации и создание заявки на возврат | SRS US 1.5 | Черновик |
 | BO-3 | — | FR-06 | [US-CR-06](./user-story/user-story-mvp.md#us-cr-06) Скачивание пустого бланка заявления без авторизации | — | Черновик (приоритет требует подтверждения) |
@@ -55,13 +55,13 @@ sequence → экран → NFR → тест`. Связывает идентиф
 | BO-1 | PP-15 | RULE-05, RULE-06, RULE-09, RULE-14, FR-15 | [US-LC-01](./user-story/user-story-mvp.md#us-lc-01) Отмена и переоформление созданного возврата | — | Черновик (`OQ-39`) |
 | BO-1 | — | RULE-11, FR-11 | [US-LC-02](./user-story/user-story-post-mvp.md#us-lc-02) Автоотмена заявки на возврат по истечении срока передачи | — | Черновик (`OQ-36` — Почта России) |
 | BO-6 | PP-10, PP-11, PP-12 | RULE-30, RULE-33, RULE-34, RULE-35, RULE-36, RULE-37, RULE-38, FR-36 | [US-LC-03](./user-story/user-story-mvp.md#us-lc-03) Исполнение возврата денежных средств и бонусов | — (вне контура оформления) | Черновик (баллы и Mindbox — отдельная история, `ADR-RET-064`, предложено; `OQ-47`) |
-| BO-5 | PP-16 | RULE-27, FR-12 | [US-LC-04](./user-story/user-story-mvp.md#us-lc-04) Уведомления о событиях возврата | — | Черновик (`OQ-45`) |
+| BO-5 | PP-16 | RULE-27, FR-12 | [US-LC-04](./user-story/user-story-post-mvp.md#us-lc-04) Уведомление об истекающем сроке передачи возврата | — | Post-MVP с 10.11.2026 (`OQ-45`) |
 | BO-1 | — | FR-40 | [US10](./user-story/user-story-mvp.md#us10) CSI-опрос после возврата (ECOMDEV-TBD, временный номер) | — | Черновик (`OQ-22`, `OQ-45`) |
 | BO-1 | — | FR-10 | [US11](./user-story/user-story-post-mvp.md#us11) Админка: настройка срока автоотмены по способу возврата (ECOMDEV-TBD, временный номер) | — | Черновик |
 | BO-1 | — | FR-23 | [US12](./user-story/user-story-mvp.md#us12) Админка: включение и отключение способов возврата по городу (ECOMDEV-TBD, временный номер) | — | Черновик (настройка способов возврата по городу — в админке сайта, решение System Analyst от 13.10.2026; `ADR-RET-060`) |
 | BO-6 | PP-11 | RULE-37 | [US14](./user-story/user-story-post-mvp.md#us14) Возврат денежных средств на подарочный сертификат (Post-MVP, ECOMDEV-TBD) | — | Post-MVP (`ADR-RET-046`, `C-12`) |
 | BO-5 | PP-16 | FR-25 | [US15](./user-story/user-story-post-mvp.md#us15) История статусов возврата (Post-MVP, ECOMDEV-TBD) | — (экран восприятия) | Post-MVP (`ADR-RET-048`) |
-| BO-1 | PP-7 | RULE-11, RULE-12, FR-13, FR-14 | [US-CH-01](./user-story/user-story-mvp.md#us-cr-03) Курьер — выбор адреса, даты и интервала приезда | SRS US 1.3 | Черновик (даты и интервалы — от сервиса логистики, без интервалов курьер для адреса недоступен — `ADR-RET-057`; запрос по возвратной ТК — `ADR-RET-061`; часовой пояс в запросе — `ADR-RET-062`; объём дат — `ADR-RET-063`, предложено) |
+| BO-1 | PP-7 | RULE-11, RULE-12, FR-13, FR-14 | [US-CH-01](./user-story/user-story-mvp.md#us-cr-03) Курьер — выбор адреса, даты и интервала приезда | SRS US 1.3 | Черновик (даты и интервалы — от сервиса логистики, без интервалов курьер для адреса недоступен — `ADR-RET-057`; запрос по коду курьера на возврат — `ADR-RET-100`; часовой пояс в запросе — `ADR-RET-062`; объём дат — `ADR-RET-063`, предложено) |
 | BO-1 | PP-15 | RULE-08 | [US-CH-02](../archive/user-story-v1/user-story-channels.md#us-ch-02) Курьер — изменение даты или интервала через «Дружбу» | — | Черновик |
 | BO-1, BO-5 | PP-15, PP-16 | RULE-08, FR-27 | [US-CH-03](../archive/user-story-v1/user-story-channels.md#us-ch-03) Курьер — изменение по согласованию с транспортной компанией | — | Черновик |
 | BO-1 | PP-15 | RULE-09 | [US-CH-04](../archive/user-story-v1/user-story-channels.md#us-ch-04) Курьер — передача изделий и фиксация факта передачи | — (вне контура оформления) | Требует уточнения (`OQ-39`) |
@@ -101,31 +101,31 @@ sequence → экран → NFR → тест`. Связывает идентиф
 | US-CR-01 | — | BL-RET-ELIG-01, BL-RET-QTY-01 | — | API-ORD-VIEW-WEB, API-ORD-VIEW-MOB | — | — | — | — |
 | US-CR-02 | SRS US 1.2 | BL-RET-QTY-01 | — | API-RET-GETPOS | — | — | — | — |
 | US-CR-03 | SRS US 1.3 | — | — | — | — | — | — | — |
-| US-CR-04 | SRS US 1.4 | — | — | API-RET-GETPOS | — | — | — | — |
-| US-CR-05 | SRS US 1.5 | TASK-RET-DATA | TASK-RET-DATA | — | SEQ-RET-MOB, SEQ-RET-1C, SEQ-RET-RCRM, SEQ-RET-OTHER | — | — | — |
+| US-CR-04 | SRS US 1.4 | BL-RET-BONUS | — | API-RET-GETPOS | — | — | — | — |
+| US-CR-05 | SRS US 1.5 | BL-RET-BONUS | ERD-RET | — | SEQ-RET-MOB, SEQ-RET-1C, SEQ-RET-RCRM, SEQ-RET-OTHER | — | — | — |
 | US-CR-06 | — | — | — | — | — | — | — | — |
-| US-VW-01 | — | TASK-RET-DATA | TASK-RET-DATA | — | — | SCR-RET-01 | — | — |
+| US-VW-01 | — | — | ERD-RET | — | — | SCR-RET-01 | — | — |
 | US-VW-02 | — | — | — | — | — | — | — | — |
 | US-VW-03 | — | — | — | — | — | SCR-RET-01 | — | — |
 | US-VW-04 | — | — | — | — | — | SCR-RET-02 | — | — |
 | US-VW-05 | — | — | — | — | — | SCR-RET-01 | — | — |
 | US3.1 (ID не присвоен) | — | — | — | — | — | SCR-RET-01 | — | — |
-| US-LC-01 | — | TASK-RET-DATA | TASK-RET-DATA | — | — | — | — | — |
-| US-LC-02 | — | TASK-RET-DATA | TASK-RET-DATA | — | — | — | — | — |
-| US-LC-03 | — | — | TASK-RET-DATA | — | — | — | — | — |
-| US-LC-04 | — | — | TASK-RET-DATA | — | — | — | — | — |
-| US-CH-01 | SRS US 1.3 | — | TASK-RET-DATA | — | — | — | — | — |
+| US-LC-01 | — | — | ERD-RET | — | — | — | — | — |
+| US-LC-02 | — | — | ERD-RET | — | — | — | — | — |
+| US-LC-03 | — | — | ERD-RET | — | — | — | — | — |
+| US-LC-04 | — | — | ERD-RET | — | — | — | — | — |
+| US-CH-01 | SRS US 1.3 | — | ERD-RET | — | — | — | — | — |
 | US-CH-02 | — | — | — | — | — | — | — | — |
 | US-CH-03 | — | — | — | — | — | — | — | — |
-| US-CH-04 | — | — | TASK-RET-DATA | — | — | — | — | — |
-| US-CH-05 | SRS US 1.3 | — | TASK-RET-DATA | — | — | — | — | — |
-| US-CH-06 | — | — | TASK-RET-DATA | — | — | — | — | — |
-| US-CH-07 | SRS US 1.3 | — | TASK-RET-DATA | — | — | — | — | — |
-| US-CH-08 | — | — | TASK-RET-DATA | — | — | — | — | — |
-| US-CH-09 | — | — | TASK-RET-DATA | — | — | — | — | — |
-| US-CH-10 | SRS US 1.3 | — | TASK-RET-DATA | — | — | — | — | — |
-| US-CH-11 | — | — | TASK-RET-DATA | — | — | — | — | — |
-| US-CH-12 | SRS US 1.3 | — | TASK-RET-DATA | — | — | — | — | — |
+| US-CH-04 | — | — | ERD-RET | — | — | — | — | — |
+| US-CH-05 | SRS US 1.3 | — | ERD-RET | — | — | — | — | — |
+| US-CH-06 | — | — | ERD-RET | — | — | — | — | — |
+| US-CH-07 | SRS US 1.3 | — | ERD-RET | — | — | — | — | — |
+| US-CH-08 | — | — | ERD-RET | — | — | — | — | — |
+| US-CH-09 | — | — | ERD-RET | — | — | — | — | — |
+| US-CH-10 | SRS US 1.3 | — | ERD-RET | — | — | — | — | — |
+| US-CH-11 | — | — | ERD-RET | — | — | — | — | — |
+| US-CH-12 | SRS US 1.3 | — | ERD-RET | — | — | — | — | — |
 
 Столбец NFR: сквозные `NFR-01`…`NFR-07` раздела 7.4 BRD отдельным историям не назначаются
 (таблица 1а); артефакта `nfr/nfr.md` в бандле нет.
@@ -138,7 +138,8 @@ sequence → экран → NFR → тест`. Связывает идентиф
 |---|---|---|---|---|
 | BL-RET-ELIG-01 | Бэк-логика | `./backend/return-eligibility_backend.md` | backend-logic | DRAFT |
 | BL-RET-QTY-01 | Бэк-логика | `./backend/available-return-quantity_backend.md` | backend-logic | DRAFT |
-| TASK-RET-DATA | Модель данных / задача БД | `./backend/return-entity_data-model_task.md` | backend-logic, erd-model | DRAFT |
+| BL-RET-BONUS | Бэк-логика | `./backend/return-bonus_backend.md` | backend-logic | DRAFT |
+| ERD-RET | Модель данных | `./diagrams/erd/return-request_erd.md` + `return-request_sql.sql` | erd-model | DRAFT |
 | SCR-RET-01 | Экран | `./screen-spec/screen-spec.md` (SCR-RET-01) | screen-spec | DRAFT |
 | SCR-RET-02 | Экран | `./screen-spec/screen-spec.md` (SCR-RET-02) | screen-spec | DRAFT |
 | API-RET-GETPOS | API-контракт | `reference/api/web/order-refund-get-positions_web.md` | openapi-spec | AS-IS описан |
@@ -150,7 +151,7 @@ sequence → экран → NFR → тест`. Связывает идентиф
 | SEQ-RET-OTHER | Sequence | `./diagrams/sequence/as-is/other_sequence.plantuml` | sequence-diagram | — |
 | SEQ-RET-ASIS | Sequence (AS-IS, базовая линия) | `./diagrams/sequence/as-is/sequence.plantuml` | sequence-diagram | — |
 
-**ERD** (`ERD-RET`) — `./diagrams/erd/to-be/return-entity_erd_merged.md` (DRAFT, в таблицу 2 ещё не разнесён); SQL-скрипта нет.
+**ERD** (`ERD-RET`) — `./diagrams/erd/return-request_erd.md`, SQL — `./diagrams/erd/return-request_sql.sql` (DRAFT, в таблицу 2 ещё не разнесён).
 **Диаграмма состояний возврата** — `./diagrams/state/to-be/return-status_state.md` (гипотеза, `OQ-1`).
 
 **Отсутствуют в бандле** (в таблице 2 — везде `—`):
@@ -167,7 +168,7 @@ QA. Пошаговый AS-IS — `./as-is/` (не входит в реестр �
 **Снизу вверх:** все 27 US трассируются до требований BRD.
 
 **Реализация (таблица 2 / 3):**
-- `TASK-RET-DATA` (модель данных сущности «возврат») покрывает создание, просмотр и жизненный цикл заявки; описана один раз в таблице 3, в таблице 2 повторяется только ID.
+- `ERD-RET` (модель данных заявки на возврат) покрывает создание, просмотр и жизненный цикл заявки; описана один раз в таблице 3, в таблице 2 повторяется только ID.
 - Бэк-логика проверки права и количества (`BL-RET-ELIG-01`, `BL-RET-QTY-01`) — только вход в оформление (US-CR-01, US-CR-02).
 - Sequence-диаграммы покрывают шаг создания заявки и исходящие интеграции (US-CR-05).
 - Экраны восприятия (`SCR-RET-01/02`) покрывают карточку, идентификаторы, список и документы (US-VW-01, US-VW-03, US-VW-04, US-VW-05, US3.1).

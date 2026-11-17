@@ -7,7 +7,7 @@
 | **Владелец решения** | Head of PMO — Светлана Варцаба; предложил 1C Solution Architect — Артем Колосов; участники: System Analyst — Катя Лемешева, Project Manager — Катя Тихомирова, System Analyst (команда BTS) — Елена Васильева |
 | **Область** | Бизнес-процесс / Интеграция |
 | **Версия** | v2 |
-| **Предыдущая версия** | [[2026-10-05 11-03] ADR-RET-066-store-return-with-existing-request-v1.md](<./[2026-10-05 11-03] ADR-RET-066-store-return-with-existing-request-v1.md>) |
+| **Предыдущая версия** | [[2026-10-05 11-03] ADR-RET-066-store-return-with-existing-request-v1.md](<./archive/[2026-10-05 11-03] ADR-RET-066-store-return-with-existing-request-v1.md>) |
 | **Заменяет** | ADR-RET-066 |
 
 ## Контекст
@@ -64,9 +64,9 @@
 
 ## Связанные артефакты
 
-- `ADR-RET-066` — [предыдущая версия](<./[2026-10-05 11-03] ADR-RET-066-store-return-with-existing-request-v1.md>).
+- `ADR-RET-066` — [предыдущая версия](<./archive/[2026-10-05 11-03] ADR-RET-066-store-return-with-existing-request-v1.md>).
 - `ADR-RET-051` — [возврат в магазине без заявки](<./[2026-10-07 16-30] ADR-RET-051-store-walk-in-return-processing-v3.md>).
-- `ADR-RET-084` — [статусная модель MVP](<./[2026-10-21 16-30] ADR-RET-084-return-status-model-mvp-v4.md>).
+- `ADR-RET-084` — [статусная модель MVP](<./archive/[2026-10-21 16-30] ADR-RET-084-return-status-model-mvp-v4.md>).
 - `ADR-RET-001` — [заявка не редактируется](<./[2026-09-10 14-00] ADR-RET-001-no-edit-return-request-v1.md>).
 
 ## История изменений

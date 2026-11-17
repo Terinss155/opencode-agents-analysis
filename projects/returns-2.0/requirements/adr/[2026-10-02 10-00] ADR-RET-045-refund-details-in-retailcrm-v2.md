@@ -7,7 +7,7 @@
 | **Владелец решения** | Согласовано на встрече (возражений нет); озвучила Лид аналитиков RetailCRM — Алена Господинова со ссылкой на договорённость 25.09.2026; участники: Head of PMO — Светлана Варцаба, Product Manager — Катя Филатова |
 | **Область** | Данные / Бизнес-процесс / ПДн |
 | **Версия** | v2 |
-| **Предыдущая версия** | [[2026-09-25 13-30] ADR-RET-031-refund-details-in-retailcrm-v1.md](<./[2026-09-25 13-30] ADR-RET-031-refund-details-in-retailcrm-v1.md>) |
+| **Предыдущая версия** | [[2026-09-25 13-30] ADR-RET-031-refund-details-in-retailcrm-v1.md](<./archive/[2026-09-25 13-30] ADR-RET-031-refund-details-in-retailcrm-v1.md>) |
 | **Заменяет** | ADR-RET-031 |
 
 ## Контекст
@@ -54,7 +54,7 @@ RetailCRM, чтобы Дружба могла их исправить. Стат�
 
 ## Связанные артефакты
 
-- `ADR-RET-031` — [предыдущая версия](<./[2026-09-25 13-30] ADR-RET-031-refund-details-in-retailcrm-v1.md>).
+- `ADR-RET-031` — [предыдущая версия](<./archive/[2026-09-25 13-30] ADR-RET-031-refund-details-in-retailcrm-v1.md>).
 - `ADR-RET-020` — [минимальный набор реквизитов в форме](<./[2026-09-24 15-01] ADR-RET-020-refund-details-minimal-set-v1.md>).
 - `RULE-39`, `RULE-40`, `RULE-42`, `C-7`, `C-13`, `FR-37` — [BRD](../brd.md).
 

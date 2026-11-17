@@ -1,7 +1,9 @@
 # Фронтенд
 
-Каталог `frontend/`. Vue 2 + Webpack 5. Не SPA: каждой странице соответствует свой бандл,
-общая «обвязка» подключается отдельно.
+> Сверено с `origin/develop` `dd4a997ac0`, 07.11.2026.
+
+Каталог `frontend/`. Vue 2.7.16 + Vuex 3.6.2 + Webpack 5.91 (`frontend/package.json`). Не SPA:
+каждой странице соответствует свой бандл, общая «обвязка» подключается отдельно.
 
 ## Сборка
 
@@ -28,7 +30,7 @@
 | `modules/cart/pages/redesign/_entry.js` | `cart-redesign` |
 | `modules/base/pages/_entry.js` | `base` (бандл по умолчанию) |
 
-Всего в проекте **95 файлов `_entry.js`**. Новый модуль со страницей подхватывается сборкой
+Всего в проекте **96 файлов `_entry.js`**. Новый модуль со страницей подхватывается сборкой
 без правок конфига.
 
 ### Алиасы
@@ -64,18 +66,22 @@
 
 | Скрипт | Команда | Когда |
 |---|---|---|
-| `build-dev` | `NODE_ENV=development webpack` | Разовая сборка для разработки |
-| `build-prod` | `NODE_ENV=production webpack` | Прод-сборка |
-| `watch` | `NODE_ENV=development webpack --watch` | Разработка |
+| `build-dev` | `cross-env NODE_ENV=development webpack --progress` | Разовая сборка для разработки |
+| `build-prod` | `cross-env NODE_ENV=production webpack --progress` | Прод-сборка |
+| `watch` | `cross-env NODE_ENV=development webpack --watch --progress` | Разработка |
+| `storybook`, `build-storybook` | `storybook dev -p 6006 --no-open`, `storybook build` | Storybook 7.6 |
 | `eslint-git` | линтер по diff | Перед коммитом |
+| `eslint-all`, `eslint-update-max-warnings` | линтер по всему коду, обновление лимита предупреждений | По необходимости |
 
 **Важно:** `NODE_ENV`, который выставляют npm-скрипты, не влияет на режим самого webpack.
 `webpack.config.js` определяет `mode` (минификация, source maps) исключительно по переменной
-`FRONTEND_APP_ENV` из `.env`: `mode = FRONTEND_APP_ENV === 'prod' ? 'production' : 'development'`.
+`FRONTEND_APP_ENV` из `.env`: `mode = FRONTEND_APP_ENV === 'prod' ? 'production' : 'development'`
+(`frontend/webpack.config.js:29`, `:108`).
 Если `.env` не содержит `FRONTEND_APP_ENV=prod`, сборка через `build-prod` всё равно соберётся
 в dev-режиме несмотря на `NODE_ENV=production`.
 
-Только переменные с префиксом `FRONTEND_*` пробрасываются в бандл через `DefinePlugin`.
+Только переменные с префиксом `FRONTEND_*` пробрасываются в бандл через `DefinePlugin`
+(`webpack.config.js:216`).
 
 ### Глобальные SCSS
 
@@ -112,8 +118,9 @@ flowchart TB
 ### Выбор бандла
 
 `themes/basic/assets/WebpackBundle.php` сопоставляет `controllerId/actionId` с именем бандла
-(например, `product/index` → `catalog/category`). Контроллер может задать бандл напрямую
-через свойство `entryName`. Если бандла нет в манифесте, подключается `base` — только обвязка.
+(например, `product/index` → `catalog/category`, `WebpackBundle.php:94`). Контроллер может задать
+бандл напрямую через свойство `entryName` (`:135-141`). Если бандла нет в манифесте, подключается
+`base` — только обвязка (`:128`, `:170`).
 
 `modules/cms/controllers/FrontendController.php` при рендере формирует `layoutContext`
 и определяет URL сборки.
@@ -121,7 +128,7 @@ flowchart TB
 ### Контракт `window._site`
 
 Данные с сервера передаются одним глобальным объектом. Формируется в
-`modules/layout/service/BaseContextService.php`:
+`modules/layout/service/BaseContextService.php` (`:751-754`):
 
 ```php
 [
@@ -173,6 +180,10 @@ Object.assign(window._site.locales, <?= json_encode($locales) ?>);
 | Легаси-глобальные переменные | Старая корзина: `window.cartData`, `window.isGuest` |
 | Запросы к API в рантайме | Сервисы в `layouts/base/workspace/` через `axiosService` |
 
+Пользователь в AJAX-запросах определяется по cookie `_identity` и сессии Yii — JWT фронт сайта
+не использует, CSRF-токен не передаётся (проверка выключена на сервере). Полный список AJAX-вызовов
+с файлами фронта и контроллерами — `knowledge/architecture/web-call-chain.html`.
+
 ### Обвязка страницы
 
 `frontend/src/layouts/base/init.js` подключается почти во всех entry points и делает:
@@ -180,19 +191,20 @@ Object.assign(window._site.locales, <?= json_encode($locales) ?>);
 - инициализацию Sentry и глобальных стилей;
 - монтирование хедера, футера, таб-бара, опросов, уведомлений (несколько корневых Vue-инстансов);
 - подключение аналитики: dataLayer, Mindbox, Diginetica, ecommerce-слушатели;
-- автозагрузку **всех** файлов из `src/blocks/**` через `import.meta.webpackContext`;
-- наполнение Vuex данными экспериментов и гео.
+- автозагрузку **всех** файлов из `src/blocks/**` через `import.meta.webpackContext` (`init.js:550-555`);
+- наполнение Vuex данными экспериментов и гео (`init.js:498-526`).
 
 Для минимальных страниц есть облегчённый вариант — `modules/empty/pages/_entry.js`.
 
 ## Модули
 
-58 модулей в `frontend/src/modules/`. Крупнейшие:
+59 модулей в `frontend/src/modules/` (прежнее значение 58 не учитывало модуль
+`city-content-page`, в котором только `_entry.js`). Крупнейшие:
 
 | Модуль | Файлов | Есть страницы | Назначение |
 |---|---|---|---|
-| `ui-kit` | 301 | нет | Дизайн-система |
-| `catalog` | 229 | да | Карточка товара, категория, поиск, фильтры |
+| `ui-kit` | 502 (вместе с историями Storybook) | нет | Дизайн-система |
+| `catalog` | 247 | да | Карточка товара, категория, поиск, фильтры |
 | `cart` | 131 | да | Корзина и чекаут (старый и новый) |
 | `orders` | 50 | да | Успешный заказ, оплата, возвраты |
 | `landing` | 42 | да | Маркетинговые лендинги |
@@ -208,7 +220,7 @@ Object.assign(window._site.locales, <?= json_encode($locales) ?>);
 
 ## ui-kit
 
-`frontend/src/modules/ui-kit/`, 301 файл.
+`frontend/src/modules/ui-kit/`, 502 файла (включая `.stories.js`).
 
 | Раздел | Содержимое |
 |---|---|
@@ -245,12 +257,14 @@ export default {
 
 ### Storybook
 
-**На ветке `master` Storybook не настроен:** каталога `frontend/.storybook/` нет, в
-`package.json` нет соответствующих скриптов, хотя `frontend/README.md` их упоминает.
-Конфигурация и истории существуют в отдельной ветке разработки.
+На `develop` Storybook **настроен** (прежнее утверждение «не настроен» относилось к старому
+срезу `master`): каталог `frontend/.storybook/` (`main.js`, `preview.js`, `README.md`,
+`WRITING-STORIES.md`), Storybook 7.6 с `@storybook/vue-webpack5` и аддонами a11y, actions,
+essentials, скрипты `storybook` (порт 6006) и `build-storybook`. Добавлен в SITEDEV-4197,
+автодокументация — ECOMDEV-1599.
 
-При этом в коде есть 20 файлов `.stories.js` и демо-страницы модуля `storybook`
-(`storybook/popup`, `storybook/tooltip`) со своими бандлами.
+В коде 71 файл `.stories.js`, плюс демо-страницы модуля `storybook` (`storybook/popup`,
+`storybook/tooltip`) со своими бандлами.
 
 ## Состояние
 
@@ -265,7 +279,7 @@ export default {
 | `catalog` | `Layouts/base/store/catalog.js` |
 | `product` | `Modules/catalog/stores/product.js` |
 | `poll` | `Layouts/base/store/poll.js` |
-| `site` | `Layouts/base/store/site.js` — брейкпоинты, пол, эксперименты, признак десктопа |
+| `site` | `Layouts/base/store/site.js` — брейкпоинты, пол (раздел) с cookie `lastContext`/`lastContextChanged`, эксперименты, признак десктопа |
 | `user` | `Layouts/base/store/user.js` — авторизация, гео |
 | `userNotifications` | `Layouts/base/store/userNotifications.js` |
 
@@ -284,7 +298,20 @@ export default {
 Все в `frontend/src/layouts/base/workspace/`: `axios.js`, `axiosService.js`, `popupManager.js`,
 `tooltipManager.js`, `dropdownManager.js`, `scrollBlocker.js`, `storage.js`, `globalLoader.js`,
 `layoutEventManager.js`, `orderManager.js`, `notificationsManager.js`, а также доменные
-сервисы `catalogService.js`, `cartService.js`, `userService.js`.
+сервисы-синглтоны (`*Service.js`, их 27 вместе с маркетинговыми обёртками): `catalogService.js`, `cartService.js`, `userService.js`,
+`homeService.js`, `productService.js`, `orderService.js`, `deliveryService.js`, `geoService.js`,
+`wishlistService.js`, `notificationService.js` и другие.
+
+### Последний раздел каталога
+
+Выбранный раздел (`female`/`male`/`home`) хранится в cookie `lastContext` на 365 дней
+(`layouts/base/store/site.js:18-25`). При переключении в меню
+`layouts/base/components/menu/mixins/menuMixin.js:38-62` отправляет его на сервер через
+`homeService.saveLastContext()` → `POST /home/last-context` (`modules/home/services/HomeService.js:32-39`).
+Запросы сериализуются: пока идёт сохранение, новый выбор ставится в очередь; при ошибке
+выставляется cookie `lastContextChanged`, и сервер (`LastContextService`) досинхронизирует
+профиль позже. Для вошедшего пользователя раздел пишется в `users_user.last_context` и общий
+с приложением (ECOMDEV-2248).
 
 ## Аналитика и внешние сервисы
 
@@ -339,13 +366,20 @@ AdvCake — исключение: подключается не через PHP-l
 | Старая | `catalog-product-index` | `pages/product/index/ProductPage.vue` |
 | Новая | `catalog-product-redesign` | `pages/product/redesign/ProductPage.vue` |
 
-Выбор делает `modules/product/controllers/ProductController.php`:
+Выбор делает `modules/product/controllers/ProductController.php:835-844`:
 
 - query-параметр `?redesign=12stz` — принудительно новая версия;
 - A/B-тест `NOVADEV-5523`, вариант `NOVADEV-5523_1` — новая версия;
 - параллельно работает эксперимент `NOVADEV-6049`.
 
 Внутри новой версии разделение на десктоп и мобильную идёт по `state.site.isDesktop`.
+
+Изменения ECOMDEV-2285 (октябрь 2026): компонент `ProductFullLookButton` **удалён**, вместо него
+везде `components/Product/ProductFullLookButtonNew.vue` (`ProductMediaGrid`, `ProductMediaSlider`,
+`ProductMedia`, `redesign/ProductMobilePage.vue`, миксины `productLookButtonsMixin.js`,
+`productMediaMixin.js`); добавлены кнопки подписки и частичной оплаты в мобильной карточке,
+предвыбор размера Onesize. Видимость размерной таблицы и ручной выбор её варианта —
+ECOMDEV-2239, 2420.
 
 ### Корзина
 
@@ -354,12 +388,26 @@ AdvCake — исключение: подключается не через PHP-l
 | Старая | `cart` | `#vue-app` | `cart/ancient/store` + `window.cartData` |
 | Новая | `cart-redesign` | `#cart-content` | Глобальный стор |
 
-Выбор в `CartController::actionIndex()`: для админов и при `?redesign=12stz`.
+Выбор в `modules/cart/controllers/CartController.php:204-211` (`actionIndex()`): новая версия
+открывается, только если пользователь — админ **и** передан `?redesign=12stz`; тогда
+вызывается `runAction('index-redesign')`. Маршрут `/cart/index-redesign` доступен и напрямую.
+Новая корзина берёт данные из `/api/cart/*`, старая — из `window.cartData` и MCA-маршрутов
+`/cart/cart/*`.
+
+Блок промокода и бонусов старой корзины (`modules/cart/components/Cart.vue:157-175`) вынесен в
+компоненты `components/PromoForm.vue` и `components/BonusForm.vue` (ECOMDEV-1725):
+
+- `PromoForm` при ответе с кодом `20171` (промокод несовместим с программой лояльности)
+  показывает `ConfirmPopup` и повторяет `addPromo(code, mode, true)` — запрос
+  `/cart/cart/add-promo` с `delete_bonuses: true` (`ancient/api/cart.js:218-235`,
+  `PromoForm.vue:139-214`);
+- при спецпромокоде (`cartData.isSpecialPromo` или `bonusBlocked`) `BonusForm` скрывается, под
+  промокодом выводится сообщение о бонусах (ECOMDEV-2379, `Cart.vue:492-512`).
 
 ### Категория
 
-Активна `CategoryPageNew.vue`. Старая `CategoryPage.vue` осталась в репозитории, но нигде
-не импортируется.
+Активна `CategoryPageNew.vue` (внутри у неё `COMPONENT_NAME = 'CategoryPage'`, что путает при
+поиске). Старая `CategoryPage.vue` осталась в репозитории, но нигде не импортируется.
 
 ### Прочие признаки
 
@@ -381,7 +429,7 @@ AdvCake — исключение: подключается не через PHP-l
 
 | Область | Дубли |
 |---|---|
-| Карточка товара | `components/Product/`, `components/ProductRedesign/`, `ProductContentMobile/` |
+| Карточка товара | `components/Product/`, `components/ProductRedesign/`, `ProductContentMobile/` (дубль `ProductFullLookButton` / `ProductFullLookButtonNew` устранён в ECOMDEV-2285) |
 | Краткая информация | `Product/desktop/ProductShortInfo.vue` и `ProductShortInfo/ProductShortInfo.vue` |
 | Попап размеров | `popups/SizesPopup/` и `popups/SizesPopupNew/` |
 | Кнопки | `controls/Button/` и `controls/ButtonV2/` |
@@ -398,7 +446,7 @@ frontend/src/
 ├── layouts/
 │   ├── base/     # основная обвязка: init.js, workspace/, store/, components/
 │   └── empty/    # минимальная обвязка
-├── modules/      # 58 функциональных модулей
-├── stories/      # заготовки Storybook
+├── modules/      # 59 функциональных модулей
+├── stories/      # заготовки Storybook (конфиг — frontend/.storybook/)
 └── vendor/       # вендорные скрипты и стили
 ```

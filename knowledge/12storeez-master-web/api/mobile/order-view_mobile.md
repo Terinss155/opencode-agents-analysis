@@ -2,15 +2,22 @@
 
 # Название метода
 
-**GET /api/orders/{id}** — Получение данных заказа
+**GET /api/orders/{id}** (хост `core.12stz.com`) — Получение данных заказа
 
-Обработчик: `src/Modules/Mobile/Controllers/OrdersController::actionIndex()` → `getOrders()`
-Трансформер: `src/Modules/Order/Transformer\OrderMobileTransformer::transformForMobile($order, full=true)`
+> Сверено 07.11.2026: монолит `dd4a997ac0`, Go `631ac38`, esb `4519218b`, iOS `4f321c86`.
 
-> **Проксирование (шлюз/API-gateway):** внешний запрос `GET /api/orders/{order_id}` проксируется на внутренний путь монолита `GET /mobile/orders/{order_id}`.
-> Внутри монолита Yii2 UrlManager (правило `src/Modules/Mobile/Rules/UrlRule.php`, строка 87-89) разбирает pathInfo `mobile/orders/{id}` и возвращает маршрут (route) `mobile/orders` с параметром `id` — это **внутренняя маршрутизация Yii2, а не HTTP-вызов**.
+Обработчик: `src/Modules/Mobile/Controllers/OrdersController::actionIndex()` (`:200`) → `getOrders()` (`:544`)
+Трансформер: `src/Modules/Order/Transformer/OrderMobileTransformer::transformForMobile($order, full=true)`, позиции — `OrderPositionMobileTransformer::transformForMobile()`
+
+> **Проксирование (шлюз `core`):** iOS (`OrdersEndpoint.orderDetail`, протокол `RequestTarget` → хост `core.12stz.com/api`) вызывает `GET /api/orders/{order_id}`. Этот хост обслуживает **старый шлюз `core`** — NestJS-приложение `esb-monorepo` (`libs/orders/controllers/src/lib/orders.controller.ts:227`, `getOrder`). Шлюз **параллельно** делает два запроса:
+> 1. HTTP `GET {PHP_BASE_URL}mobile/orders/{order_id}` в монолит (`orders.service.ts`, `path='/orders'`; клиент `libs/core/src/lib/http-client/http-client-mobile.ts`);
+> 2. gRPC `feedbacks.Mobile/CanBeSaved({order_id})` (`:236`) — можно ли оставить отзыв.
+>
+> Если `CanBeSaved.ok = false`, из `result.messages` удаляются сообщения со `status = can_be_marked` (`:238-249`). Ответ перепаковывается в `ResponseAction` → клиент получает `{success, result}` **без `total`**.
+> Внутри монолита Yii2 UrlManager (правило `src/Modules/Mobile/Rules/UrlRule.php:83-84`) разбирает pathInfo `mobile/orders/{id}` и возвращает маршрут (route) `mobile/orders` с параметром `id` — это **внутренняя маршрутизация Yii2, а не HTTP-вызов**.
 > Далее маршрут `mobile/orders` диспатчится на `Mobile\OrdersController::actionIndex()`, который читает `id` из query-параметра (`Yii::$app->request->get('id')`).
-> **Важно:** в swagger (`docs/openapi/mobile.yml`, строка 5433; сверено 09.10.2026) просмотр заказа описан как `GET /mobile/orders/{orderId}` (`operationId: getOrderById`). Пути `/orders/{orderId}/...` существуют только для операций возврата (return-details, return-method-list).
+> **Копия в Go-шлюзе (ECOMDEV-2422):** `GET mobile.12stz.com/api/v1/orders/{order_id}` — `mobile-monorepo-go` `internal/app/service/orders_core.go:376` (`GetOrder`), повторяет контракт `core`: параллельно монолит `mobile/orders/{id}` (по `SITE_BASE_INTERNAL_URL`, `ProxyToSiteAsIs`) и gRPC `CanBeSaved`, фильтр `can_be_marked`, обёртка `{success, result}`. `order_id` — только цифры (`regex(^\d+$)`), query-параметры в монолит не передаются (кроме `gender` → заголовок `X-Gender`). Без `FEEDBACKS_GRPC_URL` ручка отвечает 503. **iOS на 07.11.2026 эту копию не вызывает** — ходит в `core`.
+> **Важно:** в swagger монолита (`docs/openapi/mobile.yml:4982`) просмотр заказа описан как `GET /mobile/orders/{orderId}` (`operationId: getOrderById`). Пути `/orders/{orderId}/...` существуют только для операций возврата (return-details, return-method-list).
 
 ---
 
@@ -18,8 +25,11 @@
 
 | Система | Метод | Ссылка |
 |---------|-------|--------|
-| Mobile | `GET /api/orders/{id}` → проксируется на `GET /mobile/orders/{id}` | `src/Modules/Mobile/Controllers/OrdersController::actionIndex()` → `getOrders()` |
-| Mobile (список) | `GET /mobile/orders` | `src/Modules/Mobile/Controllers/OrdersController::actionIndex()` — список заказов |
+| Шлюз `core` (esb) | `GET /api/orders/{id}` → `GET /mobile/orders/{id}` + gRPC Feedbacks `CanBeSaved` | `esb-monorepo` `libs/orders/controllers/src/lib/orders.controller.ts:227` |
+| Шлюз `mobile` (Go, копия, iOS не вызывает) | `GET /api/v1/orders/{id}` → `GET /mobile/orders/{id}` + gRPC Feedbacks `CanBeSaved` | `mobile-monorepo-go` `internal/app/service/orders_core.go:376` |
+| Mobile | `GET /mobile/orders/{id}` | `src/Modules/Mobile/Controllers/OrdersController::actionIndex()` → `getOrders()` |
+| Mobile (список) | `core` `GET /api/orders` (esb `orders.controller.ts:54`; Go-копия `orders_core.go:69`) → `GET /mobile/orders` | `src/Modules/Mobile/Controllers/OrdersController::actionIndex()` → `transformForMobile($order, false)` — список заказов; шлюз для заказов с `button.status = can_be_marked` вызывает `CanBeSaved` и при `ok = false` ставит `button: null` |
+| Mobile (офлайн-чеки) | `core` `GET /api/orders/offline[/{id}]` (esb `:88`, `:146`; Go `orders_core.go:206`, `:282`) | В монолит не идут: gRPC Orders (`orders.Offline`) + обогащение позиций `POST api2/products/items` |
 
 ---
 
@@ -30,18 +40,23 @@ sequenceDiagram
     autonumber
     actor U as USER
     participant APP as Mobile App
-    participant G as Gate (Mobile API)
+    participant G as Шлюз core (esb-monorepo)
+    participant FB as feedbacks-ms (gRPC)
     participant URL as UrlRule (Yii2)
     participant SVC as OrdersController
     participant REPO as OrderRepository
     participant TR as OrderMobileTransformer
-    participant DB as MySQL
+    participant DB as MariaDB
 
     U ->> APP: Открыть заказ
-    APP ->> G: GET /api/orders/500127505
+    APP ->> G: GET core.12stz.com/api/orders/500127505 (Authorization: Bearer JWT)
     activate G
-    G ->> G: Проксирование на /mobile/orders/500127505 (шлюз → монолит)
-    G ->> URL: GET /mobile/orders/500127505 (pathInfo)
+    par параллельно
+    G ->> FB: feedbacks.Mobile/CanBeSaved(order_id)
+    FB -->> G: {ok}
+    and
+    G ->> URL: GET /mobile/orders/500127505 (x-access-token, x-session-token из JWT)
+    end
     activate URL
     URL ->> URL: parseRequest(): regex /orders\/\d+/ → route mobile/orders, id=500127505
     URL -->> SVC: dispatch: actionIndex() (id в query)
@@ -53,6 +68,7 @@ sequenceDiagram
     DB -->> REPO: Order record
     deactivate DB
     REPO -->> SVC: Order model
+    SVC ->> SVC: null или резерв (getIsReservation) → 404, error_code 1009
     SVC ->> TR: transformForMobile(order, full=true)
     activate TR
     TR ->> DB: SELECT * FROM order_positions WHERE order_id=?
@@ -67,8 +83,9 @@ sequenceDiagram
     DB -->> TR: OrderStatus record
     TR -->> SVC: Array (formatted order data)
     deactivate TR
-    SVC -->> G: JSON response
+    SVC -->> G: {success, total, result}
     deactivate SVC
+    G ->> G: ok=false → убрать messages со status=can_be_marked; ResponseAction (без total)
     G -->> APP: {success: true, result: {...}}
     deactivate G
     APP -->> U: Данные заказа
@@ -83,17 +100,20 @@ sequenceDiagram
     autonumber
     actor U as Юзер
     participant APP as Mobile App
-    participant GW as API Gateway
+    participant GW as Шлюз core (esb)
+    participant FB as feedbacks-ms
     participant MON as Monolith
     participant DB as DB
 
     U ->> APP: Открыть заказ
     APP ->> GW: GET /api/orders/500127505
+    GW ->> FB: CanBeSaved (gRPC, параллельно)
     GW ->> MON: GET /mobile/orders/500127505
     MON ->> DB: Получить заказ пользователя и связанные данные
     DB -->> MON: Данные заказа
     MON -->> GW: JSON с данными заказа
-    GW -->> APP: JSON с данными заказа
+    FB -->> GW: можно ли оценить
+    GW -->> APP: JSON с данными заказа (без лишних can_be_marked)
     APP -->> U: Показать заказ
 ```
 
@@ -105,13 +125,15 @@ sequenceDiagram
 
 | Параметр | Обяз. | Тип источника | Метод-источник | Поле ответа | Описание |
 |----------|-------|---------------|----------------|-------------|----------|
-| `x-access-token` | + | Header | Конфигурация приложения | — | Ключ мобильного приложения |
-| `x-session-token` | + | Header | `users_mobile_sessions` | — | Токен сессии (гостевая или авторизованная) |
-| `id` | + | Path → Query | Часть URL (`/api/orders/{id}`), шлюз транслирует в query `id` | `result.id` | ID заказа |
+| `Authorization: Bearer <JWT>` | + | Header (клиент → шлюз) | `authorization/*` шлюза `core` | — | JWT шлюза; из claim `session_token` шлюз формирует `x-session-token` |
+| `x-platform`, `version` | + | Header (клиент → шлюз) | Приложение | — | Платформа и версия; шлюз `core` передаёт `version` в монолит как `x-version` (в Go-копии обязательны `X-Platform`/`X-Version`, иначе 400) |
+| `x-access-token` | + | Header (шлюз → монолит) | `PHP_API_KEY` шлюза | — | Ключ мобильного API монолита; клиент его **не** передаёт |
+| `x-session-token` | + | Header (шлюз → монолит) | `users_mobile_sessions` | — | Токен сессии (из JWT) |
+| `id` | + | Path → Query | Часть URL (`/api/orders/{id}`), UrlRule монолита транслирует в query `id` | `result.id` | ID заказа |
 
 ### Примечание
 
-- Внешний путь `GET /api/orders/{order_id}` проксируется шлюзом на `GET /mobile/orders/{order_id}`.
+- Внешний путь `GET /api/orders/{order_id}` проксируется шлюзом `core` на `GET /mobile/orders/{order_id}`; дополнительно шлюз пробрасывает `user-agent`, `X-Request-Id`, `x-language`, `Referer`, `DeviceID`, `X-Real-IP`, а query `gender` — как заголовок `X-Gender` (`http-client-mobile.ts`).
 - Внутри монолита UrlRule транслирует pathInfo `mobile/orders/{id}` в маршрут `mobile/orders` с параметром `id` (query), а `Mobile\OrdersController::actionIndex()` читает его через `Yii::$app->request->get('id')`.
 - Заказы типа `reservation` (резерв в магазине) исключаются из ответа.
 
@@ -129,14 +151,14 @@ sequenceDiagram
 
 ```http
 GET /api/orders/500127505 HTTP/1.1
-Host: 12storeez.com
-x-access-token: {app_key}
-x-session-token: {session_token}
+Host: core.12stz.com
+Authorization: Bearer {jwt}
 x-platform: ios
-x-version: 5.0.0
+version: 1.89.0
 
-# Шлюз проксирует на внутренний путь монолита:
+# Шлюз core проксирует на внутренний путь монолита (с x-access-token, x-session-token, x-version):
 # GET /mobile/orders/500127505  →  UrlRule: route mobile/orders (id=500127505)  →  actionIndex()
+# Копия в Go (iOS пока не вызывает): GET mobile.12stz.com/api/v1/orders/500127505 (X-Platform, X-Version, Authorization)
 ```
 
 ---
@@ -145,7 +167,7 @@ x-version: 5.0.0
 
 ## Описание параметров положительного ответа (full=true)
 
-> **Примечание:** HTTP-ответ обёрнут в `{success, total, result: {...}}`.
+> **Примечание:** монолит отдаёт `{success, total, result: {...}}`; шлюз `core` (и Go-копия) перепаковывает ответ в `{success, result}` — поля `total` клиент **не получает**.
 
 ### Блок `result.*`
 
@@ -218,7 +240,7 @@ x-version: 5.0.0
 | `items[].article` | string | Артикул товара | `"ART-12345"` |
 | `items[].model_id` | integer | ID товара (products.id) | `555` |
 | `items[].barcode` | integer | Штрихкод (product_sizes.id) | `111222` |
-| `items[].title` | string | Название модели | `"Пламя"` |
+| `items[].title` | string | Название модели (`OrderPosition::getCurrentModelTitle()`) | `"Пламя"` |
 | `items[].tags[]` | array | Теги товара | `[{id: 1, title: "New"}, ...]` |
 | `items[].colors[0].id` | integer | ID товара | `555` |
 | `items[].colors[0].color_id` | integer | ID цвета | `12` |
@@ -226,7 +248,7 @@ x-version: 5.0.0
 | `items[].colors[0].color` | string | Название цвета | `"Чёрный"` |
 | `items[].colors[0].image` | string\|null | URL изображения цвета | `"https://..."` |
 | `items[].colors[0].has_circle` | boolean | Есть ли кружок цвета | `true` |
-| `items[].colors[0].circle_color` | string | Цвет кружка | `"#FFFFFF"` |
+| `items[].colors[0].circle_color` | string | Цвет кружка: `Product::CIRCLE_COLOR_HASH`, если `has_circle`, иначе `""` | `"#FFFFFF"` |
 | `items[].discount_price` | float | Цена со скидкой | `1200.00` |
 | `items[].price` | float | Цена до скидки | `1500.00` |
 | `items[].preview` | string | URL превью изображения | `"https://..."` |
@@ -239,13 +261,16 @@ x-version: 5.0.0
 | `items[].ga.category` | string | Категория для GA | `"Одежда"` |
 | `items[].item_id` | integer | FK → product_sizes.id | `111222` |
 | `items[].is_cnc` | boolean | Click & Collect | `false` |
-| `items[].can_be_marked` | boolean | Можно ли оценить | `true` |
+| `items[].can_be_marked` | boolean | Можно ли оценить: `OrderHelper::canBeMarked($order, true)` и позиция не подарок | `true` |
+| `items[].experiment` | string\|null | **Новое.** Эксперимент (A/B), с которым товар попал в заказ (`OrderPosition::getExperiment()`) | `null` |
 
 ### Блок `track_number`
 
+Весь блок = `null`, если трек-номера нет или ТК — самовывоз из магазина (`PickupHelper::isSelfPickupTkType`).
+
 | Параметр | Тип | Описание | Пример |
 |----------|-----|----------|--------|
-| `track_number.track_number` | string\|null | Трек-номер | `"777123456789"` |
+| `track_number.track_number` | string | Трек-номер | `"777123456789"` |
 | `track_number.url` | string\|null | Ссылка на отслеживание | `"https://..."` |
 
 ### Блок `summary` (только full=true)
@@ -263,7 +288,7 @@ x-version: 5.0.0
 
 ### Блок `delivery` (только full=true)
 
-Массив строк с информацией о доставке: тип ТК, дата, адрес, название ТК.
+Массив строк с информацией о доставке: тип ТК (`getTypeTitleMobile()`), дата и интервал, адрес; далее для самовывоза из магазина — «Срок хранения заказа в магазине — {N} дней» (`CommonCartService::SHOP_STORAGE_DAYS`) и часы работы магазина (`worktime`), для остальных — «Транспортная компания: {name}».
 
 ### Блок `bonuses` (только full=true)
 
@@ -275,9 +300,11 @@ x-version: 5.0.0
 
 | Параметр | Тип | Описание | Пример |
 |----------|-----|----------|--------|
-| `messages[].status` | string | Тип сообщения | `"can_be_returned"` |
+| `messages[].status` | string | Тип сообщения: `can_be_cancelled`, `can_be_payed`, `can_be_returned`, `can_be_marked` (курьер / самовывоз из магазина / ПВЗ — разный текст), `can_be_picked_up` (`OrderMobileTransformer::getMessages()`) | `"can_be_returned"` |
 | `messages[].message` | string | Текст сообщения | `"Вы можете вернуть вещи..."` |
-| `messages[].button` | string | Текст кнопки | `"Оформить возврат"` |
+| `messages[].button` | string | Текст кнопки (у `can_be_picked_up` — пустая строка) | `"Оформить возврат"` |
+
+> Сообщения `can_be_marked` шлюз (`core` и Go-копия) **вырезает**, если gRPC `feedbacks.Mobile/CanBeSaved` вернул `ok = false` (отзыв уже оставлен / оценить нельзя). Монолит этого не знает и отдаёт их по `OrderHelper::canBeMarked()`.
 
 ### Блок `return`
 
@@ -289,10 +316,11 @@ x-version: 5.0.0
 
 ## Пример успешного ответа
 
+Ответ клиенту после шлюза (у монолита дополнительно `"total": 1`):
+
 ```json
 {
   "success": true,
-  "total": 1,
   "result": {
     "id": 12345,
     "dolyame_id": null,
@@ -338,6 +366,7 @@ x-version: 5.0.0
         "ga": {"category": "Платья"},
         "item_id": 111222,
         "is_cnc": false,
+        "experiment": null,
         "can_be_marked": false
       }
     ],
@@ -405,15 +434,20 @@ x-version: 5.0.0
 
 ## Пример ответа с ошибкой
 
+Заказ не найден у пользователя или это резерв в магазине — монолит отвечает HTTP 404 (`ERROR_CODE_NOT_AVAILABLE = 1009`, `OrdersController.php:549-553`, `ApiBaseController::getError()`):
+
 ```json
 {
   "success": false,
   "result": {
-    "error_code": 1001,
-    "error_text": "Заказ не найден"
+    "error_code": 1009,
+    "error_text": "Заказ 500127505 не найден у пользователя",
+    "error_data": []
   }
 }
 ```
+
+> Как именно шлюз `core` переупаковывает ошибку монолита (axios-interceptor esb) — по коду не проверялось. Go-копия отдаёт тело ошибки со статусом монолита и флагом `isErrorFromPHP: true`; ошибка gRPC `CanBeSaved` → HTTP-статус по таблице `core_gateway_grpc_error.go`, без `FEEDBACKS_GRPC_URL` — 503.
 
 ---
 
@@ -464,7 +498,7 @@ x-version: 5.0.0
 | `items[].article` | string | `article` | varchar(255) | Артикул товара |
 | `items[].model_id` | integer | `model_id` | int(11) | FK → products.id |
 | `items[].barcode` | integer | `barcode` | int(11) | Штрихкод (→ product_sizes.id) |
-| `items[].title` | string | `model_title_ru` | varchar(255) | Денормализованное название модели |
+| `items[].title` | string | `model_title_ru` | varchar(255) | Денормализованное название модели (через `getCurrentModelTitle()`) |
 | `items[].discount_price` | float | `price` | decimal(10,2) | Цена со скидкой |
 | `items[].price` | float | `price_before_discount` | decimal(10,2) | Цена до скидки |
 | `items[].selected_color_id` | integer | `color_id` | int(11) | FK → dictionary_colors.id |
@@ -482,6 +516,7 @@ x-version: 5.0.0
 | `items[].can_be_returned` | boolean | `status` | — | Вычисляется OrderHelper |
 | `items[].can_be_marked` | boolean | `status` | — | Вычисляется OrderHelper |
 | `items[].ga.category` | string | — | — | Вычисляется Product::getMainCategoryTitleGa() |
+| `items[].experiment` | string | — | — | Вычисляется `OrderPosition::getExperiment()` (источник не сверялся) |
 
 ## Таблица `order_statuses` (справочник)
 
@@ -541,3 +576,4 @@ x-version: 5.0.0
 | 1.5 | 07.09.2026 | Системный аналитик | Зафиксировано: `delivery_date` — плановая дата доставки (НЕ фактическая); окно возврата считается от `end_date` (`end_date + days_can_be_returned > now`), а не от `delivery_date`; поля «фактическая дата получения» в системе нет |
 | 1.6 | 07.09.2026 | Системный аналитик | AS-IS (подтверждено разработчиком): `end_date` ≠ `expiration_date.end` (разные поля `orders`); расчёт возврата — `end_date + N дней`; как скрывается кнопка возврата; нюанс курьерка vs ПВЗ |
 | 1.7 | 11.09.2026 | Системный аналитик | Файл перенесён в `requirements/reference/api/mobile/` — AS-IS API-контракты по каналам вынесены из бандлов процессов в сквозной справочник |
+| 1.8 | 07.11.2026 | Системный аналитик | Сверено: монолит `dd4a997ac0`, Go `631ac38`, esb `4519218b`, iOS `4f321c86`. Шлюз конкретизирован: `core.12stz.com` = esb (`orders.controller.ts:227`) + параллельный gRPC Feedbacks `CanBeSaved` с фильтром `can_be_marked`; ответ клиенту без `total`; добавлена Go-копия `orders_core.go:376` (iOS не вызывает); заголовки разделены на клиент→шлюз (JWT) и шлюз→монолит; исправлены ошибка (404, `1009`), `UrlRule.php:83-84`, `mobile.yml:4982`; добавлены `items[].experiment`, значения `messages[].status`, `track_number = null`, строки самовывоза в `delivery`; список, офлайн-чеки |

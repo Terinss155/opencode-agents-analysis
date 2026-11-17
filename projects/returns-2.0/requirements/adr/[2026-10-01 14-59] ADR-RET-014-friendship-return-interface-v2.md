@@ -7,7 +7,7 @@
 | **Владелец решения** | Product Manager — Екатерина Филатова |
 | **Область** | Бизнес-процесс / Интеграция / Интерфейс |
 | **Версия** | v2 |
-| **Предыдущая версия** | [[2026-09-10 14-00] ADR-RET-007-friendship-return-interface-v1.md](<./[2026-09-10 14-00] ADR-RET-007-friendship-return-interface-v1.md>) |
+| **Предыдущая версия** | [[2026-09-10 14-00] ADR-RET-007-friendship-return-interface-v1.md](<./archive/[2026-09-10 14-00] ADR-RET-007-friendship-return-interface-v1.md>) |
 | **Заменяет** | ADR-RET-007 |
 
 ## Контекст
@@ -91,7 +91,7 @@
 
 ## Связанные артефакты
 
-- `ADR-RET-007` — [прежнее решение: интерфейс Дружбы в админке сайта](<./[2026-09-10 14-00] ADR-RET-007-friendship-return-interface-v1.md>) (заменено).
+- `ADR-RET-007` — [прежнее решение: интерфейс Дружбы в админке сайта](<./archive/[2026-09-10 14-00] ADR-RET-007-friendship-return-interface-v1.md>) (заменено).
 - `BR-02`, `FR-01`, `RULE-01`, `BR-04` — [BRD](../brd.md).
 - [User Story, «Требуют подтверждения до фиксации», п. 6](../user-story/user-story-mvp.md).
 

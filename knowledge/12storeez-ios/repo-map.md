@@ -2,8 +2,8 @@
 
 **Назначение документа:** карта-справочник по кодовой базе iOS-приложения 12Storeez: где что лежит, какие запросы приложение шлёт, через какой шлюз и куда они уходят дальше. Для быстрого поиска при анализе требований.
 
-**Дата актуализации:** 10.10.2026
-**Сверено с кодом:** ветка `develop`, коммит `a6de858b` (`a6de858beed5c32b8c92fcebf270293681e08894`, 05.10.2026, «Merge tag '1.86.1' into develop»)
+**Дата актуализации:** 07.11.2026
+**Сверено с кодом:** ветка `origin/develop`, коммит `4f321c86` (`4f321c86ab6cc2fd20367f32af7c7a73ab7bb4f1`, 05.11.2026, «Merge branch 'feature/DEVIOS-2692' into 'develop'», версия приложения 1.89.0). Локальная рабочая копия не обновлялась — сверка по ref `origin/develop`.
 **Код:** `C:\Users\RobotComp.ru\Desktop\12stz\12storeez-ios\` (только чтение; remote `gitlab.12storeez.com/mobile/ios/12storeez-ios`)
 **Схема цепочки вызовов:** [../architecture/call-chain.html](../architecture/call-chain.html) — iOS → шлюз → монолит → внешние системы, по каждому вызову.
 **Примечание:** пути ниже — от корня репозитория. `Business/` = `TwelveStoreez/Classes/Business/`, `Endpoints/` = `Business/Network/Endpoints/`. Где вывод сделан по названию, а не по коду, — помечено.
@@ -39,7 +39,7 @@
 
 | Папка | Назначение |
 |---|---|
-| `Modules/<Фича>/` | ~95 папок, по одной на экран или фичу: `Home`, `Catalog`, `Product`, `Search`, `Cart`, `Checkout`, `MyOrders`, `MyOrderDetail`, `ReturnOrder`, `GiftCard`, `MyGiftCards`, `CreateReservation`, `Bonuses`, `Profile`, `Auth`, `Polls`, `Flomni` и др. Внутри — `XxxVC.swift`, ячейки, extension-файлы |
+| `Modules/<Фича>/` | 76 папок верхнего уровня, по одной на экран или фичу: `Home`, `Catalog`, `Product`, `Search`, `Cart`, `Checkout`, `MyOrders`, `MyOrderDetail`, `ReturnOrder`, `GiftCard`, `MyGiftCards`, `CreateReservation`, `Bonuses`, `Profile`, `Auth`, `Polls`, `Flomni` и др. Внутри — `XxxVC.swift`, ячейки, extension-файлы |
 | `Business/Network/` | Сетевой слой: `RequestTarget.swift` (хост `core`), `RequestTargetNew.swift` (хост `mobile`), `RequestTargetDiginetica.swift`, `RequestDescription.swift` (сборка URL), `RequestProvider.swift` (Alamofire), `AuthRequestAdapter.swift` (JWT и его обновление), `BackendListService.swift` / `BackendListItemsService.swift` (пагинация), `Models/` (конверты ответа), `Errors/` |
 | `Business/Network/Endpoints/` | Один файл — эндпоинт или группа. `enum … : RequestTarget` — хост `core`; `struct … : RequestTargetNew` — хост `mobile`. `CheckoutEndpoints/` — новый чекаут |
 | `Business/Managers/` | `XxxManager` — состояние фичи и оркестрация вызовов. Папки: `Checkout/`, `Payment/`, `ReturnOrder/`, `Reservation/`, `Polls/`, `Analytics/`, `ABManagers/`, `Dresscode/`, `DebugManagers/` (переключатель хоста) |
@@ -88,6 +88,8 @@
 
 Подробнее о шлюзах: [esb-monorepo §8.1](../esb-monorepo/repo-map.md), [mobile-monorepo-go §5](../mobile-monorepo-go/repo-map.md).
 
+В Go-шлюзе уже есть копии `core`-ручек этой таблицы (ECOMDEV-2422): `v1/orders`, `v1/orders/{id}`, `DELETE v1/orders`, `POST v1/orders/{id}/return`, `v1/orders/return-reasons` (`orders_core.go`). iOS их пока не вызывает — на 05.11.2026 все строки с хостом `core` идут в esb.
+
 ### 4.4. Модели данных
 
 - **`ReturnOrderEndpoint.Payload`** (тело `POST orders/{id}/return`): `surname`, `name`, `patronymic`, `bankBic`, `bankName`, `bankInn`, `userAccount`, `userCardNumber`, `items: [{barcode, reasonId: [String]}]`.
@@ -115,7 +117,9 @@
 | `RequestTargetDiginetica` | `DigineticaURL` | `tracking-app.diginetica.net/event` | `tracking-dev.diginetica.net/event` | внешний сервис |
 
 - xcconfig: `TwelveStoreez/Resources/Configuration/{Base,Debug,Internal,Release}.xcconfig`; `https://` добавляется в `Business/Network/RequestDescription.swift:52-56`.
-- В не-release сборках хост берётся из `Business/Managers/DebugManagers/DebugServerHostManager.swift:64-80`: пресеты `default`, `mobiledev`, `dev`, `fix`, `sandbox`, `stg` (пары `core-<env>.12stz.dev` / `mobile-<env>.12stz.dev`) и произвольный.
+- В не-release сборках хост берётся из `Business/Managers/DebugManagers/DebugServerHostManager.swift:58-71`: пресеты `stg`, `sandbox`, `dev`, `fix` (пары `core-<env>.12stz.dev` / `mobile-<env>.12stz.dev`) и `custom`. Пресеты `default` и `mobiledev` удалены; по умолчанию — `stg` (`:188`).
+- От пресета зависят и платёжные ключи в не-release сборках (DEVIOS-2634, 2692): ключ YooKassa (`YOO_KASSA_PAYMENT_KEY_STG` / `_SANDBOX`, `YooKassaPaymentManager.clientApplicationKey`) и URL уведомлений Долями (`DOLYAME_NOTIFICATION_URL_STG` / `_SANDBOX`, `TinkoffDolyamePaymentManager`). Для `dev`, `fix`, `custom` ключ YooKassa пустой. Release берёт прежние `YOO_KASSA_PAYMENT_KEY` и `DOLYAME_NOTIFICATION_URL`.
+- Query-параметры: с 1.89 `Bool` кодируется литералом `true/false` (`RequestTarget.swift`, `RequestTargetNew.swift`, `boolEncoding: .literal`), ключи — snake_case.
 - Версия API — часть пути: у `core` пути в основном без версии (`products/v2/...` — внутри), у `mobile` — `v1/...`, `v2/...`.
 
 ### 5.2. Заголовки
@@ -130,7 +134,7 @@
 
 ### 5.3. Авторизация
 
-- **Токен выдаёт только `core`.** iOS не вызывает `/api/v1/auth/*` Go-шлюза. Гостевой JWT — `PUT authorization/generate-token`; при 401 — `PUT authorization/session` с `refresh_token` и повтор запроса; при неудаче — снова гостевой токен (`AuthRequestAdapter.swift:105`, `:135`).
+- **Токен выдаёт только `core`.** iOS не вызывает `/api/v1/auth/*` Go-шлюза. С ECOMDEV-2342 там полная копия авторизации `core` (generate-token, session, login, by-phone, logout), которая ходит в монолит, но приложение на неё не переключено. Гостевой JWT — `PUT authorization/generate-token`; при 401 — `PUT authorization/session` с `refresh_token` и повтор запроса; при неудаче — снова гостевой токен (`AuthRequestAdapter.swift:105`, `:135`).
 - **Тот же JWT уходит на `mobile`.** esb подписывает HS256 ключом из кода (`esb-monorepo/libs/core/src/lib/constants.ts:7-9`), срок 14 дней, claims `device_id`, `refresh_token`, `session_token`, `user_id`. Go-шлюз проверяет HS256 с `JWT_SECRET` из Vault. Значит, ключи должны совпадать — смена в одном месте ломает все вызовы на `mobile` (вывод по коду, значения не сверялись).
 - Оба шлюза передают в монолит `session_token` из JWT заголовком `x-session-token` и свой сервисный `x-access-token`; монолит по нему находит пользователя.
 - `503` на `GET authorization/session` → экран техработ (`TechnicalWorkVC`).
@@ -151,12 +155,12 @@
 | Домен | Хост `core` (esb-monorepo) | Хост `mobile` (mobile-monorepo-go) |
 |---|---|---|
 | Авторизация, сессия | `authorization/*` (токен, сессия, логин по паролю и телефону, логаут), `profile/actions/restore-password` | `v1/settings`, `v1/users/device-session-token`, `v1/errors/waf` |
-| Профиль | `profile` (GET/PATCH/DELETE), `password`, `phone`, `addresses`, `icons`, `qr`, `wishlist` (добавить, удалить, ids), `subscriptions` | `v1/users/wishlist` (список), `v1/users/addresses/*` (новые адреса), `v1/users/permissions`, `v1/users/geo/confirmation` |
+| Профиль | `profile` (GET/PATCH/DELETE), `password`, `phone`, `addresses`, `icons`, `qr`, `wishlist` (добавить, удалить, ids), `subscriptions` | `v1/users/wishlist` (список), `v1/users/addresses/*` (новые адреса), `v1/users/permissions`, `v1/users/geo/confirmation`, `v1/users/last-context` (GET/PUT — последний раздел female/male/home, общий с сайтом; DEVIOS-2639, 2667) |
 | Лояльность | — | `v1/users/bonuses`, `bonuses/history` (gRPC Mindbox) |
-| Каталог, поиск | Карточка `products/v2/{id}`, остатки, образы, недавно просмотренные, подсказки, `catalog/filter`, отзывы о товаре | `v1/pages/home`, `v1/pages/catalog`, `v1/products` (листинг), `advanced-search`, `category`, рекомендации, наличие в магазинах, `for-cart`, `complete-set` |
-| Контент | `metadata/*` (FAQ, магазины, сторис, размеры, соцсети, «О компании»), `landings/v2`, `v2/ulink`, `geo/countries/phone-details` | `v1/metadata/splash-screen-image` |
+| Каталог, поиск | Карточка `products/v2/{id}`, остатки, образы, недавно просмотренные, подсказки, `catalog/filter`, отзывы о товаре | `v1/pages/home`, `v1/pages/catalog`, `v1/products` (листинг; фильтры `waist`, `length` с DEVIOS-2642), `advanced-search`, `category`, рекомендации, наличие в магазинах, `for-cart`, `complete-set` |
+| Контент | `metadata/*` (FAQ, магазины, сторис, размеры, соцсети, «О компании» — **в esb удалён**, см. §9), `landings/v2`, `v2/ulink`, `geo/countries/phone-details` | `v1/metadata/splash-screen-image` |
 | Гео | — | `v1/geo/countries/*` (gRPC Geo) |
-| Корзина и чекаут | **Старый чекаут:** `cart/*`, `cart/delivery2` (+ Boxberry), `cart/delivery`, `PUT orders` | **Новый чекаут:** `v1/cart`, `v2/cart`, `v1/cart/*` (доставка, ПВЗ, интервал, адрес, оплата, получатель, бонусы, промокод, сертификат, позиции), `POST v1/orders`, `v1/delivery/intervals` (gRPC Logistics), `v1/pickup/*` (HTTP Logistics) |
+| Корзина и чекаут | **Старый чекаут:** `cart/*`, `cart/delivery2` (+ Boxberry), `cart/delivery`, `PUT orders` (с 1.89 — поле `subscribe`) | **Новый чекаут:** `v1/cart`, `v2/cart`, `v1/cart/*` (доставка, ПВЗ, интервал, адрес, оплата, получатель, бонусы, промокод, сертификат, позиции; в превью и промокоде — `deleteBonuses`), `POST v1/cart/delivery-list` (было GET; тело `preferredDeliveryType`, DEVIOS-2400), `POST v1/cart/subscription/check` (DEVIOS-2618), `POST v1/orders`, `v1/delivery/intervals` (gRPC Logistics), `v1/pickup/*` (HTTP Logistics) |
 | Заказы | Список, карточка, отмена, офлайн-чеки (gRPC orders), Долями | `v2/payment-types`, `v2/orders/{id}/change-payment-method` |
 | Возвраты | `orders/{id}/return`, `orders/v2/return-reasons` | `v1/delivery/{id}/return-method-list`, `return-details` |
 | Платежи | — | `v1/payment/yookassa` (+ статус), `v1/payments/{order}/{system}` (+ `/info`) |
@@ -167,6 +171,8 @@
 
 Старый и новый чекаут живут одновременно: `CreateOrderManager` и `OrderManager` ходят в `core` (`cart/*`, `PUT orders`), `Managers/Checkout/*` — в `mobile` (`v1/cart/*`, `POST v1/orders`).
 
+**Перенос `core` → Go (ноябрь 2026).** В `mobile-monorepo-go` появились копии почти всех ручек столбца `core`: авторизация, каталог, карточка товара, метаданные, лендинги, ulink, заказы, отзывы, уведомления, старая корзина (`v1/old-cart/*`, `PUT v1/old-cart/order`). Не скопированы только `profile/*` и `geo/countries/phone-details`. Приложение на 05.11.2026 их не вызывает; соответствие «старый путь → копия в Go» — в [../architecture/call-chain.html](../architecture/call-chain.html) (пометка «копия в Go»). Параллельно esb чистит неиспользуемые ручки (ECOMDEV-2180, 2189, 2230).
+
 ---
 
 ## 7. Внешние сервисы напрямую из приложения (мимо шлюзов)
@@ -176,7 +182,7 @@
 | Diginetica | `Endpoints/DigineticaEndpoint.swift`, `Managers/Analytics/Diginetica/DigineticaReporterProtocol.swift:70` | События поиска и рекомендаций; без авторизации, ответ не читается |
 | Dresscode.ai | `Managers/Dresscode/DresscodeManager.swift:104,129` | Виртуальная примерка: `api.dresscode.ai` + WebView `try-on.dresscode.ai` |
 | Mindbox SDK | `AppDelegate+Mindbox.swift` | Push, in-app; UUID устройства → `x-device-id` |
-| Платёжные SDK | `Managers/Payment/*` | YooKassa/YooMoney (токенизация), Долями, SberPay, Yandex Pay. Платёж создаётся через шлюз `mobile` |
+| Платёжные SDK | `Managers/Payment/*` | YooKassa/YooMoney (токенизация), Долями, SberPay, Yandex Pay. Платёж создаётся через шлюз `mobile`. В тестовых сборках ключ YooKassa и URL уведомлений Долями зависят от пресета хоста (§5.1) |
 | Аналитика, крэши | `AppDelegate.swift` | AppsFlyer, AppMetrica + Varioqub (A/B), Firebase, Sentry (`sentry.12stz.dev`), KSCrash, Crashlytics |
 | Чат, сторис, карты | `Modules/Flomni/`, `AppDelegate+InAppStory.swift` | Flomni chat, InAppStory, Yandex MapKit |
 
@@ -196,7 +202,9 @@
 
 ## 9. Неопределённости и вопросы
 
-- [ ] Объявлены, но не вызываются: `CheckAppVersionEndpoint` (`v1/version/check`), `MetadataEndpoint.address`, `MetadataEndpoint.home`.
+- [ ] **Риск 404 на экране «О компании».** `AboutCompanyVC.swift:58` → `MetadataEndpoint.about` → `core` GET `metadata/about`, а в esb этот маршрут удалён (ECOMDEV-2189, коммит `b3074985`). В Go есть `v1/metadata/about`. Уточнить у команды: переключить iOS или вернуть маршрут / перенаправить в ingress.
+- [ ] Когда iOS переключится с `core` на Go-копии (§6) — какие версии приложения и как долго поддерживать оба пути.
+- [ ] Объявлены, но не вызываются: `CheckAppVersionEndpoint` (`v1/version/check`), `MetadataEndpoint.address`, `MetadataEndpoint.home`, `ProductLastSearchEndpoint` (`products/last-search` — в esb удалён ECOMDEV-2230; вызывающий `ProductService.lastSearch` нигде не используется).
 - [ ] `SplitPaymentManager.swift:43-44` проверяет статус Подели с `paymentId = orderId` — сверить с ожиданием монолита (`M1/PaymentController::actionInfo`).
 - [ ] Совпадение JWT-ключей esb и Go подтверждается только тем, что приложение работает; значения в коде и Vault не сверялись.
 - [ ] Пути с ведущим `/` (`/profile/wishlist/ids`, `/v1/giftcards`) склеиваются через `appendingPathComponent` — на работу не влияет, но выбивается из стиля.
@@ -213,3 +221,4 @@
 | 1.2 | 07.10.2026 | Системный аналитик | По сваггеру нового шлюза закрыт вопрос о `v1/delivery/{id}/return-*` |
 | 1.3 | 10.10.2026 | Системный аналитик | Код шлюзов найден: `mobile` — `12stz/mobile-monorepo-go`, `core` — `12stz/esb-monorepo` |
 | 2.0 | 10.10.2026 | repository-researcher | Карта переписана по клону `12stz/12storeez-ios` (коммит `a6de858b`): структура, сетевой слой и авторизация (§5), раскладка всех вызовов по шлюзам (§6), внешние SDK (§7), подсказки по поиску; §4.3 — сквозная цепочка до контроллера монолита; исправлено: зависимости — SPM, а не CocoaPods. Добавлена схема [../architecture/call-chain.html](../architecture/call-chain.html) (общая для всех репозиториев) |
+| 2.1 | 07.11.2026 | Claude | Сверено с `origin/develop` `4f321c86` (1.89.0): новые вызовы `v1/users/last-context`, `v1/cart/subscription/check`, `POST v1/cart/delivery-list`; поля `subscribe`, `deleteBonuses`, фильтры `waist`/`length`, bool-литералы в query; пресеты хостов (`stg` по умолчанию, `default`/`mobiledev` удалены) и платёжные ключи по пресету; перенос ручек `core` в Go; риск 404 на `metadata/about`; `ProductLastSearchEndpoint` — мёртвый; число папок `Modules/` исправлено на 76 |

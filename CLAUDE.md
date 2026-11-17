@@ -19,7 +19,8 @@
 - Код: `C:\Users\RobotComp.ru\Desktop\12stz\` подключён на чтение. Перед поиском —
   `knowledge/README.md` и карта репозитория.
 - БД: инструменты `mcp__phpstorm__*` (проект PhpStorm `12stz` — оба репозитория,
-  `projectPath`: `C:\Users\RobotComp.ru\Desktop\12stz`), подключение `12stz_staging`. Каждый запрос проходит SQL-фильтр; отказ фильтра не обходить.
+  `projectPath`: `C:\Users\RobotComp.ru\Desktop\12stz`), подключения `12stz_staging` и `12stz_prod`
+  (схема `12stz_production`, только чтение — см. `AGENTS.md` → «Доступ и запреты»). Каждый запрос проходит SQL-фильтр; отказ фильтра не обходить.
 - Защитные проверки (12stz, sources, SQL, commit/push) работают как hooks; их отказ — окончательный,
   не пытайся достичь того же другим инструментом.
 

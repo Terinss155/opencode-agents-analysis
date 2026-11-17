@@ -1,6 +1,7 @@
 # Обмен заказами сайта с 1С, RetailCRM и Mindbox: RabbitMQ и outbox/inbox
 
 Сверено с `12stz/12storeez-master-web`, ветка `develop`, коммит `be3cd759d2` (07.10.2026). Дата: 16.10.2026.
+**Сверено с `origin/develop` `dd4a997ac0`, 07.11.2026:** схема outbox/inbox, имена очередей заказа, консьюмеры и файлы из раздела 6 не изменились. Добавлены: порядок «commit → события → outbox» (раздел 2.1), прочие очереди по заказу (раздел 4.1), переключатель `mindbox_integration_enabled` (раздел 2.3), уточнения в разделе 6.
 
 ## 1. Коротко
 
@@ -43,7 +44,11 @@ flowchart LR
 
 1. Сайт сохраняет заказ в БД и фиксирует транзакцию.
 2. **После фиксации** для каждой системы (1С, RetailCRM, Mindbox) пишется запись в её outbox-таблицу.
-   В записи — только номер заказа, не данные заказа.
+   В записи — только номер заказа, не данные заказа. При создании заказа между фиксацией и outbox
+   сначала выполняются события после сохранения (`AfterSaveEvent`): `OrderService::createOrder` —
+   `commit()` `OrderService.php:182` → `runEvents()` `:201` → `createOrderOutbox()` `:209`. Сайт
+   передаёт 5 событий, мобильный `POST v1/orders` (`CreateOrderServiceMobile`) — 10, старый мобильный
+   `PUT orders` — 5. Ошибка или долгая работа события задерживает запись в outbox.
 3. Запись попадает в очередь RabbitMQ своей системы:
    - **создание заказа** — только кроном: крон раз в минуту публикует в очередь все записи из таблицы;
    - **изменение заказа** — сразу после записи; если публикация не удалась, запись подхватит тот же крон.
@@ -115,7 +120,7 @@ sequenceDiagram
 |---|---|---|
 | 1С | SOAP `loadOrder`, один метод и для создания, и для изменения. Данные — JSON в параметре `OrderList` | Из ответа берётся `bitrix_id` и сохраняется в заказ. Таймаут соединения — 30 с |
 | RetailCRM | REST API v5: создание и изменение заказа, создание клиента, если его ещё нет | Перед отправкой в RetailCRM заказ дополнительно ставится в старую очередь отправки в 1С. Заказы на покупку сертификата в RetailCRM не отправляются |
-| Mindbox | REST в BFB MS: `/api/v1/mindbox/orders` — создание (`checkoutOrder`) и изменение (`patchOrder`) | Прямого вызова Mindbox из этого обмена нет, только через BFB |
+| Mindbox | REST в BFB MS: `/api/v1/mindbox/orders` — создание (`checkoutOrder`) и изменение (`patchOrder`) | Прямого вызова Mindbox из этого обмена нет, только через BFB. Параметр CMS `mindbox_integration_enabled` (миграция `m261011_120000`, `MindboxIntegrationToggleService`) отключает только прямые запросы монолита в API Mindbox (`MindboxComponent`) и, по описанию параметра, не влияет на запросы через BFB — то есть на этот обмен заказами |
 
 ## 3. Входящий обмен: 1С и RetailCRM → сайт
 
@@ -183,6 +188,19 @@ sequenceDiagram
 `onec_update_transaction_inbox`, `rcrm_create_transaction_inbox`, `rcrm_update_transaction_inbox`
 (подробнее — [architecture/04-database.md](../architecture/04-database.md)).
 
+### 4.1. Другие очереди по заказу (вне outbox/inbox)
+
+Есть в `src/Queue/RabbitMqQueueName.php` на `dd4a997ac0` (появились до `be3cd759d2`, в документ ранее не входили):
+
+| Очередь | Кто публикует | Кто читает | Что делает |
+|---|---|---|---|
+| `mindbox.order.given-bonus.update.v1.command` | `PushMindboxUpdateOrderGivenBonusesEvent` (событие после сохранения), `modules/orders/models/Order.php:1076` | `src/Modules/Mindbox/Console/MindboxController.php:140` | Запрашивает в Mindbox начисленные за заказ бонусы (`MindboxBonusService::getTotalAcquiredBalanceChange`) и сохраняет их в `cms_orders.given_bonus` |
+| `mindbox.email-subscription.order.v1.command` | `src/Modules/Mindbox/Service/EmailSubscriptionService.php:90` | `MindboxController.php:192` | Подписка email на рассылку из заказа (`email`, `is_subscribed`, `brand`, `point_of_contact`) → `EmailSubscriptionService::orderSubscription()` |
+| `offline-order.create.v1.command` | `PushCreateOfflineOrderEvent` (событие после сохранения); повтор — `OfflineOrderController::actionRetry` | `src/Modules/Order/Console/OfflineOrderController.php:78` (`actionCreate`) | Создание офлайн-чека по заказу в `cms_offline_orders`; неудачи — в `cms_offline_order_retry_queue` |
+| `to.dolyame.payment.v1.command`, `to.podeli.payment.v1.command`, `to.split.payment.v1.command`, `to.yandex-pay.payment.v1.command`, `to.yandex-sbp.payment.v1.command` | outbox платёжных систем (`PAYMENT_OUTBOX_TRANSACTIONS`) | — (не проверялось) | Создание оплаты в BNPL/Яндекс; к обмену с 1С/RetailCRM/Mindbox не относится |
+
+Новая очередь после `be3cd759d2` — только `mindbox.mobile-device.v1.command` (ECOMDEV-2342, устройства МП, к заказам не относится).
+
 ## 5. Что важно для возвратов
 
 - **Возврат сейчас уходит в 1С внутри заказа.** В JSON для `loadOrder` есть блок `return`: способ
@@ -203,12 +221,12 @@ sequenceDiagram
 
 | Что | Файл |
 |---|---|
-| Запись в outbox при создании и изменении заказа | `src/Modules/Order/Services/OrderService.php` (`createOrder`, `updateOrder`) |
-| Публикация в очередь, обработка сообщения, повторы | `src/Modules/Order/Services/Outbox/OutboxTransactionService.php` |
+| Запись в outbox при создании и изменении заказа | `src/Modules/Order/Services/OrderService.php` (`createOrder` — outbox на строке 209, `updateOrder`) |
+| Публикация в очередь, обработка сообщения, повторы | `src/Modules/Order/Services/Outbox/OutboxTransactionService.php`, `CreateOutboxTransactionService.php`, `UpdateOutboxTransactionService.php` |
 | Обработчики по системам | `src/Modules/Order/Services/Outbox/TransactionHandler/{Onec,Rcrm,Mindbox}TransactionHandler.php` |
 | Клиент 1С (SOAP) | `src/Modules/OneC/Client/OneCClient.php` |
 | Клиент RetailCRM (REST v5) | `src/Modules/Rcrm/Client/RcrmClient.php`, `modules/retailCrm/client/RetailCrmApiClient.php` |
-| Клиент Mindbox через BFB | `src/Modules/Mindbox/Client/MindboxClient.php`, хост — `di/ContainerRegister.php` (`BFB_MS_HOST`) |
+| Клиент Mindbox через BFB | `src/Modules/Mindbox/Client/MindboxClient.php` (URL — `BFB_MS_HOST` + `MindboxClient::ORDER_URL`, `src/Modules/Mindbox/Service/MindboxService.php:197`, `:266`); хост — `config/config.php:149`. Вынесенный в ECOMDEV-2342 домен `src/Integration/Mindbox` (`MindboxConfigurator`, `di/ContainerRegister.php:1137`) касается устройств МП, не заказов |
 | Входящие от 1С | `modules/api2/controllers/OrdersController.php` (`actionOrderUpdate`) |
 | Входящие от RetailCRM | `modules/api/controllers/OrdersNewController.php` |
 | Inbox: запись и публикация | `src/Modules/Order/Services/OrderIntegrationInboxFacade.php` |

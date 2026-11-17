@@ -7,7 +7,7 @@
 | **Владелец решения** | Head of PMO — Светлана Варцаба; правило назвал 1C Solution Architect — Артем Колосов; участники: Project Manager — Катя Тихомирова, System Analyst — Катя Лемешева, Lead Business Analyst 1C — Мария Мезинова, 1C Analyst — Антон Самуйлов, System Analyst (команда BTS) — Елена Васильева |
 | **Область** | Продукт / Бизнес-процесс |
 | **Версия** | v2 |
-| **Предыдущая версия** | [[2026-09-10 14-00] ADR-RET-004-cancel-before-physical-handover-v1.md](<./[2026-09-10 14-00] ADR-RET-004-cancel-before-physical-handover-v1.md>) |
+| **Предыдущая версия** | [[2026-09-10 14-00] ADR-RET-004-cancel-before-physical-handover-v1.md](<./archive/[2026-09-10 14-00] ADR-RET-004-cancel-before-physical-handover-v1.md>) |
 | **Заменяет** | ADR-RET-004 |
 
 ## Контекст
@@ -63,8 +63,8 @@
 
 ## Связанные артефакты
 
-- `ADR-RET-004` — [предыдущая версия](<./[2026-09-10 14-00] ADR-RET-004-cancel-before-physical-handover-v1.md>).
-- `ADR-RET-081` — [статусная модель MVP](<./[2026-10-21 12-03] ADR-RET-081-return-status-model-mvp-v3.md>).
+- `ADR-RET-004` — [предыдущая версия](<./archive/[2026-09-10 14-00] ADR-RET-004-cancel-before-physical-handover-v1.md>).
+- `ADR-RET-081` — [статусная модель MVP](<./archive/[2026-10-21 12-03] ADR-RET-081-return-status-model-mvp-v3.md>).
 - `ADR-RET-053` — [«Подтверждение возврата» через 30 дней](<./[2026-10-08 15-01] ADR-RET-053-return-auto-cancel-v2.md>).
 - `ADR-RET-037` — [возврат на склад без заявки](<./[2026-10-01 14-59] ADR-RET-037-warehouse-return-without-application-v2.md>).
 - `ADR-RET-017` — [первая итерация без интеграции с курьерскими службами](<./[2026-09-17 15-01] ADR-RET-017-integrated-carrier-request-via-1c-v2.md>).

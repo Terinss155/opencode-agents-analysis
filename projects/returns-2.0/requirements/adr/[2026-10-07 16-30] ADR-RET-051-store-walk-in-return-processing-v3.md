@@ -7,7 +7,7 @@
 | **Владелец решения** | 1C Analyst — Антон Самуйлов (согласовал с Ольховиковым, роль в транскрибации не указана); подтвердил 1C Solution Architect — Артем Колосов; участники: Head of PMO — Светлана Варцаба, Project Manager — Катя Тихомирова |
 | **Область** | Бизнес-процесс / Розница / Интеграция |
 | **Версия** | v3 |
-| **Предыдущая версия** | [[2026-10-01 14-59] ADR-RET-038-store-walk-in-return-processing-v2.md](<./[2026-10-01 14-59] ADR-RET-038-store-walk-in-return-processing-v2.md>) |
+| **Предыдущая версия** | [[2026-10-01 14-59] ADR-RET-038-store-walk-in-return-processing-v2.md](<./archive/[2026-10-01 14-59] ADR-RET-038-store-walk-in-return-processing-v2.md>) |
 | **Заменяет** | ADR-RET-038 |
 
 ## Контекст
@@ -65,7 +65,7 @@
 
 ## Связанные артефакты
 
-- `ADR-RET-038` — [предыдущая версия](<./[2026-10-01 14-59] ADR-RET-038-store-walk-in-return-processing-v2.md>).
+- `ADR-RET-038` — [предыдущая версия](<./archive/[2026-10-01 14-59] ADR-RET-038-store-walk-in-return-processing-v2.md>).
 - `ADR-RET-025` — [без push-подтверждения в магазине](<./[2026-09-17 15-01] ADR-RET-025-store-walk-in-return-verification-v1.md>).
 - `BO-3`, `RULE-02`, `RULE-17`, `FR-09`, раздел 4 «Вне объёма» (`OQ-33` закрыт этим решением) — [BRD](../brd.md).
 

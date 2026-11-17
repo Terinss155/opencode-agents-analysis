@@ -1,16 +1,20 @@
 # Архитектура 12 STOREEZ (AS-IS)
 
 Описание фактического устройства монолита: слои, домены, БД, API, фронтенд, инфраструктура.
-Документация описывает состояние ветки `master` и опирается на код, а не на планы.
-Все утверждения прошли независимый аудит против исходного кода (сентябрь 2026).
+Документация опирается на код, а не на планы. Все утверждения прошли независимый аудит против
+исходного кода (сентябрь 2026, ветка `master`).
+
+**Актуализация:** все разделы (README, 01–09) сверены с `origin/develop` `dd4a997ac0`, 07.11.2026
+(база предыдущей сверки — `be3cd759d2`, 07.10.2026). Опорная карта репозитория — [../repo-map.md](../repo-map.md).
 
 > **Статус: AS-IS.** Этот документ описывает текущее (фактическое) состояние системы
 > `12storeez-master`, которое мы анализируем как исходную точку. Для нашего проекта
 > (выделение процесса возвратов в отдельную сущность) целевое состояние будет описано
 > отдельно как **TO-BE** — в артефактах процессов (`requirements/{process}/`).
 
-Единый PDF со всеми разделами и кликабельным оглавлением: [dist/12storeez-architecture.pdf](dist/12storeez-architecture.pdf).
-Пересобрать после правок: `python3 requirements/reference/architecture/build-pdf.py` (нужны `pandoc`, `weasyprint`,
+Единый PDF собирается из этих же файлов (README + 01–09). Прежняя сборка от 06.09.2026 устарела и перенесена в архив:
+[../../_archive/12storeez-architecture.pdf](../../_archive/12storeez-architecture.pdf) (сборка 06.09.2026). Актуальный источник — md-файлы.
+Собрать новый PDF (в `dist/`): `python3 requirements/reference/architecture/build-pdf.py` (нужны `pandoc`, `weasyprint`,
 `@mermaid-js/mermaid-cli` — см. комментарий в начале скрипта).
 
 ## Состав
@@ -47,9 +51,10 @@
 | Сервис возврата | `src/Modules/Order/Services/OrderRefundService.php` |
 | Валидаторы | `src/Modules/Order/Validators/OrderRefundValidator.php`, `validators/order/OrderRefundRequestValidator.php` |
 | Чеки возврата (АТОЛ) | `src/Modules/Receipt/` (RefundPrepayment, RefundFullpayment) |
-| Мобильный возврат | `src/Modules/Mobile/Controllers/OrdersController.php` (actionReturnPositions, actionReturnDetails) |
+| Мобильный возврат | `src/Modules/Mobile/Controllers/OrdersController.php` (actionReturnPositions `:426`, actionReturnDetails `:1258`, actionReturnMethodList `:1327`); маршруты — `src/Modules/Mobile/Rules/UrlRule.php` |
+| Веб-возврат (ЛК сайта) | `modules/orders/controllers/RefundController.php`, `modules/users/controllers/UserRefundController.php`, `src/Modules/Api2/Controller/OrdersController.php` (actionReturnMethodList `:96`, actionReturnDetails `:145`; `config/url.php:234-235`) |
 | Причины возврата | `modules/orders/models/ReturnReason.php`, `ReturnReasonGroup.php` |
-| Статусы возврата | `src/Modules/Order/Enum/StatusEnum.php`, `modules/orders/models/Order.php` (STATUS_ORDER_RETURNED_LK=31) |
+| Статусы возврата | `src/Modules/Order/Enum/StatusEnum.php`, `modules/orders/models/Order.php` (STATUS_ORDER_RETURNED_LK=31, `:275`) |
 
 **Целевое состояние (TO-BE):** отдельный домен «Возвраты» со своей моделью данных, сервисами,
 API и статусной моделью. Артефакты TO-BE будут создаваться в `requirements/`
@@ -57,16 +62,18 @@ API и статусной моделью. Артефакты TO-BE будут с
 
 ## Ключевые цифры
 
+На `origin/develop` `dd4a997ac0` (сверено 07.11.2026):
+
 | Метрика | Значение |
 |---|---|
-| Легаси-модули (`modules/`) | 64 |
-| Современные модули (`src/Modules/`) | 43 |
-| Контроллеры (всего / админских) | 388 / 127 |
-| ActiveRecord-модели с `tableName()` | 240 |
-| Миграции | 208 (апрель 2025 — сентябрь 2026; сверено 09.10.2026) |
-| Модули фронтенда / entry points | 58 / 95 |
-| Консольные команды | 94 |
-| Строк в DI-контейнере | 1516 |
+| Легаси-модули (`modules/`) | 63 (удалён `userActivities`, ECOMDEV-2310) |
+| Современные модули (`src/Modules/`) | 44 (новый — `Discount`) |
+| Контроллеры (всего / админских) | 386 / 126 (файлы `*Controller.php` / `*BackendController.php`) |
+| ActiveRecord-модели с `tableName()` | 242 |
+| Миграции | 220 (апрель 2025 — октябрь 2026; на `be3cd759d2` — 208) |
+| Модули фронтенда / entry points | 59 / 96 (`frontend/src/modules`, файлы `_entry.js`) |
+| Консольные команды | 93 |
+| Строк в DI-контейнере | 1589 |
 
 ## Как поддерживать
 
@@ -79,3 +86,11 @@ API и статусной моделью. Артефакты TO-BE будут с
 
 Описание отдельных фич живёт рядом по теме — например, [docs/sale/categories-sale.md](../../../../12stz/12storeez-master-web/docs/sale/categories-sale.md).
 Контракты API — в `docs/openapi/frontend.yml` и `docs/openapi/mobile.yml` (с 16.09.2026; SSR-спека удалена).
+Причины изменений по задачам ECOMDEV (с 28.09.2026) — в `openspec/changes/archive/` репозитория.
+
+## История изменений
+
+| Дата | Что обновлено | Коммит |
+|---|---|---|
+| 09.10.2026 | Пересчёт миграций (208) | `be3cd759d2` |
+| 07.11.2026 | Сверка README, 01, 02, 03 с `origin/develop`: пересчитаны метрики, исправлен флоу создания заказа сайта (без `CreateOrderServiceSite`), учтены ECOMDEV-2228/2180/2342/2310, веб-бронирование, `src/User` (userApi), MariaDB 10.3, мобильные шлюзы | `dd4a997ac0` |

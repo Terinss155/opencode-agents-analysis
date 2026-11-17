@@ -7,7 +7,7 @@
 | **Владелец решения** | Head of PMO — Светлана Варцаба; участники: 1C Solution Architect — Артем Колосов, Lead Business Analyst 1C — Мария Мезинова, 1C Analyst — Антон Самуйлов, Project Manager — Катя Тихомирова, System Analyst — Катя Лемешева, System Analyst (команда BTS) — Елена Васильева |
 | **Область** | Бизнес-процесс / Scope |
 | **Версия** | v2 |
-| **Предыдущая версия** | [[2026-10-02 10-00] ADR-RET-041-return-expertise-out-of-scope-v1.md](<./[2026-10-02 10-00] ADR-RET-041-return-expertise-out-of-scope-v1.md>) |
+| **Предыдущая версия** | [[2026-10-02 10-00] ADR-RET-041-return-expertise-out-of-scope-v1.md](<./archive/[2026-10-02 10-00] ADR-RET-041-return-expertise-out-of-scope-v1.md>) |
 | **Заменяет** | ADR-RET-041 |
 
 ## Контекст
@@ -65,8 +65,8 @@ Head of PMO согласилась убрать этап экспертизы и
 
 ## Связанные артефакты
 
-- `ADR-RET-041` — [предыдущая версия](<./[2026-10-02 10-00] ADR-RET-041-return-expertise-out-of-scope-v1.md>).
-- `ADR-RET-081` — [статусная модель MVP](<./[2026-10-21 12-03] ADR-RET-081-return-status-model-mvp-v3.md>).
+- `ADR-RET-041` — [предыдущая версия](<./archive/[2026-10-02 10-00] ADR-RET-041-return-expertise-out-of-scope-v1.md>).
+- `ADR-RET-081` — [статусная модель MVP](<./archive/[2026-10-21 12-03] ADR-RET-081-return-status-model-mvp-v3.md>).
 - `ADR-RET-006` — [без блокировки по категориям в MVP](<./[2026-09-10 14-00] ADR-RET-006-no-category-blocking-in-mvp-v1.md>).
 - `RULE-30`, `FR-30`, `FR-31`, `OQ-32` — [BRD](../brd.md).
 - US16 — [user-story-post-mvp.md](../user-story/user-story-post-mvp.md).

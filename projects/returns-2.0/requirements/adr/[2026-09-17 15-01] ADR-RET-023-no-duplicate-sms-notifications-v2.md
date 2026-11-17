@@ -7,7 +7,7 @@
 | **Владелец решения** | Head of PMO — Светлана Варцаба; участники: Product Manager — Катя Филатова, System Analyst (BTS) — Елена Васильева |
 | **Область** | Интеграция / Клиентский опыт (CX) |
 | **Версия** | v2 |
-| **Предыдущая версия** | [[2026-09-10 14-00] ADR-RET-013-no-duplicate-sms-notifications-v1.md](<./[2026-09-10 14-00] ADR-RET-013-no-duplicate-sms-notifications-v1.md>) |
+| **Предыдущая версия** | [[2026-09-10 14-00] ADR-RET-013-no-duplicate-sms-notifications-v1.md](<./archive/[2026-09-10 14-00] ADR-RET-013-no-duplicate-sms-notifications-v1.md>) |
 | **Заменяет** | ADR-RET-013 |
 
 ## Контекст
@@ -60,7 +60,7 @@
 
 ## Связанные артефакты
 
-- `ADR-RET-013` — [предыдущая версия решения](<./[2026-09-10 14-00] ADR-RET-013-no-duplicate-sms-notifications-v1.md>).
+- `ADR-RET-013` — [предыдущая версия решения](<./archive/[2026-09-10 14-00] ADR-RET-013-no-duplicate-sms-notifications-v1.md>).
 - `ADR-RET-017` — [первая итерация без интеграции с курьерскими службами](<./[2026-09-17 15-01] ADR-RET-017-integrated-carrier-request-via-1c-v2.md>).
 - `RULE-27`, `C-22`, `FR-07`, `FR-08` — [BRD](../brd.md).
 - `US-LC-04` — [уведомления о событиях возврата](../user-story/user-story-mvp.md#us-lc-04).

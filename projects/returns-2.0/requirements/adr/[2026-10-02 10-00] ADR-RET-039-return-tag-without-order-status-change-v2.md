@@ -7,7 +7,7 @@
 | **Владелец решения** | Head of PMO — Светлана Варцаба; участники: Product Manager — Катя Филатова, 1C Solution Architect — Артем Колосов, Лид аналитиков RetailCRM — Алена Господинова, аналитик RetailCRM — Андрей Chug, System Analyst — Катя Лемешева |
 | **Область** | Продукт / Данные / RetailCRM |
 | **Версия** | v2 |
-| **Предыдущая версия** | [[2026-09-25 13-30] ADR-RET-015-return-tag-without-order-status-change-v1.md](<./[2026-09-25 13-30] ADR-RET-015-return-tag-without-order-status-change-v1.md>) |
+| **Предыдущая версия** | [[2026-09-25 13-30] ADR-RET-015-return-tag-without-order-status-change-v1.md](<./archive/[2026-09-25 13-30] ADR-RET-015-return-tag-without-order-status-change-v1.md>) |
 | **Заменяет** | ADR-RET-015 |
 
 ## Контекст
@@ -76,9 +76,9 @@ Product Manager обосновала, зачем нужен статус поз�
 
 ## Связанные артефакты
 
-- `ADR-RET-015` — [предыдущая версия](<./[2026-09-25 13-30] ADR-RET-015-return-tag-without-order-status-change-v1.md>).
+- `ADR-RET-015` — [предыдущая версия](<./archive/[2026-09-25 13-30] ADR-RET-015-return-tag-without-order-status-change-v1.md>).
 - `ADR-RET-019` — [раздельные статусы заказа и возврата](<./[2026-09-24 15-01] ADR-RET-019-return-order-status-separation-v1.md>).
-- `ADR-RET-040` — [статусная модель возврата](<./[2026-10-02 10-00] ADR-RET-040-return-status-model-mvp-v2.md>).
+- `ADR-RET-040` — [статусная модель возврата](<./archive/[2026-10-02 10-00] ADR-RET-040-return-status-model-mvp-v2.md>).
 - `RULE-29`, `FR-28`, `FR-29`, `OQ-47` — [BRD](../brd.md).
 
 ## История изменений

@@ -74,8 +74,8 @@ TeamLead 1С привёл контраргумент на реальном сл�
 ## Связанные артефакты
 
 - `ADR-RET-002` — [отдельная сущность заявки на возврат](<./[2026-09-10 14-00] ADR-RET-002-separate-return-request-entity-v1.md>).
-- `ADR-RET-015` — [отметка о возврате без смены статусов заказа (предложено)](<./[2026-09-25 13-30] ADR-RET-015-return-tag-without-order-status-change-v1.md>).
-- `ADR-RET-018` — [без единой мастер-системы возврата](<./[2026-09-24 15-01] ADR-RET-018-return-master-system-v1.md>).
+- `ADR-RET-015` — [отметка о возврате без смены статусов заказа (предложено)](<./archive/[2026-09-25 13-30] ADR-RET-015-return-tag-without-order-status-change-v1.md>).
+- `ADR-RET-018` — [без единой мастер-системы возврата](<./archive/[2026-09-24 15-01] ADR-RET-018-return-master-system-v1.md>).
 - `RULE-29`, `FR-28`, `FR-29`, `OQ-1` — [BRD](../brd.md).
 - [Диаграмма состояний возврата](../diagrams/state/return-status_state.md).
 

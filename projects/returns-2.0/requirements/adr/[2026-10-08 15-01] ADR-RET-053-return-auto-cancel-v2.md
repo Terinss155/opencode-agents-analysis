@@ -7,7 +7,7 @@
 | **Владелец решения** | Head of PMO — Светлана Варцаба; участники: Project Manager — Катя Тихомирова, System Analyst — Катя Лемешева, Head of Customer Service — Ольга Соколова, Product Manager — Катя Филатова, Acting Head of Transport Logistics — Артем Лисин |
 | **Область** | Бизнес-процесс / Жизненный цикл возврата |
 | **Версия** | v2 |
-| **Предыдущая версия** | [[2026-10-01 14-59] ADR-RET-033-return-auto-cancel-v1.md](<./[2026-10-01 14-59] ADR-RET-033-return-auto-cancel-v1.md>) |
+| **Предыдущая версия** | [[2026-10-01 14-59] ADR-RET-033-return-auto-cancel-v1.md](<./archive/[2026-10-01 14-59] ADR-RET-033-return-auto-cancel-v1.md>) |
 | **Заменяет** | ADR-RET-033 |
 
 ## Контекст
@@ -90,9 +90,9 @@ CRM, и получила подтверждение.
 
 ## Связанные артефакты
 
-- `ADR-RET-033` — [предыдущая версия](<./[2026-10-01 14-59] ADR-RET-033-return-auto-cancel-v1.md>).
+- `ADR-RET-033` — [предыдущая версия](<./archive/[2026-10-01 14-59] ADR-RET-033-return-auto-cancel-v1.md>).
 - `ADR-RET-051` — [возврат на кассе магазина](<./[2026-10-07 16-30] ADR-RET-051-store-walk-in-return-processing-v3.md>).
-- `ADR-RET-081` — [статусная модель MVP](<./[2026-10-21 12-03] ADR-RET-081-return-status-model-mvp-v3.md>).
+- `ADR-RET-081` — [статусная модель MVP](<./archive/[2026-10-21 12-03] ADR-RET-081-return-status-model-mvp-v3.md>).
 - `ADR-RET-082` — [отмена клиентом до «Возврат принят»](<./[2026-10-21 12-03] ADR-RET-082-cancel-before-physical-handover-v2.md>).
 - `ADR-RET-017` — [первая итерация без интеграции с курьерскими службами](<./[2026-09-17 15-01] ADR-RET-017-integrated-carrier-request-via-1c-v2.md>).
 - `RULE-09`, `FR-10`, `FR-11`, `FR-12`, `FR-26`, `FR-41` — [BRD](../brd.md).

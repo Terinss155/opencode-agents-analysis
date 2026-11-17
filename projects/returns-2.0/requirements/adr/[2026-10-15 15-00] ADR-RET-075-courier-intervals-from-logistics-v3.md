@@ -7,7 +7,7 @@
 | **Владелец решения** | Product Manager — Катя Филатова; участник: System Analyst — Катя Лемешева |
 | **Область** | Интеграция / Бизнес-процесс |
 | **Версия** | v3 |
-| **Предыдущая версия** | [[2026-10-15 15-00] ADR-RET-071-courier-intervals-from-logistics-v2.md](<./[2026-10-15 15-00] ADR-RET-071-courier-intervals-from-logistics-v2.md>) |
+| **Предыдущая версия** | [[2026-10-15 15-00] ADR-RET-071-courier-intervals-from-logistics-v2.md](<./archive/[2026-10-15 15-00] ADR-RET-071-courier-intervals-from-logistics-v2.md>) |
 | **Заменяет** | ADR-RET-071 |
 
 ## Контекст
@@ -87,9 +87,9 @@
 
 ## Связанные артефакты
 
-- `ADR-RET-071` — [предыдущая версия](<./[2026-10-15 15-00] ADR-RET-071-courier-intervals-from-logistics-v2.md>).
-- `ADR-RET-074` — [ручной ввод адреса курьера](<./[2026-10-14 15-00] ADR-RET-074-manual-return-address-v1.md>).
-- `ADR-RET-063` — [объём дат курьера](<./[2026-10-14 15-00] ADR-RET-063-courier-date-range-v1.md>).
+- `ADR-RET-071` — [предыдущая версия](<./archive/[2026-10-15 15-00] ADR-RET-071-courier-intervals-from-logistics-v2.md>).
+- `ADR-RET-074` — [ручной ввод адреса курьера](<./archive/[2026-10-14 15-00] ADR-RET-074-manual-return-address-v1.md>).
+- `ADR-RET-063` — [объём дат курьера](<./archive/[2026-10-14 15-00] ADR-RET-063-courier-date-range-v1.md>).
 - Статусы заявки, переход S2 — [диаграмма состояний](../diagrams/state/return-status_state.md).
 - `NFR-MON-08` — [мониторинг интервалов курьера](../nfr/returns-monitoring_nfr.md).
 - Проверка интервалов Дружбой и порядок действий — [courier-intervals_questions.md](../questions/courier-intervals_questions.md).

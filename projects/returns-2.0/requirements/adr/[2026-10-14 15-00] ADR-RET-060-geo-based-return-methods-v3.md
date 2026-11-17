@@ -7,7 +7,7 @@
 | **Владелец решения** | Project Manager — Катя Тихомирова; [BTS] Head of IT Services and Integrations — Дмитрий Зотов; System Analyst (BTS) — Елена Васильева; участники: Product Manager — Катя Филатова, System Analyst — Катя Лемешева, Backend Developer — Оля Свистунова |
 | **Область** | Архитектура / Интеграция / Логистика |
 | **Версия** | v3 |
-| **Предыдущая версия** | [[2026-09-24 15-01] ADR-RET-021-geo-based-return-methods-v2.md](<./[2026-09-24 15-01] ADR-RET-021-geo-based-return-methods-v2.md>) |
+| **Предыдущая версия** | [[2026-09-24 15-01] ADR-RET-021-geo-based-return-methods-v2.md](<./archive/[2026-09-24 15-01] ADR-RET-021-geo-based-return-methods-v2.md>) |
 | **Заменяет** | ADR-RET-021 |
 
 ## Контекст
@@ -63,9 +63,9 @@
 
 ## Связанные артефакты
 
-- `ADR-RET-021` — [предыдущая версия решения](<./[2026-09-24 15-01] ADR-RET-021-geo-based-return-methods-v2.md>).
-- `ADR-RET-057` — [даты и интервалы курьера от сервиса логистики](<./[2026-10-14 11-59] ADR-RET-057-courier-intervals-from-logistics-v1.md>).
-- `ADR-RET-061` — [отдельный тип доставки для возвратов](<./[2026-10-14 15-00] ADR-RET-061-return-delivery-type-v1.md>).
+- `ADR-RET-021` — [предыдущая версия решения](<./archive/[2026-09-24 15-01] ADR-RET-021-geo-based-return-methods-v2.md>).
+- `ADR-RET-057` — [даты и интервалы курьера от сервиса логистики](<./archive/[2026-10-14 11-59] ADR-RET-057-courier-intervals-from-logistics-v1.md>).
+- `ADR-RET-100` — [отдельный тип доставки для возврата курьера СДЭК, коды ПВЗ](<./[2026-11-12 14-59] ADR-RET-100-return-delivery-type-v2.md>) (заменяет `ADR-RET-061`).
 - `FR-13`, `FR-16`, `FR-23`, `FR-42`, `OQ-38` — [BRD](../brd.md).
 
 ## История изменений
@@ -73,3 +73,4 @@
 | Дата | Изменение |
 |---|---|
 | 14.10.2026 | ADR создан как v3 решения `geo-based-return-methods` по транскрибации от 14.10.2026 |
+| 17.11.2026 | В «Связанных артефактах» ссылка на `ADR-RET-061` переведена на новую версию решения `ADR-RET-100`; решение не менялось |

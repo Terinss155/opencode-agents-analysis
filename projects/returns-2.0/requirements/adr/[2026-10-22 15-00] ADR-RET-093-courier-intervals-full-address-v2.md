@@ -7,7 +7,7 @@
 | **Владелец решения** | System Analyst (команда BTS) — Елена Васильева |
 | **Область** | Интеграция / Логистика |
 | **Версия** | v2 |
-| **Предыдущая версия** | [[2026-10-22 15-00] ADR-RET-090-courier-intervals-full-address-v1.md](<./[2026-10-22 15-00] ADR-RET-090-courier-intervals-full-address-v1.md>) |
+| **Предыдущая версия** | [[2026-10-22 15-00] ADR-RET-090-courier-intervals-full-address-v1.md](<./archive/[2026-10-22 15-00] ADR-RET-090-courier-intervals-full-address-v1.md>) |
 | **Заменяет** | ADR-RET-090 |
 
 ## Контекст

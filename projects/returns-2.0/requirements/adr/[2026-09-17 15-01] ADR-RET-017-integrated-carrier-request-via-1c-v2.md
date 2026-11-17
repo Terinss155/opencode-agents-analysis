@@ -7,7 +7,7 @@
 | **Владелец решения** | Head of PMO — Светлана Варцаба; участники: 1C Solution Architect — Артем Колосов, TeamLead ERP 1C Development — Алексей Крицин, 1C Analyst — Антон Самуйлов, System Analyst (BTS) — Елена Васильева, Product Manager — Катя Филатова, Project Manager — Катя Тихомирова |
 | **Область** | Архитектура / Интеграция / Scope |
 | **Версия** | v2 |
-| **Предыдущая версия** | [[2026-09-10 14-00] ADR-RET-003-integrated-carrier-request-via-1c-v1.md](<./[2026-09-10 14-00] ADR-RET-003-integrated-carrier-request-via-1c-v1.md>) |
+| **Предыдущая версия** | [[2026-09-10 14-00] ADR-RET-003-integrated-carrier-request-via-1c-v1.md](<./archive/[2026-09-10 14-00] ADR-RET-003-integrated-carrier-request-via-1c-v1.md>) |
 | **Заменяет** | ADR-RET-003 |
 
 ## Контекст
@@ -82,7 +82,7 @@
 
 ## Связанные артефакты
 
-- `ADR-RET-003` — [предыдущая версия решения](<./[2026-09-10 14-00] ADR-RET-003-integrated-carrier-request-via-1c-v1.md>).
+- `ADR-RET-003` — [предыдущая версия решения](<./archive/[2026-09-10 14-00] ADR-RET-003-integrated-carrier-request-via-1c-v1.md>).
 - `ADR-RET-022` — [работа склада «Бетта» без бумажного заявления](<./[2026-09-17 15-01] ADR-RET-022-warehouse-return-without-application-v1.md>).
 - `ADR-RET-023` — [коды ТК в первой итерации не показываются в ЛК](<./[2026-09-17 15-01] ADR-RET-023-no-duplicate-sms-notifications-v2.md>).
 - `BO-3`, `C-22`, `FR-07`, `FR-08`, `INT-04`, `OQ-10`, `OQ-11` — [BRD](../brd.md).

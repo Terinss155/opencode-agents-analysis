@@ -7,6 +7,7 @@
 >
 > **Дата:** 2026-09-08
 > **Источник:** анализ кода монолита (Yii2)
+> **Сверено с `origin/develop` `dd4a997ac0`, 07.11.2026:** выводы не изменились; обновлены номера строк в `User.php` (242-243 → 256-257), `AbstractCartService.php` (607 → 628), `OrderHelper.php` (587-610 → 589-611), `Order.php` (`canBeReturned()` 1367-1380 → 1360-1373, `afterSave()` 1453 → 1446), `OrderPosition.php` (647-657 → 660-670), `User.php` (`vip` 1340 → 1413). Остальные ссылки (`OrdersBackendController.php`, `_form.php`, `Order::rules()`/`beforeSave()`) совпадают.
 
 ---
 
@@ -16,7 +17,7 @@
 
 ### Подтверждение в коде
 
-**Файл:** `modules/users/models/User.php`, строка 242
+**Файл:** `modules/users/models/User.php`, строка 256
 
 ```php
 [['email', 'number', 'name'], 'required', 'on' => 'order'],
@@ -27,7 +28,7 @@
 - **number** — телефон
 - **name** — имя
 
-Сценарий `order` активируется в `src/Modules/Cart/Service/AbstractCartService.php`, строка 607:
+Сценарий `order` активируется в `src/Modules/Cart/Service/AbstractCartService.php`, строка 628:
 
 ```php
 $cart->scenario = 'order';
@@ -35,7 +36,7 @@ $cart->scenario = 'order';
 
 ### Исключение: покупка в один клик
 
-**Файл:** `modules/users/models/User.php`, строка 243
+**Файл:** `modules/users/models/User.php`, строка 257
 
 ```php
 [['number'], 'required', 'on' => 'order_one_click'],
@@ -53,7 +54,7 @@ $cart->scenario = 'order';
 
 ### Как работает логика возврата сейчас
 
-**Файл:** `src/Modules/Order/Helpers/OrderHelper.php`, строки 587-610
+**Файл:** `src/Modules/Order/Helpers/OrderHelper.php`, строки 589-611
 
 ```php
 public function canBeReturned(Order $order): bool
@@ -69,14 +70,14 @@ public function canBeReturned(Order $order): bool
 ```
 
 Аналогичная логика (deprecated, но используется):
-- `modules/orders/models/Order.php`, строки 1367-1380 — `Order::canBeReturned()`
-- `modules/orders/models/OrderPosition.php`, строки 647-657 — `OrderPosition::canBeReturned()`
+- `modules/orders/models/Order.php`, строки 1360-1373 — `Order::canBeReturned()`
+- `modules/orders/models/OrderPosition.php`, строки 660-670 — `OrderPosition::canBeReturned()`
 
 ### Что есть в коде о статусах клиентов
 
 | Поле/модель | Что хранит | Используется ли в возврате? |
 |-------------|------------|----------------------------|
-| `User.vip` (строка 1340) | Флаг VIP из CRM | ❌ Нет |
+| `User.vip` (строка 1413) | Флаг VIP из CRM | ❌ Нет |
 | `UserSegment` | Только блокировка наложенного платежа (`cash_pay_block_user_id`) | ❌ Нет |
 | `Parameters.days_can_be_returned` | Глобальное значение (14 дней) | ✅ Да, но для всех одинаково |
 
@@ -113,6 +114,11 @@ public function canBeReturned(Order $order): bool
 **Клиент (сайт/мобилка)** — после оформления заказ **не редактируется** клиентом. Клиент может только:
 - Отменить заказ (если `canBeCancelled()`)
 - Оформить возврат (если `canBeReturned()`)
+- Сменить способ оплаты (`src/Modules/Payment/Controller/ChangePaymentController.php`, `actionChangePaymentMethod()` — строка 152)
+
+> **Уточнение по `origin/develop` `dd4a997ac0` (07.11.2026):**
+> - Отмена из веб-ЛК (`modules/users/controllers/ProfileController.php:633-659`, `actionCancelOrderJson`) проверяет только владельца заказа (`findOneByIdAndUserId`), но **не вызывает** `canBeCancelled()`: `OrderCancelService::prepareCancelOrder()` (`src/Modules/Order/Services/OrderCancelService.php:26`) сразу ставит статус `ORDER_CANCELLED` (или `PAYMENT_CANCEL` для C&C light) и отменяет позиции.
+> - Смена способа оплаты на сайте загружает заказ через `OrderRepository::findOne($order_id)` (`ChangePaymentController.php:103`, `:161`) — без проверки, что заказ принадлежит текущему пользователю.
 
 ### 3.2. Что именно можно менять в CMS
 
@@ -163,7 +169,7 @@ public function canBeReturned(Order $order): bool
 
 3. **`fromSite()`** (строка 244) — обработка данных
 
-4. **`Order::afterSave()`** (строка 1453) — отправка в CRM/1С и т.д.
+4. **`Order::afterSave()`** (строка 1446) — отправка в CRM/1С и т.д.
 
 5. **История изменений** — ведётся через `adminHistoryService` (строки 165, 209, 248, 269, 282)
 
@@ -180,8 +186,8 @@ public function canBeReturned(Order $order): bool
 
 | Вопрос | Ответ | Где в коде |
 |--------|-------|------------|
-| Email обязателен при заказе? | ✅ Да (сценарий `order`); ❌ Нет (сценарий `order_one_click`) | `User.php:242-243` |
-| Статус Friends & Family влияет на срок возврата? | ❌ Нет, срок одинаков для всех (подтверждено разработчиком) | `OrderHelper.php:587-610` |
+| Email обязателен при заказе? | ✅ Да (сценарий `order`); ❌ Нет (сценарий `order_one_click`) | `User.php:256-257` |
+| Статус Friends & Family влияет на срок возврата? | ❌ Нет, срок одинаков для всех (подтверждено разработчиком) | `OrderHelper.php:589-611` |
 | Можно ли менять заказ после оформления? | ✅ Да, в CMS-админке (любой статус); ❌ Нет, для клиента | `OrdersBackendController.php:159` |
 
 ---

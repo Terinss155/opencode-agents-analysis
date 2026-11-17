@@ -1,9 +1,10 @@
 # Справочники статусов: заказ, позиция заказа, Mindbox, WMS
 
 **Проект:** «Возвраты 2.0» / «Омниканальный возврат»  
-**Версия:** 1.3  
-**Последнее обновление:** 23.10.2026  
-**Сверено с кодом:** `12storeez-master-web`, коммит `be3cd759d2` (раздел 3.1)
+**Версия:** 1.4  
+**Последнее обновление:** 07.11.2026  
+**Сверено с кодом:** `12storeez-master-web`, коммит `be3cd759d2` (раздел 3.1)  
+**Сверено с `origin/develop` `dd4a997ac0`, 07.11.2026** — ссылки на код (разделы 2, 3.1, 4); значения справочников — по выгрузкам (раздел 8), БД не запрашивалась
 
 ## 1. Назначение
 
@@ -18,7 +19,7 @@
 | `cms_order_positions.status` | `cms_order_position_statuses` | `cms_order_positions.status = cms_order_position_statuses.internal_id` | `modules/statuses/models/OrderPositionStatus.php` |
 | пара статусов заказа и позиции | `cms_mb_statuses_map` | `order_status_id = cms_order_statuses.internal_id`, `order_position_status_id = cms_order_position_statuses.internal_id` → `mindbox_status_id` | `modules/statuses/models/MbStatusesMap.php`, `src/Modules/Mindbox/Service/MindboxStatusesMapService.php` |
 | `cms_orders.status_wms` (строка) | `cms_order_statuses_wms` | `cms_orders.status_wms = cms_order_statuses_wms.code` | `Order::getWmsStatuses()` — `modules/orders/models/Order.php:894-897` |
-| `cms_orders.return_status_wms` (строка) | `cms_order_return_statuses_wms` | `cms_orders.return_status_wms = cms_order_return_statuses_wms.code` | `OrderReturnStatusWmsService::getByCode()`; приходит из 1С в `api2/OrdersController::actionOrderUpdate` (`modules/api2/controllers/OrdersController.php:875-879`), сохраняется в `OrderUpdateService.php:384-387` вместе с `return_order_num` |
+| `cms_orders.return_status_wms` (строка) | `cms_order_return_statuses_wms` | `cms_orders.return_status_wms = cms_order_return_statuses_wms.code` | `OrderReturnStatusWmsService::getByCode()`; приходит из 1С в `api2/OrdersController::actionOrderUpdate` (`modules/api2/controllers/OrdersController.php:897-901`), сохраняется в `OrderUpdateService.php:384-387` вместе с `return_order_num` |
 | `cms_order_statuses.code`, `cms_order_position_statuses.code` | справочники RetailCRM | символьный код статуса RetailCRM | `OrderPositionStatusRepository::getRetailStatuses()`, `RcrmOrderPositionTransformer.php:29-35` |
 
 `id` — идентификатор строки справочника. Для расшифровки статуса из бизнес-таблицы используется `internal_id` (для WMS — `code`), поэтому искать строку справочника по совпадению с `id` некорректно.
@@ -173,8 +174,8 @@
 | Админка, форма статуса заказа (`views/order-status-backend/_form.php:16-18`) | У статуса редактируются независимо: клиентское название `client_title` (свободный текст) и группа `group` (выпадающий список активных групп, `OrderStatus::getStatusGroupList()`) |
 | Админка, список статусов заказа (`OrderStatusSearch.php:34-37`) | Колонка и фильтр по названию группы |
 | Админка, список заказов (`OrderSearch.php:42` → `Order::getStatuses()` → `StatusGroup::getGroupWithOrderTitle()`) | Список статусов для фильтра, сгруппированный по активным группам; в группах выводится техническое название статуса `title` |
-| Логика заказа (`StatusGroup::findCompleteStatuses()` → `Order.php:600`, `OrderHelper.php:554`) | Выполненные заказы — статусы группы `complete` |
-| Логика возврата (`OrderStatus.php:160-163`) | Возвратные статусы — статусы групп `vvyp`, `vozvrds`, `vozvratds`, `delivery` |
+| Логика заказа (`StatusGroup::findCompleteStatuses()` → `Order.php:600`, `OrderHelper.php:556`) | Выполненные заказы — статусы группы `complete` |
+| Логика возврата (`OrderStatus::findBlockCashPayStatuses()`, `OrderStatus.php:157-166`) | Возвратные статусы (блокировка оплаты наличными) — статусы групп `vvyp`, `vozvrds`, `vozvratds`, `delivery` и дополнительно строка `id = 22` (это `internal_id = 23` «Заказ отменён»: условие написано по `id`, а не по `internal_id`) |
 
 Наблюдения:
 
@@ -460,3 +461,4 @@
 | 1.1 | 28.07.2026 | Добавлены все предоставленные статусы `cms_order_statuses`; расшифрован `cms_orders.status = 8`; зафиксированы `internal_id` возвратных статусов |
 | 1.2 | 02.10.2026 | Файл перенесён в бандл (`requirements/reference/database/`) и переименован из `order-status-reference.md`. Сверка с выгрузкой 02.10.2026: расхождений нет. Добавлены все поля `cms_order_statuses`, маппинг `cms_mb_statuses_map`, справочники `cms_order_statuses_wms` и `cms_order_return_statuses_wms`, правила сопоставления WMS, возвратные статусы позиции в коде, наблюдения по Mindbox для возвратов |
 | 1.3 | 23.10.2026 | Добавлен справочник групп статусов заказа `cms_status_groups` (раздел 3.1): все группы, состав статусов, использование в админке и логике, правило сопоставления `cms_order_statuses.group` |
+| 1.4 | 07.11.2026 | Сверено с `origin/develop` `dd4a997ac0`: обновлены строки `api2/OrdersController.php` (875-879 → 897-901) и `OrderHelper.php` (554 → 556); уточнено условие `findBlockCashPayStatuses()` (группы + `id = 22`). Новых миграций по справочникам статусов после `be3cd759d2` нет; `MindboxStatusesMapService` остался в `src/Modules/Mindbox` (в `src/Integration/Mindbox` вынесена только работа с устройствами МП) |

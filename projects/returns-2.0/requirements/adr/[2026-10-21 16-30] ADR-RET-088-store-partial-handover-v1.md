@@ -61,7 +61,7 @@
 
 ## Связанные артефакты
 
-- `ADR-RET-084` — [статусная модель возврата MVP](<./[2026-10-21 16-30] ADR-RET-084-return-status-model-mvp-v4.md>).
+- `ADR-RET-084` — [статусная модель возврата MVP](<./archive/[2026-10-21 16-30] ADR-RET-084-return-status-model-mvp-v4.md>).
 - `ADR-RET-085` — [сдача в магазине по заявке другого способа](<./[2026-10-21 16-30] ADR-RET-085-store-return-with-existing-request-v2.md>).
 - Статусы позиции возврата, переход P2 — [диаграмма состояний](../diagrams/state/return-status_state.md).
 

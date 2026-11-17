@@ -84,7 +84,7 @@
 ## Связанные артефакты
 
 - `ADR-RET-002` — [отдельная сущность заявки на возврат](<./[2026-09-10 14-00] ADR-RET-002-separate-return-request-entity-v1.md>).
-- `ADR-RET-040` — [статусы возвратного заказа](<./[2026-10-02 10-00] ADR-RET-040-return-status-model-mvp-v2.md>).
+- `ADR-RET-040` — [статусы возвратного заказа](<./archive/[2026-10-02 10-00] ADR-RET-040-return-status-model-mvp-v2.md>).
 - `ADR-RET-044` — [обмен возвратами через сайт](<./[2026-10-02 10-00] ADR-RET-044-returns-integration-gateway-v2.md>).
 - `ADR-RET-045` — [реквизиты в возвратном заказе RetailCRM](<./[2026-10-02 10-00] ADR-RET-045-refund-details-in-retailcrm-v2.md>).
 

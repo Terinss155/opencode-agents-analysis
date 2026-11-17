@@ -1,19 +1,23 @@
 # База данных
 
+> Сверено с `origin/develop` `dd4a997ac0`, 07.11.2026.
+
 ## Общие сведения
 
-MariaDB/MySQL, около 240 ActiveRecord-моделей с объявленным `tableName()`.
+MariaDB 10.3 (не MySQL 8: оконные функции, CTE и JSON-функции ведут себя иначе — см.
+`repo-map.md`). 242 файла моделей в `modules/`, `src/`, `components/`, `coreExtends/` объявляют
+`tableName()`.
 
 **Префикс таблиц** задаётся переменной `TABLE_PREFIX`, по умолчанию `cms_`. В моделях
 используется запись `{{%orders}}`, что в рантайме превращается в `cms_orders`.
 
 Логи пишутся в отдельное подключение `log_db` (переменные `LOG_DSN`, `LOG_USERNAME`,
-`LOG_PASSWORD`), см. `config/common.php`.
+`LOG_PASSWORD`, свой префикс `LOG_TABLE_PREFIX`), см. `config/common.php:169-175`.
 
-Кэш схемы БД включён (`enableSchemaCache`, TTL 1 час — задаются в `config/common.php` и
+Кэш схемы БД включён (`enableSchemaCache`, TTL 1 час — `config/common.php:165-167`,
 действуют для web и консоли), но хранится не в Redis, а в файлах: компонент `cacheSchema`
 типа `FileCache` в `@runtime/cache/dbSchema`. Сам компонент `cacheSchema` зарегистрирован
-только в `config/web.php` — в чистом `config/console.php` (без web-расширения) его нет.
+только в `config/web.php:324` — в чистом `config/console.php` (без web-расширения) его нет.
 
 ## Соглашения об именовании
 
@@ -44,7 +48,7 @@ MariaDB/MySQL, около 240 ActiveRecord-моделей с объявленн�
 | Таблица | Модель |
 |---|---|
 | `orders` | `modules/orders/models/Order.php` **и** `src/Modules/Order/Model/Order.php` |
-| `order_positions` | `modules/orders/models/OrderPosition.php` |
+| `order_positions` | `modules/orders/models/OrderPosition.php` (с 16.09.2026 — колонка `experiment`, вариант A/B-теста ECOMDEV-1821, миграция `m260916_120000_ecomdev_2105_orders_and_mobile_toggle.php`) |
 | `orders_history` | `modules/orders/models/OrderHistory.php` |
 | `order_positions_history` | `modules/orders/models/OrderPositionHistory.php` |
 | `orders_payments` | `modules/payment/models/Payment.php` |
@@ -55,7 +59,7 @@ MariaDB/MySQL, около 240 ActiveRecord-моделей с объявленн�
 | `offline_orders`, `offline_order_positions` | `src/Modules/Order/Model/OfflineOrder*.php` |
 | `offline_order_retry_queue` | `src/Modules/Order/Model/OfflineOrderRetryQueue.php` |
 | `shopping_carts` | `modules/cart/models/Cart.php` |
-| `shopping_cart_positions` | `modules/shopping/models/ShoppingCartPosition.php` |
+| `shopping_cart_positions` | `modules/shopping/models/ShoppingCartPosition.php` (колонка `experiment` — с 10.09.2026) |
 | `checkout_user_settings` | `src/Modules/Cart/Model/CheckoutUserSettings.php` |
 | `wishlist_items` | `modules/wishlist/models/WishlistItem.php` |
 
@@ -74,13 +78,16 @@ MariaDB/MySQL, около 240 ActiveRecord-моделей с объявленн�
 | `catalog_item_stock` | `modules/catalog/models/ItemStock.php` — остаток по штрихкоду и магазину |
 | `product_stocks` | `src/Modules/Product/Models/ProductStock.php` |
 | `product_attributes` | `src/Modules/Product/Models/ProductAttribute.php` |
+| `product_stocks_by_cities` | `src/Modules/Stock/Model/ProductStockByCity.php` |
+| `product_size_mapping` | `src/Modules/Product/Models/ProductSizeMapping.php` — маппинг размеров по типу размерной таблицы (сентябрь 2026; у `products` и `product_history` появилась колонка типа таблицы, `m261014_120000_add_size_table_type_to_products_table.php`) |
+| `product_order_weighted_demand`, `category_size_weight` | `src/Modules/Product/Models/ProductOrderWeightedDemand.php`, `CategorySizeWeight.php` — сортировка «взвешенный спрос» (август 2026), админка `ProductOrderWeightedDemandBackendController` |
 | `product_order_kate`, `product_order_sonya` | веса мерчандайзинговой сортировки |
 
 ### Пользователи
 
 | Таблица | Модель |
 |---|---|
-| `users_user` | `modules/users/models/User.php` |
+| `users_user` | `modules/users/models/User.php` (колонка `last_context` — последний выбранный раздел `female`/`male`/`home`, с 25.09.2026, пишется `LastContextService` с сайта и из приложения) |
 | `users_address` | `modules/users/models/Address.php` |
 | `users_auth` | `modules/users/models/Auth.php` |
 | `users_geo` | `src/Modules/Delivery/Model/UserGeo.php` |
@@ -121,7 +128,7 @@ MariaDB/MySQL, около 240 ActiveRecord-моделей с объявленн�
 | `mainpages`, `mainpage_blocks`, `mainpage_block_elements` | Главная страница |
 | `ab_test`, `ab_test_variant` | A/B-тесты |
 | `events_toggle` | Переключатели аналитических событий |
-| `notifications` | In-app уведомления пользователей |
+| `notifications` | In-app уведомления пользователей (`src/User/Notifications/Model/Notification.php`) |
 
 ### Интеграционные outbox и inbox
 
@@ -222,9 +229,15 @@ erDiagram
 
 ## Миграции
 
-196 файлов на момент классификации (сверка 09.10.2026: уже 208, последняя — 30.09.2026), диапазон: `m250403_150841_5479_add_is_express_to_cart.php` (апрель 2025) —
-`m260817_093503_add_index_item_stock_store_quantity_catalog_item_stock_table.php` (август 2026).
-**92 миграции (47%) написаны в 2026 году.**
+На `dd4a997ac0` — **220 миграций** (плюс `.gitignore` и каталог `ImportData/`, поэтому
+`ls-tree` показывает 222 записи), диапазон: `m250403_150841_5479_add_is_express_to_cart.php`
+(апрель 2025) — `m261023_120000_rename_dictionary_colors_ecomdev_2426.php` (23.10.2026).
+**116 миграций (53%) написаны в 2026 году.** Классификация ниже сделана на срезе 196 миграций
+(последняя — 17.08.2026) и не пересчитывалась; новые миграции перечислены в п. 8–11 списка
+«Что разрабатывалось в 2026 году».
+
+`m261023_120000_rename_dictionary_colors_ecomdev_2426.php`, несмотря на имя, таблицу не
+переименовывает — она обновляет `dictionary_colors.title_ru` по `guid`.
 
 ### Соглашение об именовании
 
@@ -285,6 +298,21 @@ m{ГГММДД}_{ЧЧММСС}[_{номер задачи}]_{описание_ч�
 7. **Повторные попытки офлайн-заказов и флаги RCRM** (апрель–июль) —
    `m260420_122824_add_offline_order_retry_queue_table.php`,
    `m260730_065013_add_is_rcrm_modified_column_order.php`.
+8. **Сортировка «взвешенный спрос»** (август) — `m260828_120000_add_weighted_demand_sorting.php`:
+   таблицы `product_order_weighted_demand`, `category_size_weight`, колонки в `products` и
+   `product_history`.
+9. **A/B-тест фона фото ECOMDEV-1821** (сентябрь) — `m260908_120000_ab_test_dark_vs_light_bg.php`,
+   `m260910_160933_add_experiment_to_shopping_cart_positions.php`,
+   `m260916_120000_ecomdev_2105_orders_and_mobile_toggle.php` (колонка `order_positions.experiment`
+   добавлена без пары для `order_positions_history`).
+10. **Размерные таблицы** (сентябрь–октябрь) — `m260921_083149_create_size_mapping_table.php`,
+    `m261012_100000_add_size_info_fields_to_catalog_category_table.php`,
+    `m261014_120000_add_size_table_type_to_products_table.php`.
+11. **Последний раздел каталога и Mindbox** (сентябрь–октябрь) —
+    `m260925_120000_add_last_context_to_users_user_table.php`,
+    `m261011_120000_add_mindbox_integration_enabled_parameter.php`,
+    `m261011_150000_remove_mindbox_sms_enabled_parameter.php`,
+    `m261020_120000_add_early_access_vic_only_parameter.php`.
 
 ### Проверка парных миграций истории в CI
 
@@ -302,7 +330,7 @@ m{ГГММДД}_{ЧЧММСС}[_{номер задачи}]_{описание_ч�
 |---|---|---|
 | ActiveRecord (легаси) | `modules/*/models/` | Корзина, заказ, товар — с бизнес-логикой в модели |
 | ActiveRecord (современный) | `src/Modules/*/Model/` | Outbox, уведомления, резерв |
-| Репозитории (~190) | `src/Modules/*/Repository/`, `modules/*/repository/` | Предпочтительно для нового кода |
+| Репозитории (~230 файлов в каталогах `Repository/`, `repository/`, `repositories/`) | `src/Modules/*/Repository/`, `modules/*/repository/` | Предпочтительно для нового кода |
 | Сырой SQL | Репозитории, миграции, консольные команды | Массовый обмен остатками, пересборка сортировок, очистка outbox |
 
 Примеры тяжёлых запросов:
@@ -317,10 +345,12 @@ m{ГГММДД}_{ЧЧММСС}[_{номер задачи}]_{описание_ч�
 
 ### Известные места с риском N+1
 
-- `ProductSize::getSize()` вызывает `hasOne(...)->one()` внутри метода, а не через свойство-связь.
-- `OrderPosition::beforeSave()` подгружает товар и размер на каждое сохранение.
-- Фиды: в `YandexFeedService` оставлен комментарий о необходимости заранее загружать
-  товары с `with('sizes')`.
+- `ProductSize::getSize()` (`modules/product/models/ProductSize.php:362`) вызывает
+  `hasOne(...)->one()` внутри метода, а не через свойство-связь.
+- `OrderPosition::beforeSave()` (`modules/orders/models/OrderPosition.php:445`) подгружает товар
+  и размер на каждое сохранение.
+- Фиды: в `src/Modules/Feed/Service/YandexFeedService.php:171` и `GarderoboFeedService.php:96`
+  оставлен комментарий о необходимости заранее загружать товары с `with('sizes')`.
 
 ## Поиск
 
@@ -336,22 +366,26 @@ m{ГГММДД}_{ЧЧММСС}[_{номер задачи}]_{описание_ч�
 ## Redis
 
 Доступ через `Application\Cache\Redis\Contract\RedisInterface` с обязательным указанием группы:
-`$redis->byGroup(RedisGroupDictionary::GROUP_*)`. Групп 40.
+`$redis->byGroup(RedisGroupDictionary::GROUP_*)`. Словарь —
+`src/Cache/Redis/Dictionary/RedisGroupDictionary.php`: 42 константы, в `getValidGroups()`
+43 группы (плюс `RateLimiterConfigurator::REDIS_GROUP`).
 
 Основные группы:
 
 | Область | Группы |
 |---|---|
-| Каталог | `CatalogCategories`, `BlockCategories`, `FastProduct`, `ProductsMobileListv2`, `CategoryDefaultProductsList` |
+| Каталог | `CatalogCategories`, `FastProduct`, `FastProductLists`, `ProductsMobileListv2`, `CategoryDefaultProductsList`, `ProductSizeMappingByType` (новая) |
 | Остатки | `stocks`, `ProductStocksMobile` |
 | Корзина и чекаут | `NewCheckout`, `OrderCreateAction`, `PaymentType` |
 | Мобильные | `UserMobileSession`, `MobileCategories`, `MobileInfo`, `AppVersionsConfig` |
 | Интеграции | `Integration`, `Mindbox`, `WebhookOnec`, `Elastic` |
-| Прочее | `AbTests`, `Diginetica`, `SessionLocation`, `Auth`, `ActionPresent` |
+| Прочее | `AbTests`, `ProductImageBgExperiment` (новая, A/B фона фото), `UserSearch` (новая, кэш любимых категорий и размеров для API поиска пользователей), `Diginetica`, `SessionLocation`, `Auth`, `ActionPresent` |
 
-Группы, исключённые из массового сброса (`getFlushExcludedGroups()`): `Logs`, `ExchangeErrors`,
-`Auth`, `Integration`, `OrderCreateAction`, `WebhookOnec`, а также `RateLimiter`
-(`RateLimiterConfigurator::REDIS_GROUP`).
+Группа `BlockCategories` удалена в ECOMDEV-2228 вместе с админкой «Блок категорий».
+
+Группы, исключённые из массового сброса (`getFlushExcludedGroups()`, `RedisGroupDictionary.php:110`):
+`Logs`, `ExchangeErrors`, `Auth`, `Integration`, `OrderCreateAction`, `WebhookOnec`,
+`ProductImageBgExperiment`, а также `RateLimiter` (`RateLimiterConfigurator::REDIS_GROUP`).
 
 Помимо этого Redis используется как бэкенд Yii-компонентов кэша (`cache`, `cacheMain`,
 `cacheYiiT`). Формирование ключа имеет неочевидную особенность — см.
@@ -359,6 +393,11 @@ m{ГГММДД}_{ЧЧММСС}[_{номер задачи}]_{описание_ч�
 
 Хранение сессий:
 
+- **вход на сайте** — cookie `_identity` (`enableAutoLogin`, не HttpOnly, `config/web.php:110`)
+  и стандартная PHP-сессия Yii: компонент `session` в конфигурации не переопределён, в Redis и
+  БД сессии не хранятся;
 - **корзина на сайте** — `shopping_carts.session_id` (не Redis);
 - **мобильная авторизация** — таблица `users_mobile_sessions` с кэширующей обёрткой;
-- **JWT** — таблица `jwt_refresh_token` плюс denylist в Redis с префиксом `jwt:deny:`.
+- **JWT** (только `/api/auth/*` и `/api/user/me`, фронт сайта их не вызывает) — таблица
+  `jwt_refresh_token` плюс denylist в Redis с префиксом `jwt:deny:`
+  (`src/Cache/Redis/Enum/RedisKeyPrefixEnum.php:8`).

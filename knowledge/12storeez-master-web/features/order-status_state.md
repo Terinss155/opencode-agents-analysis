@@ -2,6 +2,7 @@
 
 **Тип:** диаграмма состояний заказа (`cms_orders.status`) в монолите `12storeez-master-web`, как работает сейчас.
 **Сверено:** код `12stz/12storeez-master-web` и история заказов стенда (`12stz_staging.cms_orders_history`), 17.10.2026.
+**Сверено с `origin/develop` `dd4a997ac0`, 07.11.2026** (только код, БД не запрашивалась; числа `n` — по-прежнему от 17.10.2026): логика переходов не изменилась; обновлены номера строк в `OrderHelper.php` (+2), `modules/orders/models/Order.php` (−7 после строки 1265), `OrderRepository.php`; добавлены веб-бронирование (§1) и отмена из веб-ЛК без проверки (§2.2, §8 п. 8).
 **Расшифровка кодов статусов:** [order-status-dictionaries.md](../database/order-status-dictionaries.md) §3. Числа на схемах — `internal_id`.
 
 ## 0. Главное
@@ -52,11 +53,12 @@ flowchart TD
 
 | Канал | Правило | Код | На стенде |
 |---|---|---|---|
-| Корзина сайта и МП | Проверки идут сверху вниз, первая сработавшая задаёт статус. Если ни одна не сработала, возвращается `0`, и при сохранении `getNewStatus()` ставит `7` для онлайн-оплаты или `3` для остальных | `src/Modules/Order/Helpers/OrderHelper.php:885-950` (`getOrderStartStatus`), `:153-176` (`getNewStatus`); вызовы — `CartOrderCreateDtoPrepareService.php:228`, `AbstractCreateOrderDtoBuilder.php:268` | `S→0→7` 2468, `S→70` 565, `S→8` 439, `S→60` 114, `S→72` 43 |
+| Корзина сайта и МП | Проверки идут сверху вниз, первая сработавшая задаёт статус. Если ни одна не сработала, возвращается `0`, и при сохранении `getNewStatus()` ставит `7` для онлайн-оплаты или `3` для остальных | `src/Modules/Order/Helpers/OrderHelper.php:887-952` (`getOrderStartStatus`), `:155-178` (`getNewStatus`); вызовы — `CartOrderCreateDtoPrepareService.php:228`, `AbstractCreateOrderDtoBuilder.php:268` | `S→0→7` 2468, `S→70` 565, `S→8` 439, `S→60` 114, `S→72` 43 |
 | Mercaux | Всегда `3` | `src/Modules/Order/Services/MercauxOrderCreateDtoPrepareService.php:109` | `S→3` mercaux 40 |
 | Блогерский заказ (CMS) | Всегда `3` | `modules/orders/controllers/BloggerBackendController.php:502` | `S→3` blogger 79 |
 | Lamoda | `23`, если Lamoda прислала отмену, иначе `3`. Затем `3 → 8`, если при подготовке не было ошибок | `LamodaOrderCreateDtoPrepareService.php:180-190`, `src/Modules/Order/Helpers/LamodaOrderHelper.php:101-109` | — |
 | Подарочный сертификат | `7` | `src/Modules/Giftcard/Service/GiftcardCreateOrderService.php:54`, `modules/giftcards/service/GiftcardsService.php:295` | `S→7` без источника 222 ❓ |
+| Бронь (МП и, с `dd4a997ac0`, сайт) | Заказ типа `reservation` создаётся через общий путь создания (`AbstractCreateReservationService`, `CreateReservationServiceMobile`, новый `CreateReservationServiceSite`; веб-вход — `src/Modules/Reservation/Controller/ReservationController.php` → `Operation/CreateOrderOp.php`, источник `cart`). Отдельного стартового статуса для брони в этих классах нет; срок брони пишется в `cms_order_reservation_expiration` | `src/Modules/Order/Services/CreateOrder/AbstractCreateReservationService.php`, `CreateReservationServiceSite.php` | не проверялось |
 | Заказ, созданный в RetailCRM | Статус приходит из RCRM по коду. Для C&C ставится `70` (онлайн-оплата или способ оплаты не указан) или `72`. Для предзаказа `1 → 60` | `src/Modules/Rcrm/Service/RcrmOrderCreateService.php:612, 703`, `RcrmOrderService.php:675-679` | `S→1` 103, `S→61` 188 |
 
 ## 2. Оплата, обработка, отмена (статусы ставит сайт)
@@ -113,7 +115,7 @@ stateDiagram-v2
 
 ### 2.1. Оплата: `Order::setPaidStatus()`
 
-Срабатывает, когда платёжная система подтверждает оплату (`modules/payment/models/Payment.php:270-288`), источник `payment`. Код — `modules/orders/models/Order.php:2122-2147`, `:2824-2846`.
+Срабатывает, когда платёжная система подтверждает оплату (`modules/payment/models/Payment.php:270-288`), источник `payment`. Код — `modules/orders/models/Order.php:2115-2140`, `:2817-2839`.
 
 | № | Из статуса | Условие | В статус |
 |---|---|---|---|
@@ -133,8 +135,8 @@ stateDiagram-v2
 
 | № | Кто | Когда | Код |
 |---|---|---|---|
-| C1 | Клиент в ЛК или МП | Статус разрешает отмену (`can_be_cancelled = 1`: `3`, `7`, `60`, `70`, `71`), либо бронь с постоплатой в статусе `8` | `OrderHelper::canBeCancelled()` — `OrderHelper.php:572-585`; `modules/users/controllers/UsersController.php:669`, `src/Modules/Mobile/Controllers/OrdersController.php:388` |
-| C2 | Крон `status/check-payment-status` | Статус `7`, `60` или `70`, не оплачен, в статусе дольше параметра `max_minutes_wait_payment` (для экспресса — `max_minutes_wait_payment_express_delivery`, для брони — параметр `MAX_MINUTES_WAIT`). Время отсчитывается от `cms_orders_status_timer` | `modules/orders/console/StatusController.php:88-115`, `src/Modules/Order/Repository/OrderRepository.php:82-124`, `StatusEnum::ORDER_STATUSES_FOR_TIMEOUT_CANCEL` |
+| C1 | Клиент в ЛК или МП | Статус разрешает отмену (`can_be_cancelled = 1`: `3`, `7`, `60`, `70`, `71`), либо бронь с постоплатой в статусе `8` | `OrderHelper::canBeCancelled()` — `OrderHelper.php:574-587`; `modules/users/controllers/UsersController.php:669`, `src/Modules/Mobile/Controllers/OrdersController.php:388`. Веб-ЛК `ProfileController::actionCancelOrderJson` (`modules/users/controllers/ProfileController.php:633-659`) `canBeCancelled()` **не вызывает** — см. §8 п. 8 |
+| C2 | Крон `status/check-payment-status` | Статус `7`, `60` или `70`, не оплачен, в статусе дольше параметра `max_minutes_wait_payment` (для экспресса — `max_minutes_wait_payment_express_delivery`, для брони — параметр `MAX_MINUTES_WAIT`). Время отсчитывается от `cms_orders_status_timer` | `modules/orders/console/StatusController.php:88-115`, `src/Modules/Order/Repository/OrderRepository.php:99-141` (`getAllForTimeoutCancel`; для `type = reservation` — параметр `MAX_MINUTES_WAIT`), `StatusEnum::ORDER_STATUSES_FOR_TIMEOUT_CANCEL` |
 | C3 | Крон `status/check-payment-status-dolyame` | Рассрочка (Долями, Подели), статус `7`, `60` или `70`, не оплачен, с момента создания прошло больше тех же параметров | `StatusController.php:125-182` |
 | C4 | 1С или RCRM | Прислали `23` → сайт вызывает `cancelOrder()` с причиной из заказа или по умолчанию: «доставка отменена», если WMS-статус `deliveryCanceled`, иначе «нет в наличии» | `src/Modules/Order/Services/Inbox/OrderUpdateService.php:192-200`, `src/Modules/Rcrm/Service/RcrmOrderUpdateService.php:377-386` |
 | C5 | Менеджер в CMS | Сохранил заказ со статусом `23` | `modules/orders/controllers/OrdersBackendController.php:219-224` |
@@ -176,7 +178,7 @@ stateDiagram-v2
 ```
 
 - `api2/orders/update-status` — `modules/api2/controllers/OrdersController.php:579-742`. Если все позиции подтверждены, ставится `49` и списываются деньги (capture). Если часть — `50` и capture. Если ничего — `23`, платёж отменяется, `is_cancel_site = 1`. Неподтверждённой позиции с комментарием ставится статус «нет в магазине».
-- `49` надолго не остаётся: `Order::afterSave()` (`Order.php:1564-1573`) и `beforeSave` инбокса 1С и RCRM (`OrderUpdateService.php:885-891`, `RcrmOrderService.php:610-616`) сразу переводят его в `8` или `7`. В истории стенда `49` не встречается.
+- `49` надолго не остаётся: `Order::afterSave()` (`Order.php:1557-1566`) и `beforeSave` инбокса 1С и RCRM (`OrderUpdateService.php:885-891`, `RcrmOrderService.php:610-616`) сразу переводят его в `8` или `7`. В истории стенда `49` не встречается.
 - `api2/orders/update-notify` с `notified = 0` → `52` (`OrdersController.php:784-793`).
 
 ## 4. Логистика и завершение (статусы ставят 1С, RCRM, CMS)
@@ -258,7 +260,7 @@ stateDiagram-v2
     S14 --> S19 : 1С (n=31) ❓
 ```
 
-- **Сайт ставит только `31`.** Условие: заказ в группе `complete` (`17`, `33`, `56`) или в статусе с `is_returned = 1` (`17`, `31`, `33`, `56`), и с `end_date` прошло не больше `days_can_be_returned` дней. Позиции заявки получают статус `9` «ВОЗВРАТ (если был отгружен)». Код — `src/Modules/Order/Services/OrderRefundService.php:80-124`, вызовы — `modules/users/controllers/UserRefundController.php:128`, `src/Modules/Mobile/Controllers/OrdersController.php:501`. Старый путь — `OrderPosition::returnPosition()` → `Order::updateReturnStatus()` (`Order.php:1864-1876`).
+- **Сайт ставит только `31`.** Условие: заказ в группе `complete` (`17`, `33`, `56`) или в статусе с `is_returned = 1` (`17`, `31`, `33`, `56`), и с `end_date` прошло не больше `days_can_be_returned` дней. Позиции заявки получают статус `9` «ВОЗВРАТ (если был отгружен)». Код — `src/Modules/Order/Services/OrderRefundService.php:80-124`, вызовы — `modules/users/controllers/UserRefundController.php:128`, `src/Modules/Mobile/Controllers/OrdersController.php:501`. Старый путь — `OrderPosition::returnPosition()` → `Order::updateReturnStatus()` (`Order.php:1857-1869`).
 - Статусы `29`, `34`, `40`, `53` (поступил, осмотрен, поступил в магазин, запрос реквизитов) ставят 1С или RCRM. На стенде их нет.
 - Прямые и обратные переходы `14 ↔ 19` (около 30 раз в каждую сторону от 1С) похожи на переключение статусов при обмене или тестовые данные ❓.
 - TO-BE статусы возврата проекта «Возвраты 2.0» — в [return-status_state.md](../../../projects/returns-2.0/requirements/diagrams/state/return-status_state.md).
@@ -269,8 +271,8 @@ stateDiagram-v2
 |---|---|---|---|
 | Пустой статус | `status` пустой | `7` для онлайн-оплаты, иначе `3` | `OrderGetterTrait::getChangedStatus()` (`src/Modules/Order/Traits/OrderGetterTrait.php:1119-1142`), `OrderHelper::getNewStatus()` |
 | Ошибка ПВЗ | Тип доставки — ПВЗ, есть `pvz_id`, адрес пустой, статус пустой или `1`, `7`, `3` | `3` | те же методы, `hasErrorInPvz()` (`OrderGetterTrait.php:1169-1179`) |
-| Длинный адрес (только новый заказ) | Дом или квартира длиннее лимита 1С; заказ не офлайн-отгрузка, не предзаказ, статус не `7` и не `70` | `3`, для C&C — `71`; `processing_reason = address_check` | `Order::beforeSave()` (`Order.php:961-979`); `OrderHelper::updateStatusIfAddressTooLong()` (`OrderHelper.php:310-337`) — см. §8 п. 2 |
-| Сборка магазином | Статус `49` | `8`, если оплата не онлайн или уже оплачено, иначе `7` | `Order.php:1564-1573`, `OrderUpdateService.php:885-891`, `RcrmOrderService.php:610-616` |
+| Длинный адрес (только новый заказ) | Дом или квартира длиннее лимита 1С; заказ не офлайн-отгрузка, не предзаказ, статус не `7` и не `70` | `3`, для C&C — `71`; `processing_reason = address_check` | `Order::beforeSave()` (`Order.php:961-979`); `OrderHelper::updateStatusIfAddressTooLong()` (`OrderHelper.php:312-339`) — см. §8 п. 2 |
+| Сборка магазином | Статус `49` | `8`, если оплата не онлайн или уже оплачено, иначе `7` | `Order.php:1557-1566`, `OrderUpdateService.php:885-891`, `RcrmOrderService.php:610-616` |
 
 ## 7. Все переходы на стенде
 
@@ -364,3 +366,5 @@ stateDiagram-v2
 5. ❓ `23 → 7` (45 раз: autocancel, mobile, yandex-pay) — отменённый заказ снова ждёт оплаты. В `setPaidStatus()` статуса `23` нет. Что именно возвращает заказ, по коду не найдено. Вероятно, повторная оплата или обработчик платёжного провайдера.
 6. ❓ `S → 7` без источника (222) — предположительно заказы на подарочные сертификаты (`GiftcardCreateOrderService`); не проверено.
 7. ❓ `3 → 8` / `3 → 4` в `RcrmExchangeService::sendOrderUpdate()` меняют статус в объекте перед отправкой в CRM. Похоже, что в БД сайта он попадает только когда RCRM возвращает этот статус обратно (`3→8` от retailcrm — 12 раз).
+8. **Отмена из веб-ЛК не проверяет, можно ли отменить** (`origin/develop` `dd4a997ac0`). `ProfileController::actionCancelOrderJson` (`modules/users/controllers/ProfileController.php:633-659`) проверяет только владельца (`findOneByIdAndUserId`) и сразу вызывает `OrderCancelService::prepareCancelOrder()` (`OrderCancelService.php:26`) → `23` (или `66` для офлайн-отгрузки). Значит, клиент через этот метод может перевести в `23` заказ в любом статусе, в отличие от `UsersController.php:669` и МП (`OrdersController.php:388`), где есть `canBeCancelled()`.
+9. Константа `ORDER_STATUSES_FOR_RESERVATION_TIMEOUT_CANCEL` (`StatusEnum.php:67`) по-прежнему нигде не используется (см. п. 3); автоотмена брони идёт общим кроном по `ORDER_STATUSES_FOR_TIMEOUT_CANCEL` с отдельным порогом для `type = reservation`.

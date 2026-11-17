@@ -1,18 +1,26 @@
 # Общая картина
 
+> Сверено с `origin/develop` `dd4a997ac0`, 07.11.2026: пересчитаны модули, `config/url.php`,
+> очереди и CronJobs; уточнены СУБД (MariaDB 10.3) и путь мобильных запросов через шлюзы.
+
 ## Что это за система
 
-Интернет-магазин 12 STOREEZ. Монолит на PHP 8.2 / Yii2 с фронтендом на Vue 2, работает в Kubernetes.
+Интернет-магазин 12 STOREEZ. Монолит на PHP 8.2 / Yii2 с фронтендом на Vue 2.7, работает в Kubernetes.
 Обслуживает три типа клиентов: сайт, мобильные приложения (iOS/Android) и партнёрские интеграции
 (1С, RetailCRM, Lamoda, Mercaux).
+
+Мобильные приложения ходят в монолит не напрямую, а через шлюзы: Go-шлюз `mobile-monorepo-go`
+проксирует запросы в мобильные маршруты монолита (`mobile/...`); функционал старого шлюза esb (`core`)
+переносится в Go-шлюз (ECOMDEV-2342…2480), iOS пока частично ходит в `core`. Цепочки вызовов —
+`knowledge/architecture/call-chain.html` (приложение) и `web-call-chain.html` (сайт).
 
 Технологический стек:
 
 | Слой | Технологии |
 |---|---|
-| Бэкенд | PHP 8.2, Yii2 2.0.55 |
-| Фронтенд | Vue 2, Webpack 5, SCSS |
-| БД | MariaDB/MySQL (префикс таблиц `cms_`), отдельная БД для логов |
+| Бэкенд | PHP 8.2+, Yii2 2.0.55 |
+| Фронтенд | Vue 2.7 (2.7.16), Webpack 5, SCSS |
+| БД | MariaDB 10.3 (не MySQL 8: оконные функции, CTE и JSON работают иначе; префикс таблиц `cms_`), отдельная БД для логов |
 | Кэш | Redis (два кластера) |
 | Очереди | MySQL-очередь + RabbitMQ |
 | Поиск | Elasticsearch |
@@ -27,7 +35,7 @@
 | Namespace | `modules\` | `Application\` |
 | Стиль | Yii2 MVC, «толстые» ActiveRecord | Слои Service / Repository / Dto / Enum |
 | Что содержит | Модели данных, CMS-админка, views, легаси-кроны | Новый чекаут, mobile API, платежи, outbox, интеграции |
-| Объём | 64 каталога | 43 домен-модуля в `src/Modules/` + 11 инфраструктурных каталогов рядом |
+| Объём | 63 каталога (`userActivities` перенесён в `src/`, ECOMDEV-2310) | 44 домен-модуля в `src/Modules/` + 11 инфраструктурных каталогов рядом |
 
 Разделение **не по слоям, а по времени написания**. Практическое правило:
 
@@ -55,7 +63,7 @@
 | `yii` | Консоль: `vendor/autoload.php` → `Yii.php` → `config/console.php` → `yii\console\Application` |
 | `Yii.php` | Файл фреймворка Yii2 (не проектный класс), подключается обоими входами до чтения конфигов |
 
-Каталог `themes/basic/` — отдельный слой PHP-представлений (180+ файлов: layouts, views модулей,
+Каталог `themes/basic/` — отдельный слой PHP-представлений (200+ файлов: layouts, views модулей,
 асеты), через который проходит связка с фронтендом. Подробнее — [06-frontend.md](06-frontend.md).
 
 ## Конфигурация
@@ -65,11 +73,11 @@
 | Файл | Содержимое |
 |---|---|
 | `config/config.php` | Чтение переменных окружения в массив `$params` |
-| `config/common.php` | Компоненты для web и консоли: `db`, отдельное подключение `log_db`, `queue`, `mindbox`, `retailCrm`, службы доставки, `atol`, `sentry`, RBAC |
-| `config/web.php` | Web-специфика: `request`, `user`, кэш, i18n, `urlManager`, обработчики `beforeRequest`/`afterRequest`, OAuth |
-| `config/console.php` | 94 консольные команды через `controllerMap` |
-| `config/modules.php` | Регистрация Yii-модулей из обоих стеков |
-| `config/url.php` | Правила маршрутизации (336 строк) + кастомные `UrlRule` |
+| `config/common.php` | Компоненты для web и консоли: `db`, отдельное подключение `log_db`, `queue`, `mindbox`, `retailCrm`, службы доставки, `atol`, `sentry`, RBAC; bootstrap `ContainerRegister` и `EventBootstrap` |
+| `config/web.php` | Web-специфика: `request`, `user`, кэш (префикс ключей — `CacheKeyPrefix::build()`, `:300`), i18n, `urlManager`, обработчики `beforeRequest`/`afterRequest`, OAuth |
+| `config/console.php` | 93 консольные команды через `controllerMap` |
+| `config/modules.php` | Регистрация Yii-модулей из обоих стеков (новые ID — `userApi`, `reservation`) |
+| `config/url.php` | Правила маршрутизации (351 строка) + кастомные `UrlRule` |
 | `config/log.php` | Цели логирования: БД, stdout/stderr в JSON, файл |
 | `config/events.php` | Обработчики событий приложения |
 | `config/sphinx.php` | **Не используется в рантайме**, см. [09-pitfalls.md](09-pitfalls.md) |
@@ -92,6 +100,7 @@ flowchart TB
   subgraph clients [Клиенты]
     Web[Сайт]
     App[Мобильные приложения]
+    GW["Шлюзы: Go mobile-monorepo-go / esb core"]
     Partners[1С / RCRM / Lamoda]
   end
 
@@ -108,7 +117,7 @@ flowchart TB
   end
 
   subgraph storage [Хранилища]
-    DB[(MySQL)]
+    DB[(MariaDB)]
     Redis[(Redis)]
     ES[(Elasticsearch)]
   end
@@ -119,7 +128,8 @@ flowchart TB
     Cron[CronJobs]
   end
 
-  Web & App & Partners --> Nginx
+  App --> GW
+  Web & GW & Partners --> Nginx
   URL --> Ctrl
   Ctrl --> DI
   DI --> Legacy & Modern
@@ -135,11 +145,12 @@ flowchart TB
 
 - **MySQL-очередь** (таблица `default_queue`, **без префикса** `TABLE_PREFIX`) — 22 именованные
   очереди, воркеры `yii queue/listen <name>`.
-- **RabbitMQ** — 45 констант очередей (40 уникальных имён, часть констант — маппинги на уже
-  объявленные), отдельные деплойменты-консьюмеры.
+- **RabbitMQ** — 47 констант в `src/Queue/RabbitMqQueueName.php` (42 имени очередей + 5 констант-маппингов
+  на уже объявленные; новая — `mindbox.mobile-device.v1.command`, ECOMDEV-2342), отдельные деплойменты-консьюмеры.
 - **Outbox/Inbox** — обмен с 1С, RetailCRM, Mindbox и платёжными провайдерами идёт через
   таблицы-outbox в MySQL, откуда кроны и воркеры отправляют сообщения в Rabbit.
-- **CronJobs** — 109 расписаний в Helm: фиды, переиндексация, обработка outbox, уведомления.
+- **CronJobs** — ~110 расписаний в Helm (`cronJobs` в `.deploy/helm/values.yaml`: 112 записей, 110 явных `schedule:`):
+  фиды, переиндексация, обработка outbox, уведомления.
 
 Ключевой вывод: **рантайм-поведение прода описано в `.deploy/helm/values.yaml`**, а не в коде
 приложения. Консольная команда может существовать без воркера, и наоборот.

@@ -73,7 +73,7 @@
 ## Связанные артефакты
 
 - `ADR-RET-014` — [оформление возврата Дружбой в RetailCRM](<./[2026-10-01 14-59] ADR-RET-014-friendship-return-interface-v2.md>).
-- `ADR-RET-018` — [без единой мастер-системы возврата](<./[2026-09-24 15-01] ADR-RET-018-return-master-system-v1.md>).
+- `ADR-RET-018` — [без единой мастер-системы возврата](<./archive/[2026-09-24 15-01] ADR-RET-018-return-master-system-v1.md>).
 - `ADR-RET-044` — [обмен возвратами через сайт](<./[2026-10-02 10-00] ADR-RET-044-returns-integration-gateway-v2.md>).
 - `FR-52` — [BRD](../brd.md).
 

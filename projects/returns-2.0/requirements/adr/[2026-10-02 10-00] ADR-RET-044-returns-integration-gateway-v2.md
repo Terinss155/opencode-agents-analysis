@@ -7,7 +7,7 @@
 | **Владелец решения** | Head of PMO — Светлана Варцаба; 1C Solution Architect — Артем Колосов; участники: Project Manager — Катя Тихомирова, Лид аналитиков RetailCRM — Алена Господинова, аналитик RetailCRM — Андрей Chug |
 | **Область** | Архитектура / Интеграция |
 | **Версия** | v2 |
-| **Предыдущая версия** | [[2026-09-25 13-30] ADR-RET-030-returns-integration-gateway-v1.md](<./[2026-09-25 13-30] ADR-RET-030-returns-integration-gateway-v1.md>) |
+| **Предыдущая версия** | [[2026-09-25 13-30] ADR-RET-030-returns-integration-gateway-v1.md](<./archive/[2026-09-25 13-30] ADR-RET-030-returns-integration-gateway-v1.md>) |
 | **Заменяет** | ADR-RET-030 |
 
 ## Контекст
@@ -69,9 +69,9 @@ RetailCRM ↔ 1С нет.
 
 ## Связанные артефакты
 
-- `ADR-RET-030` — [предыдущая версия](<./[2026-09-25 13-30] ADR-RET-030-returns-integration-gateway-v1.md>).
-- `ADR-RET-018` — [без единой мастер-системы](<./[2026-09-24 15-01] ADR-RET-018-return-master-system-v1.md>).
-- `ADR-RET-036` — [нумерация на сайте (предложено)](<./[2026-10-01 14-59] ADR-RET-036-return-numbering-master-v1.md>).
+- `ADR-RET-030` — [предыдущая версия](<./archive/[2026-09-25 13-30] ADR-RET-030-returns-integration-gateway-v1.md>).
+- `ADR-RET-018` — [без единой мастер-системы](<./archive/[2026-09-24 15-01] ADR-RET-018-return-master-system-v1.md>).
+- `ADR-RET-036` — [нумерация на сайте (предложено)](<./archive/[2026-10-01 14-59] ADR-RET-036-return-numbering-master-v1.md>).
 - `INT-04`, `INT-09`, `INT-10`, `OQ-52` — [BRD](../brd.md).
 
 ## История изменений

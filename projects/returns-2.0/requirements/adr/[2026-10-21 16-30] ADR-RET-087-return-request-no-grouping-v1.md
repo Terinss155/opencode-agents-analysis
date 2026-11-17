@@ -55,7 +55,7 @@
 
 ## Связанные артефакты
 
-- `ADR-RET-084` — [статусная модель MVP](<./[2026-10-21 16-30] ADR-RET-084-return-status-model-mvp-v4.md>).
+- `ADR-RET-084` — [статусная модель MVP](<./archive/[2026-10-21 16-30] ADR-RET-084-return-status-model-mvp-v4.md>).
 - `ADR-RET-037` — [возврат на склад без заявки](<./[2026-10-01 14-59] ADR-RET-037-warehouse-return-without-application-v2.md>).
 
 ## История изменений

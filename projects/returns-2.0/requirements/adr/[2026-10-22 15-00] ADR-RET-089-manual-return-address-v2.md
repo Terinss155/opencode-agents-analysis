@@ -7,7 +7,7 @@
 | **Владелец решения** | Head of Customer Service — Ольга Соколова; Product Manager — Катя Филатова; участники: System Analyst — Катя Лемешева, System Analyst (команда BTS) — Елена Васильева, Head of PMO — Светлана Варцаба |
 | **Область** | Бизнес-процесс / Интеграция |
 | **Версия** | v2 |
-| **Предыдущая версия** | [[2026-10-14 15-00] ADR-RET-074-manual-return-address-v1.md](<./[2026-10-14 15-00] ADR-RET-074-manual-return-address-v1.md>) |
+| **Предыдущая версия** | [[2026-10-14 15-00] ADR-RET-074-manual-return-address-v1.md](<./archive/[2026-10-14 15-00] ADR-RET-074-manual-return-address-v1.md>) |
 | **Заменяет** | ADR-RET-074 |
 
 ## Контекст
@@ -82,10 +82,10 @@
 
 ## Связанные артефакты
 
-- `ADR-RET-074` — [предыдущая версия](<./[2026-10-14 15-00] ADR-RET-074-manual-return-address-v1.md>).
+- `ADR-RET-074` — [предыдущая версия](<./archive/[2026-10-14 15-00] ADR-RET-074-manual-return-address-v1.md>).
 - `ADR-RET-075` — [возврат курьером без дат уходит Дружбе](<./[2026-10-15 15-00] ADR-RET-075-courier-intervals-from-logistics-v3.md>).
-- `ADR-RET-090` — [полный адрес в запросе интервалов](<./[2026-10-22 15-00] ADR-RET-090-courier-intervals-full-address-v1.md>).
-- `ADR-RET-091` — [статусная модель MVP](<./[2026-10-22 15-00] ADR-RET-091-return-status-model-mvp-v5.md>).
+- `ADR-RET-090` — [полный адрес в запросе интервалов](<./archive/[2026-10-22 15-00] ADR-RET-090-courier-intervals-full-address-v1.md>).
+- `ADR-RET-091` — [статусная модель MVP](<./archive/[2026-10-22 15-00] ADR-RET-091-return-status-model-mvp-v5.md>).
 - Статусы заявки, переход S15 — [диаграмма состояний](../diagrams/state/return-status_state.md).
 - US 1.3, US 1.5 — [User Story](../user-story/user-story-mvp.md).
 - Рабочие вопросы — [courier-intervals_questions.md](../questions/courier-intervals_questions.md).

@@ -70,7 +70,7 @@
 ## Связанные артефакты
 
 - `ADR-RET-070` — [предыдущая версия](<./[2026-10-12 13-01] ADR-RET-070-exchange-via-return-order-v1.md>).
-- `ADR-RET-084` — [статусная модель MVP](<./[2026-10-21 16-30] ADR-RET-084-return-status-model-mvp-v4.md>).
+- `ADR-RET-084` — [статусная модель MVP](<./archive/[2026-10-21 16-30] ADR-RET-084-return-status-model-mvp-v4.md>).
 - `ADR-RET-045` — [реквизиты в возвратном заказе RetailCRM](<./[2026-10-02 10-00] ADR-RET-045-refund-details-in-retailcrm-v2.md>).
 
 ## История изменений

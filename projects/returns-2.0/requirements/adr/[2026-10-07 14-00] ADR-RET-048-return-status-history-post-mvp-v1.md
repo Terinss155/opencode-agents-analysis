@@ -58,7 +58,7 @@
 
 ## Связанные артефакты
 
-- `ADR-RET-040` — [статусная модель MVP](<./[2026-10-02 10-00] ADR-RET-040-return-status-model-mvp-v2.md>).
+- `ADR-RET-040` — [статусная модель MVP](<./archive/[2026-10-02 10-00] ADR-RET-040-return-status-model-mvp-v2.md>).
 - `ADR-RET-017` — [без интеграции с ТК в первой итерации](<./[2026-09-17 15-01] ADR-RET-017-integrated-carrier-request-via-1c-v2.md>).
 - `SCR-RET-01`, `SCR-RET-02` — [спецификация экранов](../screen-spec/screen-spec.md).
 - `OQ-1` — [BRD](../brd.md).

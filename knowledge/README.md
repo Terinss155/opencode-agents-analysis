@@ -10,19 +10,24 @@
 
 | Папка знаний | Код в `12stz` | С каким коммитом сверено |
 |---|---|---|
-| [12storeez-master-web/](12storeez-master-web/repo-map.md) | `12stz/12storeez-master-web` (Yii2 PHP-монолит, ветка `develop`) | `be3cd759d2`, 2026-10-09. Тексты написаны по копии `12storeez-master` (сентябрь 2026); пути сверены с живым репозиторием, расхождения — в `knowledge_staleness.md` |
-| [esb-monorepo/](esb-monorepo/repo-map.md) | `12stz/esb-monorepo` (NestJS/Nx, TypeScript, ветка `master`) — старый шлюз МП `core.12stz.com/api` | `beba6e61`, 2026-10-10 |
-| [mobile-monorepo-go/](mobile-monorepo-go/repo-map.md) | `12stz/mobile-monorepo-go` (Go, ветка `master`) — новый Mobile API Gateway `mobile.12stz.com/api` | `f302aeb`, 2026-10-10 |
-| [12storeez-ios/](12storeez-ios/repo-map.md) | `12stz/12storeez-ios` (Swift, ветка `develop`) — iOS-приложение | `a6de858b`, 2026-10-10 |
-| [esb-protobufs/](esb-protobufs/repo-map.md) | `12stz/esb-protobufs` (`.proto` + сгенерированные Go/TS, ветка `master`) — общие gRPC-контракты шлюзов и микросервисов | `f889483e` (`v0.9.5`), 2026-10-14 |
+Все сверки 07.11.2026 сделаны по ref `origin/*`: локальные рабочие копии в `12stz` отстают и не обновлялись (только `fetch`). Ищите в коде через `git -C <repo> show|grep <ref>`, а не по файлам рабочей копии.
 
-Сквозные схемы, которые касаются нескольких репозиториев сразу, лежат в [architecture/](architecture/): [call-chain.html](architecture/call-chain.html) — цепочка iOS → шлюзы `core`/`mobile` → монолит → внешние системы (сверено на коммитах всех четырёх репозиториев, 10.10.2026); [web-call-chain.html](architecture/web-call-chain.html) — цепочка сайта: браузер → ServicePipe/nginx → монолит (страницы и AJAX) → внешние системы, плюс сравнение с приложением (коммит `be3cd759d2`, 10.10.2026).
+| Папка знаний | Код в `12stz` | С каким коммитом сверено |
+|---|---|---|
+| [12storeez-master-web/](12storeez-master-web/repo-map.md) | `12stz/12storeez-master-web` (Yii2 PHP-монолит, ветка `develop`) | `origin/develop` `dd4a997ac0` (03.11.2026), сверено 07.11.2026 — карта, `architecture/`, `api/`, `database/`, `features/` |
+| [esb-monorepo/](esb-monorepo/repo-map.md) | `12stz/esb-monorepo` (NestJS/Nx, TypeScript, ветка `master`) — старый шлюз МП `core.12stz.com/api`, **ручки чистятся и переносятся в Go** | `origin/master` `4519218b` (03.11.2026), сверено 07.11.2026 |
+| [mobile-monorepo-go/](mobile-monorepo-go/repo-map.md) | `12stz/mobile-monorepo-go` (Go, ветка `master`) — новый Mobile API Gateway `mobile.12stz.com/api`; с ноября 2026 содержит копии почти всех ручек `core` | `origin/master` `631ac38` (03.11.2026), сверено 07.11.2026 |
+| [12storeez-ios/](12storeez-ios/repo-map.md) | `12stz/12storeez-ios` (Swift, ветка `develop`) — iOS-приложение | `origin/develop` `4f321c86` (05.11.2026, 1.89.0), сверено 07.11.2026 |
+| [esb-protobufs/](esb-protobufs/repo-map.md) | `12stz/esb-protobufs` (`.proto` + сгенерированные Go/TS, ветка `master`) — общие gRPC-контракты шлюзов и микросервисов | `origin/master` `3ee1f5a` (`v0.9.9`, 05.11.2026), сверено 07.11.2026 |
+| [architecture-docs/](architecture-docs/repo-map.md) | `12stz/architecture-docs` (C4-диаграммы PlantUML, ветка `main`) — сервисы бэкенда, их связи, БД, очереди; TO-BE архитектура 10.2026. **Источник при постановке задач** | `874cecd`, 2026-10-12 (на 07.11.2026 новых коммитов нет) |
+
+Сквозные схемы, которые касаются нескольких репозиториев сразу, лежат в [architecture/](architecture/): [call-chain.html](architecture/call-chain.html) — цепочка iOS → шлюзы `core`/`mobile` → монолит → внешние системы, с пометкой «копия в Go» у ручек `core`, уже перенесённых в Go-шлюз (обновлено по `origin` 07.11.2026); [web-call-chain.html](architecture/web-call-chain.html) — цепочка сайта: браузер → ServicePipe/nginx → монолит (страницы и AJAX) → внешние системы, плюс сравнение с приложением (обновлено по `origin/develop` `dd4a997ac0` 07.11.2026).
 
 Точки входа по монолиту: [repo-map.md](12storeez-master-web/repo-map.md) (карта папок и модулей) и [architecture/README.md](12storeez-master-web/architecture/README.md) (оглавление архитектурных документов 01–09).
 
 ## Вопрос → файл знаний → код
 
-Пути к коду указаны внутри `12stz/12storeez-master-web`. Все они проверены на коммите `be3cd759d2`.
+Пути к коду указаны внутри `12stz/12storeez-master-web`. Ссылки в таблице проверены на `be3cd759d2`; файлы знаний, на которые они ведут, сверены с `origin/develop` `dd4a997ac0` (07.11.2026) — при расхождении верить файлу знаний и коду.
 
 | Вопрос | Файл знаний | Где смотреть в коде |
 |---|---|---|
@@ -37,7 +42,7 @@
 | Какие таблицы хранят заказ и как они связаны | [database/orders-er.md](12storeez-master-web/database/orders-er.md), [architecture/04-database.md](12storeez-master-web/architecture/04-database.md) | `modules/orders/models/Order.php`, `src/Modules/Order/Model/Order.php` |
 | Ключевые таблицы других доменов, Redis, поиск | [architecture/04-database.md](12storeez-master-web/architecture/04-database.md) | `src/Search/Elastic/`, `config/common.php` |
 | Где миграции и как их называют | [architecture/04-database.md](12storeez-master-web/architecture/04-database.md) «Миграции» | `migrations/`, `check-migrate-trigger.sh` |
-| Как создаётся заказ на сайте и в приложении | [architecture/03-business-domains.md](12storeez-master-web/architecture/03-business-domains.md) «Заказы», [repo-map.md](12storeez-master-web/repo-map.md) §5.2 | `src/Modules/Order/Services/CreateOrder/`, `src/Modules/Order/Services/OrderService.php` |
+| Как создаётся заказ на сайте и в приложении | [architecture/03-business-domains.md](12storeez-master-web/architecture/03-business-domains.md) «Заказы», [repo-map.md](12storeez-master-web/repo-map.md) §5.2, [web-call-chain.html](architecture/web-call-chain.html) «Сайт и приложение» | Сайт: `modules/orders/controllers/OrdersController.php` (`proceed`) → `src/Modules/Order/Services/OrderService.php` (`createOrder`); приложение: `src/Modules/Order/Services/CreateOrder/` (`CreateOrderServiceMobile`); бронь с сайта — `src/Modules/Reservation/` |
 | Что происходит после сохранения заказа (побочные эффекты) | [architecture/03-business-domains.md](12storeez-master-web/architecture/03-business-domains.md) «Заказы» | `src/Modules/Order/AfterSaveEvent/` |
 | Как мобильное приложение открывает карточку заказа | [features/order-view.md](12storeez-master-web/features/order-view.md) §1 | `src/Modules/Mobile/Controllers/OrdersController.php`, `src/Modules/Mobile/Rules/UrlRule.php` |
 | Какие поля возвращает мобильная карточка заказа | [api/mobile/order-view_mobile.md](12storeez-master-web/api/mobile/order-view_mobile.md) | `src/Modules/Order/Transformer/OrderMobileTransformer.php`, `src/Modules/Order/Repository/OrderRepository.php` |
@@ -60,7 +65,9 @@
 | Очереди: MySQL-очередь, RabbitMQ, outbox/inbox | [architecture/07-infrastructure.md](12storeez-master-web/architecture/07-infrastructure.md) «Асинхронная обработка» | `components/SqlQueue.php`, `components/rabbitmq/RabbitMQ.php`, `src/Queue/RabbitMqQueueName.php`, `src/Modules/Order/Services/Outbox/` |
 | Консольные команды и cron | [architecture/02-backend.md](12storeez-master-web/architecture/02-backend.md) «Консольные команды», [architecture/07-infrastructure.md](12storeez-master-web/architecture/07-infrastructure.md) | `config/console.php` (`controllerMap`). Файл `config/cron-web` в Kubernetes не используется, расписания задаются в Helm |
 | Какой контроллер обрабатывает URL | [architecture/05-api.md](12storeez-master-web/architecture/05-api.md) «Маршрутизация», [repo-map.md](12storeez-master-web/repo-map.md) §6 | `config/url.php`, `src/Modules/Mobile/Rules/UrlRule.php`, `modules/mobilev2/rules/UrlRule.php` |
-| Какие есть API сайта и мобилки, версии, эндпоинты, OpenAPI-спецификации | [architecture/05-api.md](12storeez-master-web/architecture/05-api.md), [api/mobile-vs-core-api.md](12storeez-master-web/api/mobile-vs-core-api.md) §1 | `src/Modules/Mobile/Controllers/`, `modules/mobilev2/`, `src/Modules/MobileV2/`, `modules/api2/`; спеки — `docs/openapi/mobile.yml`, `docs/openapi/frontend.yml` (в знаниях ещё старые пути `docs/mobileApi/`, `docs/frontend/`, `docs/ssr/`) |
+| Какие есть API сайта и мобилки, версии, эндпоинты, OpenAPI-спецификации | [architecture/05-api.md](12storeez-master-web/architecture/05-api.md), [api/mobile-vs-core-api.md](12storeez-master-web/api/mobile-vs-core-api.md) §1 | `src/Modules/Mobile/Controllers/`, `modules/mobilev2/`, `src/Modules/MobileV2/`, `modules/api2/`, `src/User/` (userApi); спеки — `docs/openapi/mobile.yml`, `docs/openapi/frontend.yml` |
+| Что выпилено из мобильного API и шлюзов в октябре–ноябре 2026 | [repo-map.md](12storeez-master-web/repo-map.md) §3–4, [esb-monorepo/repo-map.md](esb-monorepo/repo-map.md) §4.1, §10 | Задачи ECOMDEV-2180, 2189, 2228, 2230: `git -C <repo> log --oneline --grep=ECOMDEV-2228 origin/develop` |
+| Новые веб-маршруты: бронирование, наличие в магазинах, last-context, API пользователя | [repo-map.md](12storeez-master-web/repo-map.md) §5.5, [web-call-chain.html](architecture/web-call-chain.html) «Находки» | `config/url.php`, `src/Modules/Reservation/`, `src/User/Controller/`, `src/Modules/Mainpage/Service/LastContextService.php` |
 | Чем отличаются Mobile API, API Gateway и Core API | [api/mobile-vs-core-api.md](12storeez-master-web/api/mobile-vs-core-api.md), [api/mobile/mobile-gateway_swagger.yaml](12storeez-master-web/api/mobile/mobile-gateway_swagger.yaml) | `docs/openapi/mobile.yml`. Код шлюзов — в `esb-monorepo` (`core`) и `mobile-monorepo-go` (`mobile`), см. раздел ниже |
 | Куда уходит запрос браузера: какой контроллер рисует страницу или отвечает на AJAX, что дальше | [architecture/web-call-chain.html](architecture/web-call-chain.html) (справочник с фильтрами) | `frontend/src/modules/*/services/*Service.js` → `config/url.php` → контроллер |
 | Чем путь сайта отличается от пути приложения (авторизация, корзина, заказ, оплата) | [architecture/web-call-chain.html](architecture/web-call-chain.html) «Сайт и приложение» | `modules/orders/controllers/OrdersController.php`, `src/Modules/Order/Services/OrderService.php`, `modules/common/service/SessionService.php` |
@@ -78,18 +85,36 @@
 | Вопрос | Файл знаний | Где смотреть в коде |
 |---|---|---|
 | Какой шлюз обслуживает запрос МП: `core.12stz.com` или `mobile.12stz.com` | [esb-monorepo/repo-map.md](esb-monorepo/repo-map.md) §1, [mobile-monorepo-go/repo-map.md](mobile-monorepo-go/repo-map.md) §1 | `esb-monorepo/.deploy/helm/`, `mobile-monorepo-go/.deploy/helm/` |
+| Есть ли у ручки `core` копия в Go-шлюзе и где она | [mobile-monorepo-go/repo-map.md](mobile-monorepo-go/repo-map.md) §3.2, [call-chain.html](architecture/call-chain.html) (пометка «копия в Go») | `mobile-monorepo-go/internal/app/service/*_core.go`, `old_cart.go`; маршруты — `cmd/mobile_api/mobile_api.go` |
 | Как устроен старый шлюз `core` и куда он проксирует метод (монолит или gRPC) | [esb-monorepo/repo-map.md](esb-monorepo/repo-map.md) §4.1, §5 | `esb-monorepo/apps/mobile-api/`, `esb-monorepo/libs/<домен>/controllers/` |
 | Методы возврата в шлюзе `core`: причины, создание возврата, карточка заказа | [esb-monorepo/repo-map.md](esb-monorepo/repo-map.md) §8.1 | `esb-monorepo/libs/orders/controllers/src/lib/orders.controller.ts` |
 | Где реализованы `v1/delivery/{id}/return-method-list` и `return-details` | [mobile-monorepo-go/repo-map.md](mobile-monorepo-go/repo-map.md) §5 | `mobile-monorepo-go/internal/app/service/delivery.go`, `mobile-monorepo-go/internal/app/models/dto/delivery/` |
 | Какой путь нового шлюза обрабатывает какой хендлер и во что превращается в монолите | [mobile-monorepo-go/repo-map.md](mobile-monorepo-go/repo-map.md) §3, §4.1, §7 | `mobile-monorepo-go/cmd/mobile_api/mobile_api.go`, `mobile-monorepo-go/config/config.go`, `mobile-monorepo-go/.deploy/helm/values.yaml` |
 | Как шлюзы передают пользователя и заголовки в монолит (JWT → `x-session-token`) | [esb-monorepo/repo-map.md](esb-monorepo/repo-map.md) §5, [mobile-monorepo-go/repo-map.md](mobile-monorepo-go/repo-map.md) §3, §4.1 | `esb-monorepo/libs/core/src/lib/http-client/`, `mobile-monorepo-go/internal/app/helpers/site_proxy.go` |
 | Какие gRPC-сервисы и внешние системы вызывают шлюзы | [esb-monorepo/repo-map.md](esb-monorepo/repo-map.md) §6, [mobile-monorepo-go/repo-map.md](mobile-monorepo-go/repo-map.md) §4 | `esb-monorepo/libs/*/grpc/`, `mobile-monorepo-go/pkg/grpc_client/` |
-| Обмен с 1С через шлюз `core` (товары, остатки, офлайн-заказы) | [esb-monorepo/repo-map.md](esb-monorepo/repo-map.md) §4.1, §6 | `esb-monorepo/libs/gateway-1c/` |
+| Обмен с 1С через шлюз `core` (товары, остатки, офлайн-заказы) | [esb-monorepo/repo-map.md](esb-monorepo/repo-map.md) §4.1, §6 | `libs/gateway-1c/` **удалена** (ECOMDEV-2189, коммит `7c07c6d6`); офлайн-заказы теперь только gRPC Orders (`libs/orders/`) |
 | Окружения и хосты шлюзов | [esb-monorepo/repo-map.md](esb-monorepo/repo-map.md) §7, [mobile-monorepo-go/repo-map.md](mobile-monorepo-go/repo-map.md) §6 | `.deploy/helm/*.values.yaml` в каждом репозитории |
 | Какие методы и поля у gRPC-сервиса (geo, mindbox, logistics, orders и др.) | [esb-protobufs/repo-map.md](esb-protobufs/repo-map.md) §3 | `esb-protobufs/proto/` |
 | Как запросить даты и интервалы курьера у логистики, какой адрес передавать, можно ли собрать адрес из заказа | [esb-protobufs/api/logistics-intervals.md](esb-protobufs/api/logistics-intervals.md) | `esb-protobufs/proto/logistics/winner.proto` (`Intervals`), `esb-protobufs/proto/geo.proto`, монолит `src/Modules/Order/Traits/OrderGetterTrait.php` |
-| Кто какой контракт использует и какой версии | [esb-protobufs/repo-map.md](esb-protobufs/repo-map.md) §4 | `esb-monorepo/package.json` (`esb-protobufs`), `mobile-monorepo-go/go.mod`, `12storeez-master-web/modules/grpc/` |
+| Кто какой контракт использует и какой версии (Go-шлюз на v0.8.99 отстаёт от v0.9.9) | [esb-protobufs/repo-map.md](esb-protobufs/repo-map.md) §4 | `esb-monorepo/package.json` (`esb-protobufs`), `mobile-monorepo-go/go.mod`, `12storeez-master-web/modules/grpc/` |
 | Поля возврата в контрактах (новый сервис заказов, чеки возврата) | [esb-protobufs/repo-map.md](esb-protobufs/repo-map.md) §6.1 | `esb-protobufs/proto/order.proto`, `esb-protobufs/proto/receipt.proto` |
+
+## Сервисы бэкенда (architecture-docs): вопрос → файл знаний → диаграмма
+
+Пути — от `12stz/architecture-docs/`. Это документация, не код: связи из диаграмм подтверждаются кодом или командой, если от них зависит логика задачи. Порядок использования при постановке задачи — [architecture-docs/repo-map.md](architecture-docs/repo-map.md) §1.
+
+| Вопрос | Файл знаний | Где смотреть |
+|---|---|---|
+| Какой сервис владеет данными / куда делать доработку | [architecture-docs/repo-map.md](architecture-docs/repo-map.md) §3, §5 | `<сервис>/system.puml` |
+| Через что монолит ходит во внутренние сервисы (BFB-маршруты `/giftcards`, `/receipt`, `/delivery`, `/api/v1/geo`, `/api/v1/mindbox`, …) | [architecture-docs/repo-map.md](architecture-docs/repo-map.md) §3.1 | `monolith-bfb-ms/system.puml`, `monolith/system.puml` |
+| Все входящие и исходящие интеграции монолита, живые или мёртвые | [architecture-docs/repo-map.md](architecture-docs/repo-map.md) §3.1 | `monolith/readme.md` |
+| Имена и типы колонок таблиц монолита (MariaDB) | [architecture-docs/repo-map.md](architecture-docs/repo-map.md) §4 | `monolith/database.puml` (`class <таблица> {`) |
+| Очереди монолита (RabbitMQ, SQL queue), outbox/inbox 1С / RetailCRM / Mindbox / BNPL | [architecture-docs/repo-map.md](architecture-docs/repo-map.md) §6.1 | `monolith/queue.puml` |
+| Возврат денег (BNPL, Yandex), чек возврата, офлайн-возвраты | [architecture-docs/repo-map.md](architecture-docs/repo-map.md) §3.2, §6.1 | `aggregate-billing-ms/system.puml`, `monolith-bfb-ms/system.puml`, `orders-srv-go/system.puml` |
+| Логистика: winner (МРП), ПВЗ провайдеров, интервалы, вебхуки в монолит | [architecture-docs/repo-map.md](architecture-docs/repo-map.md) §3.4 | `logistics-monorepo/system.puml`, `database.plantuml` |
+| Остатки и номенклатура: из 1С на сайт, Mercaux, Shopify | [architecture-docs/repo-map.md](architecture-docs/repo-map.md) §3.4 | `stocks-monorepo-go/system.puml`, `queue.puml` |
+| Mindbox: какие операции, кто вызывает | [architecture-docs/repo-map.md](architecture-docs/repo-map.md) §3.3 | `mindbox-srv-go/system.puml` |
+| Куда движется архитектура (Laravel, OMS в 1С:УТ, stocks-ms, user-ms), сроки | [architecture-docs/repo-map.md](architecture-docs/repo-map.md) §5 | `acrhitecture_10_2026/summary.md` |
 
 ## iOS-приложение: вопрос → файл знаний → код
 
@@ -109,7 +134,7 @@
 
 - Каталог, корзина, чекаут, пользователи и CMS описаны только обзорно в [03-business-domains.md](12storeez-master-web/architecture/03-business-domains.md). Отдельных разборов фич по ним нет.
 - Нет схемы таблиц за пределами заказов: ER-диаграмма есть только для `cms_orders` и связанных с ней таблиц. Типы полей в ней предварительные.
-- Шлюзы МП описаны только картами репозиториев; отдельных AS-IS-контрактов по их методам нет. Реальные prod-адреса монолита и gRPC — в Vault, в репозиториях их нет.
+- Шлюзы МП описаны только картами репозиториев; отдельных AS-IS-контрактов по их методам нет. Копия swagger Go-шлюза [mobile-gateway_swagger.yaml](12storeez-master-web/api/mobile/mobile-gateway_swagger.yaml) снята с `f302aeb` (октябрь) и не содержит ручек, перенесённых из `core` в ноябре; актуальный — `mobile-monorepo-go/docs/mobile_api/swagger.yaml` на `origin/master`. Реальные prod-адреса монолита и gRPC — в Vault, в репозиториях их нет.
 - Нет Android-клиента в `12stz`. Ручки Go-шлюза, которые не вызывает iOS, перечислены в [call-chain.html](architecture/call-chain.html); вызывает ли их Android, по коду не проверить.
 - Нет описания Helm-чартов и расписаний cron: они вне этого репозитория.
-- Нет кода серверов gRPC-сервисов (заказы, чеки, логистика, номенклатура, пользователи): в `esb-protobufs` только контракты, реализации вне `12stz`.
+- Нет кода серверов gRPC-сервисов (заказы, чеки, логистика, номенклатура, пользователи): в `esb-protobufs` только контракты, реализации вне `12stz`. Их роль, адреса, методы и вызывающие описаны диаграммами в [architecture-docs](architecture-docs/repo-map.md) §3; у `receipt-ms`, `gift-cards-ms`, `marketplace-ms`, `notifications-go-ms` диаграммы — заглушки.

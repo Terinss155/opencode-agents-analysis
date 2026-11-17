@@ -119,7 +119,7 @@ AS-IS монолита: калькуляция корзины и обновле�
 
 - `ADR-RET-064` — [возврат баллов в отдельной истории](<./[2026-10-14 15-00] ADR-RET-064-return-bonus-points-separate-story-v1.md>).
 - `ADR-RET-073` — [повторный возврат одинаковых изделий](<./[2026-10-12 13-01] ADR-RET-073-identical-units-repeat-return-v2.md>).
-- `ADR-RET-091` — [статусная модель MVP](<./[2026-10-22 15-00] ADR-RET-091-return-status-model-mvp-v5.md>).
+- `ADR-RET-091` — [статусная модель MVP](<./archive/[2026-10-22 15-00] ADR-RET-091-return-status-model-mvp-v5.md>).
 - `FR-36`, `OQ-47` — [BRD](../brd.md).
 - [Вопросы по баллам](../questions/refund-bonus_questions.md) — решения 7–12, вопросы 2, 4, 8, 11.
 

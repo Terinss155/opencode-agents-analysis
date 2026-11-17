@@ -2,8 +2,8 @@
 
 **Назначение документа:** карта-справочник по `esb-protobufs` — общему хранилищу gRPC-контрактов (`.proto`) 12Storeez и сгенерированных из них клиентов (Go, TypeScript, Angular) и Swagger. Помогает быстро найти, какой сервис что умеет, кто им пользуется и где в контрактах поля возврата.
 
-**Дата актуализации:** 14.10.2026
-**Сверено с кодом:** ветка `master`, коммит `f889483e` (`f889483e7ccc3858cb0c9a91d64fa84254616b5d`, 29.06.2026, тег `v0.9.5`, «TNT-2265 (#448)»)
+**Дата актуализации:** 07.11.2026
+**Сверено с кодом:** ветка `origin/master`, коммит `3ee1f5a` (`3ee1f5afb0a70a71bab853f4a6607315910b0522`, 05.11.2026, тег `v0.9.9`, «TNT-2837 (#452)»). Потребители — `mobile-monorepo-go` `origin/master` `631ac38`, `esb-monorepo` `origin/master` `4519218b`, `12storeez-master-web` `origin/develop` `dd4a997ac0` (все от 03.11.2026)
 **Код:** `C:\Users\RobotComp.ru\Desktop\12stz\esb-protobufs\` (только чтение)
 **Примечание:** в репозитории только контракты — **реализаций сервисов здесь нет**. Где живёт сервер каждого контракта, по этому репозиторию не установить; потребители найдены поиском по соседним репозиториям в `12stz/`. Где вывод сделан по названию — помечено.
 
@@ -17,10 +17,10 @@
   - `angular/` — клиенты `@ngx-grpc` (только 9 старых контрактов, см. §2);
   - `swagger/` — OpenAPI v2 для контрактов с HTTP-аннотациями (`google.api.http`).
 - **Как распространяется:**
-  - **npm-пакет `esb-protobufs`** (`package.json:2-3`, версия `0.9.5`); в пакет попадают `typescript/`, `proto/`, `angular/` (`package.json:7-11`). Публикация — GitHub Actions при создании релиза (`.github/workflows/npm-publish.yml`). Node-потребители читают `.proto` прямо из `node_modules/esb-protobufs/proto/`.
+  - **npm-пакет `esb-protobufs`** (`package.json:2-3`, версия `0.9.9`); в пакет попадают `typescript/`, `proto/`, `angular/` (`package.json:7-11`). Публикация — GitHub Actions при создании релиза (`.github/workflows/npm-publish.yml`). Node-потребители читают `.proto` прямо из `node_modules/esb-protobufs/proto/`.
   - **Go-модуль** `github.com/12storeez/esb-protobufs` по git-тегам `vX.Y.Z`. Файла `go.mod` в репозитории нет (есть только `go.sum`) — Go собирает модуль без него.
 - **Хостинг кода:** GitHub `12storeez/esb-protobufs` (`package.json:15-17`) — в отличие от шлюзов, которые собираются в GitLab.
-- **История:** первый коммит — 04.02.2020; активная разработка до 06.2026 (последние задачи `TNT-*`). Ветки задач: `ITSOL-*`, `LGS-*` (логистика), `TNT-*`, `NOVADEV-*`, `MOBILE-*`.
+- **История:** первый коммит — 04.02.2020; активная разработка до 11.2026 (последние задачи `TNT-*`; с `v0.9.5` по `v0.9.9` — только логистика, признаки возврата, см. §3.3). Ветки задач: `ITSOL-*`, `LGS-*` (логистика), `TNT-*`, `NOVADEV-*`, `MOBILE-*`.
 
 ---
 
@@ -30,7 +30,7 @@
 |---|---|
 | `proto/` | **Исходные контракты** (см. §3). Подпапки: `logistics/` (25 файлов), `platform/`, `notifications/`, `internal/`, `common/`, `google/` |
 | `go/` | Сгенерированный Go-код, по папке на `go_package` (`go/logistics`, `go/order`, `go/orders`, …) |
-| `typescript/` | `index.d.ts` (~3 000 строк) и `index.js` — namespace-типы по всем `.proto`; точка входа npm-пакета (`package.json:4-5`) |
+| `typescript/` | `index.d.ts` (~3 000 строк) и `index.js` — namespace-типы по всем `.proto`; точка входа npm-пакета (`package.json:4-5`). В `v0.9.6`–`v0.9.9` не перегенерировался: полей `is_return`, `is_return_available`, `sending_address` в нём нет |
 | `angular/` | `*.pb.ts`, `*.pbconf.ts`, `*.pbsc.ts` для `feedbacks`, `logistics`, `mercaux`, `meta`, `mindbox`, `orders`, `slack`, `transports` (последнего `.proto` уже нет — артефакт старой версии) |
 | `swagger/` | `feedbacks/`, `logistics/` (объединённый `logistics.swagger.json`), `notifications/`, `platform/` |
 | `google.golang.org/protobuf/.../emptypb/` | Сгенерированный `google.protobuf.Empty` (из `proto/google/empty.proto`) |
@@ -48,13 +48,13 @@
 
 ## 3. Контракты (`proto/`)
 
-Колонка «Потребители в `12stz`» — где контракт реально подключён в коде соседних репозиториев (сверено 14.10.2026). «—» — потребителей в `12stz` нет, сервис используется кем-то вне этих репозиториев.
+Колонка «Потребители в `12stz`» — где контракт реально подключён в коде соседних репозиториев (сверено 07.11.2026 по актуальным origin-веткам, см. шапку). «—» — потребителей в `12stz` нет, сервис используется кем-то вне этих репозиториев.
 
 ### 3.1. Заказы, оплата, чеки
 
 | Файл | Пакет / go | Сервисы и методы | Потребители в `12stz` |
 |---|---|---|---|
-| `orders.proto` | `orders` / `go/orders` | `Offline`: `ByClient`, `GetById`, `GetByGuid` (`:7-13`) — офлайн-чеки магазинов; `Online`: `ByClient` (`:73-75`) | `esb-monorepo` (`libs/orders/grpc`, офлайн-заказы); монолит — PHP-копия `modules/grpc/Orders/` (`OfflineClient`, `OnlineClient`) |
+| `orders.proto` | `orders` / `go/orders` | `Offline`: `ByClient`, `GetById`, `GetByGuid` (`:7-13`) — офлайн-чеки магазинов; `Online`: `ByClient` (`:73-75`) | `esb-monorepo` (`libs/orders/grpc`, офлайн-заказы); `mobile-monorepo-go` — `Offline` (`pkg/grpc_client/grpc_client.go:168`, восстановлен в ECOMDEV-2422); монолит — PHP-копия `modules/grpc/Orders/` (`OfflineClient`, `OnlineClient`) |
 | `order.proto` | `orders` / `go/order` | **Новый сервис заказов** (по названию — Order MS): `OrderService` (списки, по ID, по пользователю, для админки, статистика), `OrderHistoryService`, `PositionHistoryService`, `OutboxService` (просмотр/правка/удаление outbox-сообщений), `OrderPaymentService.UpdatePaymentStatus` (`:751-779`) | — |
 | `payments.proto` | `payments` / `go/payments` | `Payments.GetPaymentsByOrderIDForAdmin` | — |
 | `receipt.proto` | `app.grpc.receipt` / `go/receipt` | `ReceiptService`: `SellPrepaymentReceipt`, `SellFullpaymentReceipt`, `RefundPrepaymentReceipt`, `RefundFullpaymentReceipt` (`:7-12`) — фискальные чеки продажи и возврата | — по gRPC. Монолит ходит в чековый сервис по **HTTP** (`src/Modules/Receipt/Client/ReceiptClient.php` — `yii\httpclient`) |
@@ -67,9 +67,9 @@
 
 | Файл | Пакет / go | Сервисы и методы | Потребители в `12stz` |
 |---|---|---|---|
-| `auth.proto` | `auth` / `go/auth` | `auth`: `LoginPassword`, `LoginSMS`, `Logout`, `Refresh`, `Validate`, `LoginTBankCode`, `GetAuthSettings` | `mobile-monorepo-go` (`pkg/grpc_client/grpc_client.go:140`, `internal/app/usecase/auth.go`) |
+| `auth.proto` | `auth` / `go/auth` | `auth`: `LoginPassword`, `LoginSMS`, `Logout`, `Refresh`, `Validate`, `LoginTBankCode`, `GetAuthSettings` | `mobile-monorepo-go` (`pkg/grpc_client/grpc_client.go:150`, `internal/app/usecase/auth.go`) |
 | `user.proto` | `user` / `go/user` | `user`: CRUD, `GetBySiteID`, `GetByToken`, `Merge`, `GetUserAddresses`, ограничения (`Restrict`, …); `Employee`: стилисты | — |
-| `mindbox.proto` | `mindbox` / `go/mindbox` | `User` (профиль, заказы, OSMI-карта, история бонусов), `Mobile` (устройство, код подтверждения, push-клик), `Order` (создание/обновление заказа, расчёт), `Gift`, `Cart`/`Product` (рекомендации), `Mailing` | `esb-monorepo` (`libs/profile/{bonus,auth}-grpc`, `libs/notification/grpc`); `mobile-monorepo-go` (`grpc_client.go:108,124`); монолит — PHP-копия `modules/grpc/Mindbox/` (`UserClient`, `MobileClient`) |
+| `mindbox.proto` | `mindbox` / `go/mindbox` | `User` (профиль, заказы, OSMI-карта, история бонусов), `Mobile` (устройство, код подтверждения, push-клик), `Order` (создание/обновление заказа, расчёт), `Gift`, `Cart`/`Product` (рекомендации), `Mailing` | `esb-monorepo` (`libs/profile/{bonus,auth}-grpc`, `libs/notification/grpc`); `mobile-monorepo-go` — только `User` (`grpc_client.go:134`); монолит — PHP-копия `modules/grpc/Mindbox/` (`UserClient`, `MobileClient`), вызывается из `modules/mindbox/services/MindboxUserService.php`, `MindboxGrpcService.php`. Доменная область `src/Modules/Mindbox/` (ECOMDEV-2342) ходит в Mindbox напрямую по HTTP (`Client/MindboxClient.php` — `yii\httpclient`, Guzzle), не через этот контракт |
 | `platform/oauth.proto`, `platform/client.proto` | `platform` / `go/platform` | `Oauth` (`Token`, `Authorize`), `Clients` (CRUD); HTTP `/api/oauth/*`, `/api/client*` | — |
 | `passwork.proto` | `passwork` / `go/passwork` | `Passwork` CRUD (по названию — интеграция с менеджером паролей) | — |
 
@@ -80,7 +80,7 @@
 | Файл | Сервис | Методы / HTTP |
 |---|---|---|
 | `winner.proto` | `WinnerService` | **Расчёт доступной доставки** («победитель»): `Calculate` (`POST /api/v1/winner/calculate`), `Intervals`, `PickupList`, `PickupDetail`, `AddressDetails` (`:11-43`) |
-| `delivery_type.proto`, `delivery_mode.proto`, `delivery_method.proto` | `DeliveryTypeService`, `DeliveryModeService`, `DeliveryMethodService` | Справочники способов доставки: CRUD + `Suggest` |
+| `delivery_type.proto`, `delivery_mode.proto`, `delivery_method.proto` | `DeliveryTypeService`, `DeliveryModeService`, `DeliveryMethodService` | Справочники способов доставки: CRUD + `Suggest` (`delivery_type.proto:19`, `:51`) |
 | `transport_company.proto`, `transport_company_mode.proto` | `TransportCompanyService`, `TransportCompanyModeService` | ТК и режимы ТК; интервалы режима (`/transport-company-mode/{id}/interval`) |
 | `zone.proto`, `zone_group.proto`, `zone_to_geo.proto` | `ZoneService`, `ZoneGroupService`, `ZoneToGeoService` | Зоны доставки и привязка к geo_id |
 | `zone_group_restriction.proto`, `category_zone_group_restriction.proto`, `category_delivery_type_restrictions.proto`, `global_restrictions.proto` | `*RestrictionService` | Ограничения доставки по зонам, категориям, типам доставки, глобальные |
@@ -92,7 +92,16 @@
 | `country.proto`, `category.proto`, `address_file.proto` | `CountryService`, `CategoryService`, `AddressFileService` | Страны, категории, файлы адресов |
 | `common.proto` | — (пакет `common`) | `UnifiedResponse` и общие типы |
 
-Потребители: `mobile-monorepo-go` использует только `WinnerService` (`pkg/grpc_client/grpc_client.go:60`) и типы `logistics` в `internal/app/helpers/logistics_proxy.go`, `internal/app/models/dto/logistics/`.
+**Изменения `v0.9.6`–`v0.9.9` (27.10–05.11.2026): признаки возврата.** Новых сервисов и RPC нет, удалённых нет — только новые поля (обратно совместимо). Go-код (`go/logistics/*.pb.go`) и Swagger перегенерированы, TypeScript — нет (§2).
+
+| Тег | Задача | Файл | Поля |
+|---|---|---|---|
+| `v0.9.6` (27.10) | TNT-2712 (в истории также коммит `7c456c3` с заголовком TNT-2265 и тем же содержимым) | `winner.proto` | `is_return_available` (`google.protobuf.BoolValue`): `Filter` = 9 (`:81`, фильтр `PickupList`), `PickupPoint` = 11 (`:107`), `PickUpPointsDetailResponse` = 15 (`:131`) — ПВЗ принимает возвраты |
+| `v0.9.7` (28.10) | TNT-2713 | `pickup_points.proto` | `PickupPointLogistics.is_return_available` = 18 (`:70`, `BoolValue`) — то же в справочнике ПВЗ провайдера |
+| `v0.9.8` (29.10) | TNT-2839 | `delivery_type.proto` | `is_return` (bool) — тип доставки для возврата: `DeliveryTypeShort` = 7 (`:76`), `DeliveryType` = 46 (`:137`), `UpdateDeliveryType` = 44 (`:222`), `SuggestDeliveryType` = 4 (`:256`); фильтр `Suggest` — `FilterDeliveryType.is_return` = 2 (`:266`, `optional bool`) |
+| `v0.9.9` (05.11) | TNT-2837 | `winner.proto` | `IntervalsRequest` (`:226`): `sending_address` = 6 (string, `:232`) — адрес отправки для возврата; `is_return` = 7 (bool, `:233`). Подробно — [api/logistics-intervals.md](api/logistics-intervals.md) |
+
+Потребители: `mobile-monorepo-go` использует только `WinnerService` (`pkg/grpc_client/grpc_client.go:69`) и типы `logistics` в `internal/app/helpers/logistics_proxy.go`, `internal/app/models/dto/logistics/`. Новые поля возврата в Go-шлюзе не используются (поиск `IsReturn`, `SendingAddress` по `origin/master` — пусто), да и подключённая версия `v0.8.99` их не содержит (§4).
 
 ### 3.4. Каталог, справочники, магазины
 
@@ -103,14 +112,14 @@
 | `internal/stocks.proto` | `stocks` / `go/stocks` | `Stocks`: `Upsert`, `Get`, `GetPagination` | — |
 | `internal/release_plan.proto` | `release` / `go/release` | `ArticlesRelease` CRUD (план выпуска артикулов) | — |
 | `store.proto` | `store` / `go/store` | `StoreService`: `GetList`, `GetByStoreCode` | — |
-| `meta.proto` | `meta` / `go/meta` | `Mobile` (`Contacts`, `About`, `Faq`, `Countries`, `SocialNetworks`), `Stores` (`All`, `ByID`, `Cities`) | `esb-monorepo` (`libs/metadata/grpc`, `libs/stores/grpc`); `mobile-monorepo-go` (`grpc_client.go:92`) |
-| `geo.proto` | `geo` / `go/geo` | `geo`: подсказки и детали стран, городов, адресов; город по IP; страна по телефону | `esb-monorepo` (`libs/geo/grpc`); `mobile-monorepo-go` (`grpc_client.go:76`) |
+| `meta.proto` | `meta` / `go/meta` | `Mobile` (`Contacts`, `About`, `Faq`, `Countries`, `SocialNetworks`), `Stores` (`All`, `ByID`, `Cities`) | `esb-monorepo` (`libs/metadata/grpc`, `libs/stores/grpc`); `mobile-monorepo-go` — `Mobile` (`grpc_client.go:101`) и `Stores` (`:118`, восстановлен в ECOMDEV-2422) |
+| `geo.proto` | `geo` / `go/geo` | `geo`: подсказки и детали стран, городов, адресов; город по IP; страна по телефону | `esb-monorepo` (`libs/geo/grpc`); `mobile-monorepo-go` (`grpc_client.go:85`) |
 
 ### 3.5. Отзывы, поддержка, уведомления, служебное
 
 | Файл | Пакет / go | Сервисы и методы | Потребители в `12stz` |
 |---|---|---|---|
-| `feedbacks.proto` | `feedbacks` / `go/feedbacks` | `Mobile` (оценки приложения, магазина, заказа, причины, `CanBeSaved`), `Store`, `NPS`, `PortalFeedbackService` (HTTP `/api/v1/portal/feedback*`) | `esb-monorepo` (`libs/reviews/grpc`); монолит — PHP-копия `modules/grpc/Feedbacks/` |
+| `feedbacks.proto` | `feedbacks` / `go/feedbacks` | `Mobile` (оценки приложения, магазина, заказа, причины, `CanBeSaved`), `Store`, `NPS`, `PortalFeedbackService` (HTTP `/api/v1/portal/feedback*`) | `esb-monorepo` (`libs/reviews/grpc`); `mobile-monorepo-go` — `Mobile` (`grpc_client.go:185`, восстановлен в ECOMDEV-2422); монолит — PHP-копия `modules/grpc/Feedbacks/` |
 | `usedesk.proto` | `usedesk` / `go/usedesk` | `CSI.Save` (HTTP `POST /`) | `esb-monorepo` (`apps/usedesk-gate`, `libs/usedesk-gate/grpc`) |
 | `slack.proto` | `slack` / `go/slack` | `Slack`: сообщения, файлы (stream), ссылки | `esb-monorepo` (`libs/slack/grpc`) |
 | `notifications.proto`, `notifications/slack.proto` | `notifications` | `notifications.Send`; `Slack.Send`, `SendFile` (HTTP `/v1/slack/*`) | — |
@@ -126,12 +135,14 @@
 
 | Потребитель | Как подключён | Версия | Какие контракты |
 |---|---|---|---|
-| `esb-monorepo` (старый шлюз `core`) | npm `esb-protobufs` (`package.json:46`), путь к `.proto` — `GRPC.nameToPath()` (`libs/constants/src/lib/grpc-transport.ts`) | **`0.6.77`** (тег от 27.09.2023) | `orders`, `feedbacks`, `mindbox`, `geo`, `meta`, `slack`, `usedesk`, `internal/errors` |
-| `mobile-monorepo-go` (новый шлюз `mobile`) | Go-модуль (`go.mod:8`) | **`v0.8.99`** (16.03.2026) | `auth`, `geo`, `logistics` (`WinnerService`), `meta`, `mindbox` |
-| `12storeez-master-web` (монолит) | **Не подключён** как зависимость. Лежит ручная PHP-генерация трёх контрактов: `modules/grpc/{Feedbacks,Mindbox,Orders}/` + `GPBMetadata/` | неизвестна (копия) | `feedbacks`, `mindbox`, `orders` |
+| `esb-monorepo` (старый шлюз `core`) | npm `esb-protobufs` (`package.json:46`), путь к `.proto` — `GRPC.nameToPath()` (`libs/constants/src/lib/grpc-transport.ts`) | **`0.6.77`** (тег от 27.09.2023), без изменений на `origin/master` 03.11.2026 | `orders`, `feedbacks`, `mindbox`, `geo`, `meta`, `slack`, `usedesk`, `internal/errors` |
+| `mobile-monorepo-go` (новый шлюз `mobile`) | Go-модуль (`go.mod:8`) | **`v0.8.99`** (16.03.2026), без изменений на `origin/master` 03.11.2026 | `auth`, `geo`, `logistics` (`WinnerService`), `meta` (`Mobile`, `Stores`), `mindbox` (`User`), `orders` (`Offline`), `feedbacks` (`Mobile`) — последние три восстановлены в ECOMDEV-2422 (`pkg/grpc_client/grpc_client.go:5-11`) |
+| `12storeez-master-web` (монолит) | **Не подключён** как зависимость. Лежит ручная PHP-генерация трёх контрактов: `modules/grpc/{Feedbacks,Mindbox,Orders}/` + `GPBMetadata/` (на `origin/develop` состав тот же) | неизвестна (копия) | `feedbacks`, `mindbox`, `orders`. Логистику монолит вызывает через BFB по HTTP, не по этому контракту |
 | `12storeez-ios` | Не использует (ходит в шлюзы по HTTP) | — | — |
 
 Остальные контракты (`order`, `receipt`, `user`, `nomenclature`, `logistics` кроме `WinnerService`, `mercaux`, `platform`, …) в репозиториях `12stz` не подключены — их серверы и клиенты находятся вне доступного кода.
+
+**Отставание от `v0.9.9`.** Контракты, изменённые в `v0.9.6`–`v0.9.9`, — только `logistics`. Из потребителей в `12stz` его подключает лишь `mobile-monorepo-go` (`v0.8.99`): в его версии нет `IntervalsRequest.sending_address`/`is_return` и `is_return_available` у ПВЗ — для передачи адреса отправки и признака возврата в `Intervals` шлюзу нужно поднять модуль минимум до `v0.9.9`. `esb-monorepo` (`0.6.77`) и монолит `logistics` не используют — изменения их не затрагивают (их собственное отставание по другим контрактам — §8).
 
 ---
 
@@ -150,7 +161,7 @@
 
 ### 6.1. Возврат товара (Возвраты 2.0)
 
-Отдельного сервиса возвратов в контрактах **нет**: поиск `refund`, `return`, `возврат` по `proto/` даёт совпадения только в двух файлах.
+Отдельного сервиса возвратов в контрактах **нет**: поиск `refund`, `return`, `возврат` по `proto/` даёт совпадения в `order.proto`, `receipt.proto` и (с `v0.9.6`) в логистике — `winner.proto`, `pickup_points.proto`, `delivery_type.proto`.
 
 | Что | Где | Комментарий |
 |---|---|---|
@@ -159,6 +170,9 @@
 | Признаки статуса | `order.proto:141-142` (`OrderStatus.is_returned`, `can_be_returned`) | Можно ли вернуть заказ — флаг статуса |
 | Возврат ТК в админке | `order.proto:443-447` (`ReturnTK`: `datetime`, `mode_id`, `mode_name`), `:476` | Только для списка заказов админки |
 | Чек возврата | `receipt.proto:10-11` (`RefundPrepaymentReceipt`, `RefundFullpaymentReceipt`), `RefundRequest` (`:28-33`), `RefundPayment.returnQuid` (`:79-83`) | Монолит вызывает чековый сервис по HTTP, не через этот контракт |
+| Тип доставки для возврата | `delivery_type.proto:76,137,222,256` (`is_return`), фильтр `Suggest` — `:266` | С `v0.9.8` (TNT-2839) |
+| ПВЗ принимает возвраты | `winner.proto:81` (`Filter`), `:107` (`PickupPoint`), `:131` (`PickUpPointsDetailResponse`); `pickup_points.proto:70` | `is_return_available`, с `v0.9.6`/`v0.9.7` (TNT-2712, TNT-2713) |
+| Интервалы курьерского возврата | `winner.proto:232-233` (`IntervalsRequest.sending_address`, `is_return`) | С `v0.9.9` (TNT-2837); адрес — строка, см. [api/logistics-intervals.md](api/logistics-intervals.md) |
 | Методы `v1/delivery/{orderId}/return-method-list` и `return-details` | **нет в контрактах** | Реализованы в `mobile-monorepo-go` поверх монолита, см. [../mobile-monorepo-go/repo-map.md](../mobile-monorepo-go/repo-map.md) §5 |
 
 ### 6.2. Прочее
@@ -166,6 +180,7 @@
 | Что искать | Где |
 |---|---|
 | Расчёт доступной доставки для чекаута | `proto/logistics/winner.proto` |
+| Даты и интервалы курьера (доставка и возврат) | `winner.proto:19` (`Intervals`), `:226-234` (`IntervalsRequest`); разбор — [api/logistics-intervals.md](api/logistics-intervals.md) |
 | Справочники доставки и ограничения | `proto/logistics/*` (§3.3), REST — `swagger/logistics/logistics.swagger.json` |
 | Статусы заказа и позиций в новом сервисе заказов | `order.proto:53-62` (`PositionStatus`), `:123-157` (`StatusGroup`, `OrderStatus`) |
 | Outbox заказов (что и куда отправлено) | `order.proto:308-324` (`Outbox`), `:751-756` (`OutboxService`) |
@@ -193,6 +208,8 @@
 - [ ] Совпадает ли PHP-копия `modules/grpc/` в монолите с текущими `feedbacks.proto`, `mindbox.proto`, `orders.proto` — не сверялось.
 - [ ] `esb-monorepo` сидит на версии `0.6.77` (2023 г.): расхождения с HEAD для его 8 контрактов не проверялись.
 - [ ] Каталог `angular/` и `transports` — используется ли где-то, из кода не видно.
+- [ ] Кто клиент новых полей возврата логистики (`is_return`, `is_return_available`, `sending_address`) — в `12stz` их никто не использует; будет ли `mobile-monorepo-go` поднимать модуль до `v0.9.9`, из кода не видно.
+- [ ] `typescript/index.d.ts` не перегенерирован в `v0.9.6`–`v0.9.9` — намеренно или пропуск, из репозитория не установить.
 
 ---
 
@@ -201,3 +218,4 @@
 | Версия | Дата | Автор | Изменения |
 |---|---|---|---|
 | 1.0 | 14.10.2026 | repository-researcher | Первая версия карты по коммиту `f889483e` (`v0.9.5`): контракты, потребители в `12stz`, поля возврата |
+| 1.1 | 07.11.2026 | repository-researcher | Сверено с `origin/master` `3ee1f5a` (`v0.9.9`): признаки возврата в логистике (TNT-2712, 2713, 2839, 2837) — §3.3, §6.1; версия пакета; TS не перегенерирован (§2); потребители по `origin`-веткам: в `mobile-monorepo-go` восстановлены Orders/Feedbacks/Stores (ECOMDEV-2422), номера строк `grpc_client.go`; Mindbox в монолите (ECOMDEV-2342); отставание потребителей от `v0.9.9` (§4) |

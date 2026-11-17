@@ -4,12 +4,15 @@
 
 **GET /profile/view/{id}** — Просмотр заказа на сайте
 
-Обработчик: `modules/users/controllers/ProfileController::actionView($id)`
-Экстрактор: `modules/users/extractors/UserOrderExtractor::extract()`
+> Сверено 07.11.2026: монолит `dd4a997ac0`, Go `631ac38`, esb `4519218b`, iOS `4f321c86` (шлюзы и iOS к веб-просмотру заказа отношения не имеют).
 
-> Маршрут определён в `config/url.php` строка 23: `/profile/<action>/<id:\d+>` → `users/profile/<action>`.
+Обработчик: `modules/users/controllers/ProfileController::actionView($id)` (`:496`)
+Экстрактор: `modules/users/extractors/UserOrderExtractor::extract()`, позиции — `UserOrderPositionExtractor::extract($position, false)`
+
+> Маршрут определён в `config/url.php:25`: `/profile/<action>/<id:\d+>` → `users/profile/<action>` (строки `:20-23` — частные правила `/profile`, `/profile/subscribe`, `/profile/wishlist`, `/profile/permissions`).
 > Параметр `id` передаётся **частью URL**, а не query-параметром.
-> Альтернативный способ: `/profile/view?hash={hash}` (без `id`, по хешу заказа).
+> Альтернативный способ: `/profile/view?hash={hash}` (без `id`, по хешу заказа; правило `/profile/<action>`, `config/url.php:24`).
+> Контроллер наследует `AbstractRestController`: для AJAX-запросов `runAction()` дописывает к экшену суффикс `-json` и отдаёт JSON — поэтому фронтенд вызывает `/profile/online-orders`, а исполняется `actionOnlineOrdersJson`. У `view` JSON-версии нет — страница только серверная.
 
 ---
 
@@ -18,11 +21,16 @@
 | Система | Метод | Ссылка |
 |---------|-------|--------|
 | Web | `GET /profile/view/{id}` | `modules/users/controllers/ProfileController::actionView()` |
-| Web | `GET /users/profile/orders` | `modules/users/controllers/ProfileController::actionOrders()` — список заказов |
-| Web | `GET /users/profile/online-orders-json` | `modules/users/controllers/ProfileController::actionOnlineOrdersJson()` — JSON-список |
+| Web | `GET /profile/orders` | `modules/users/controllers/ProfileController::actionOrders()` (`:336`) — HTML-страница списка: актуальные (неоплаченные онлайн, с догенерацией ссылки YooMoney) и 5 последних завершённых |
+| Web | `GET /profile/online-orders?limit=5&offset=0` (AJAX) | `ProfileController::actionOnlineOrdersJson()` (`:404`) — JSON-список онлайн-заказов `{total, items}` (`frontend/src/modules/orders/services/OrderService.js:49`) |
+| Web | `GET /profile/offline-orders?limit=5&offset=0` (AJAX) | `ProfileController::actionOfflineOrdersJson()` (`:459`) — офлайн-чеки: `ProfileOrderService::getOfflineOrdersWithFeedbackFlag()` → `OfflineOrderExtractor` → `modules/orders/services/OfflineOrderService::enrichExtractOfflineOrders()` (`OrderService.js:70`) |
+| Web | `GET /profile/seller-orders?limit=5&offset=0` (AJAX) | `ProfileController::actionSellerOrdersJson()` (`:423`) — заказы продавца (только `User::isSeller()`) (`OrderService.js:107`) |
+| Web | `GET /profile/get-order-position?id={id}` (AJAX) | `ProfileController::actionGetOrderPositionJson()` (`:546`) — позиции заказа для отзыва + пункты «что улучшить» (`OrderService.js:120`) |
 | Web | `GET /orders/refund/get-positions?id={id}` | `modules/orders/controllers/RefundController::actionGetPositionsJson()` — позиции для возврата (вызывается по клику «Оформить возврат»). **Разбор эндпоинта: [order-refund-get-positions_web.md](../../../../projects/returns-2.0/as-is/api/order-refund-get-positions_web.md)** |
 | Web | `GET /api/orders/{order_id}/return-method-list` | `src\Modules\Api2\Controller\OrdersController::actionReturnMethodList()` — доступные способы возврата и даты (`available_dates_return`). **Разбор эндпоинта: [order-return-method-list_web.md](order-return-method-list_web.md)** |
-| Web | `POST /api/orders/{order_id}/return-details` | `src\Modules\Api2\Controller\OrdersController::actionReturnDetails()` — сохранение выбранного способа и даты возврата |
+| Web | `POST /api/orders/{order_id}/return-details` | `src\Modules\Api2\Controller\OrdersController::actionReturnDetails()` — сохранение выбранного способа и даты возврата (`config/url.php:234-235`, модуль `api2_new`) |
+
+> **Не путать с новыми сервисами слоя `src/Modules/Order/Services/`:** `OnlineOrderHistoryService` используется в `GET user/{id}/orders` (`src/User/Operation/UserOrdersOp.php`, модуль `userApi`, `HttpBearerAuth`), `OrderEcommerceDataService` — в `modules/orders/controllers/OrdersController` и веб-бронировании (`ReservationOrderWebResponseTransformer`), `src/.../OfflineOrderService` — отдельный класс. Страница `/profile/view/{id}` и JSON-списки ЛК на 07.11.2026 работают на старом слое (`modules/orders/...`, `UserOrderExtractor`, `UserOrderListExtractor`).
 
 ---
 
@@ -35,18 +43,22 @@ sequenceDiagram
     participant WEB as Browser
     participant PC as ProfileController
     participant OPS as OrderProfileService
+    participant OOS as OrderService (modules/orders)
     participant EXT as UserOrderExtractor
-    participant DB as MySQL
+    participant DB as MariaDB
 
     U ->> WEB: Открыть заказ
     WEB ->> PC: GET /profile/view/500127505 → actionView($id)
     activate PC
     PC ->> OPS: getOrderStatusData($id)
-    OPS ->> DB: SELECT * FROM orders WHERE id=? AND user_id=?
+    OPS ->> DB: findOneWithProfileRelationsById(id) — SELECT ... FROM orders WHERE id=? (+ связи профиля)
     activate DB
-    DB -->> OPS: Order + OrderPaymentData DTO
+    DB -->> OPS: Order
     deactivate DB
-    OPS -->> PC: OrderDataDto
+    OPS -->> PC: Order (не найден → Assert → страница 404)
+    PC ->> PC: order.user_id != user.id → ForbiddenHttpException (показывается как 404)
+    PC ->> OOS: getPaymentDataDto($order)
+    OOS -->> PC: OrderPaymentDataDto → OrderDataDto
     PC ->> EXT: extract($orderDataDto)
     activate EXT
     EXT ->> DB: SELECT * FROM order_positions WHERE order_id=?
@@ -96,7 +108,8 @@ sequenceDiagram
 
 ### Примечание
 
-- Дополнительная проверка: `$order->user_id == Yii::$app->user->id` — доступ только к своим заказам.
+- Заказ выбирается **только по `id`** (или `hash`) — `OrderProfileService::getOrderStatusData()` → `OrderRepository::findOneWithProfileRelationsById()`; затем в контроллере проверка `$order->user_id != Yii::$app->user->id` → `ForbiddenHttpException` — доступ только к своим заказам.
+- Доступ к экшену — только авторизованным (`AuthRequiredBehavior`, `ProfileController::behaviors()`), метод — только `GET` (`VerbFilter`).
 - Ответ рендерится как server-side HTML-шаблон (`base` view), не JSON.
 
 ---
@@ -152,7 +165,7 @@ Cookie: _identity=...
 | `status.client_title` | string | Клиентское название статуса | `"Передан в доставку"` |
 | `status.payed` | boolean | Оплачен ли | `true` |
 | `status.feedback` | boolean | Есть ли отзыв | `false` |
-| `status.steps[]` | array | История статусов | `[{name: "Создан", date: "15 Aug"}, ...]` |
+| `status.steps[]` | array | История статусов из `orders_history`: каждый статус один раз (первое вхождение), порядок — обратный (`array_reverse`), дата в формате `j M` | `[{name: "Создан", date: "15 Aug"}, ...]` |
 | `status.rate` | integer\|null | Оценка (если есть отзыв) | `5` |
 
 ### Блок `recipient`
@@ -175,7 +188,7 @@ Cookie: _identity=...
 | `delivery.time_from` | string\|null | Время с | `"10:00"` |
 | `delivery.time_to` | string\|null | Время до | `"18:00"` |
 | `delivery.track_link` | string\|null | Ссылка на трекинг | `"https://..."` |
-| `delivery.track_number` | string\|null | Трек-номер | `"777123456789"` |
+| `delivery.track_number` | string\|null | Трек-номер; `null`, если ТК — самовывоз из магазина (`PickupHelper::isSelfPickupTkType`) | `"777123456789"` |
 
 ### Блок `payment`
 
@@ -191,7 +204,7 @@ Cookie: _identity=...
 | `cost.return_price` | float | Сумма возврата | `0` |
 | `cost.delivery_cost` | float | Стоимость доставки | `300.00` |
 | `cost.discount` | float | Скидка | `500.00` |
-| `cost.total_payable` | float | К оплате | `1800.00` |
+| `cost.total_payable` | float | К оплате: `OrderPaymentDataDto::getTotalPayable()` минус сумма сертификатов | `1800.00` |
 | `cost.bonuses` | integer | Начисленные бонусы | `150` |
 | `cost.giftcardsAmount` | float | Сумма сертификатов | `0` |
 
@@ -212,7 +225,7 @@ Cookie: _identity=...
 | `positions[].colors[].hash` | string | HEX-код | `"#000000"` |
 | `positions[].colors[].label` | string | Название | `"Чёрный"` |
 | `positions[].colors[].circle_color` | string | Цвет кружка | `"#FFFFFF"` |
-| `positions[].url` | string | URL товара | `"https://12storeez.com/catalog/platya/plamya"` |
+| `positions[].url` | string | URL товара (`catalog/{категория}/{slug}`; на странице заказа без `?experiment=` — `extract($position, false)`; при ошибке — `""`) | `"https://12storeez.com/catalog/platya/plamya"` |
 | `positions[].image_site_url` | string | URL изображения | `"https://cdn.12storeez.com/..."` |
 | `positions[].is_click_and_collect` | boolean | Click & Collect | `false` |
 | `positions[].price` | integer | Цена со скидкой | `1200` |
@@ -309,14 +322,7 @@ Cookie: _identity=...
 
 ## Пример ответа с ошибкой
 
-```json
-{
-  "status": "error",
-  "message": "Заказ не найден или нет доступа",
-  "code": "ORDER_NOT_FOUND",
-  "errors": []
-}
-```
+JSON-ошибки у страницы нет. Заказ не найден (`Webmozart\Assert` → `InvalidArgumentException`) или чужой заказ (`ForbiddenHttpException`) перехватываются в `AbstractRestController::runAction()` и для обычного (не AJAX) запроса отдаются как **HTML-страница 404** (`self::_404()`). Ранее приведённый JSON `{"status":"error","code":"ORDER_NOT_FOUND",...}` в коде не встречается.
 
 ---
 
@@ -411,7 +417,7 @@ deadline_create = orders.end_date + 14 календарных дней
 | `delivery.track_number` | string | `track_number` | varchar(255) NULL | Трек-номер |
 | `cost.giftcardsAmount` | float | — | — | Вычисляется через GiftcardsService |
 | `cost.total_cost` | float | — | — | Вычисляется из order_positions |
-| `cost.total_payable` | float | `sum` | decimal(10,2) | Итоговая сумма |
+| `cost.total_payable` | float | `sum` | decimal(10,2) | Итоговая сумма (через `OrderPaymentDataDto`) минус сертификаты |
 | `cost.delivery_cost` | float | `delivery_price` | decimal(10,2) NULL | Стоимость доставки |
 | `cost.bonuses` | integer | `given_bonus` | int(11) | Начисленные бонусы |
 | `status.show_payment_button` | boolean | `status`, `payment_status` | — | Вычисляется canBePayed() |
@@ -514,3 +520,4 @@ deadline_create = orders.end_date + 14 календарных дней
 | 1.4 | 07.09.2026 | Системный аналитик | Зафиксирована разная логика банковских реквизитов (web `need_bank_details` vs mobile `is_bank_data_required`); добавлена ссылка на разбор эндпоинта `GET /orders/refund/get-positions` (`order-refund-get-positions_web.md`); файл перенесён в `requirements/web/` |
 | 1.5 | 07.09.2026 | Системный аналитик | AS-Israel: `status.show_refund_button` — зафиксирована формула (`end_date + N days`) и источник `days_can_be_returned` из БД |
 | 1.6 | 11.09.2026 | Системный аналитик | Файл перенесён в `requirements/reference/api/web/` — AS-IS API-контракты по каналам вынесены из бандлов процессов в сквозной справочник |
+| 1.7 | 07.11.2026 | Системный аналитик | Сверено с монолитом `dd4a997ac0`: маршрут `config/url.php:25` (было `:23`); исправлены URL списков (`/profile/orders`, AJAX `/profile/online-orders` → `*Json` через суффикс `-json` в `AbstractRestController`), добавлены `offline-orders`, `seller-orders`, `get-order-position`; выборка заказа только по `id` + проверка владельца в контроллере; ошибка — HTML 404, а не JSON; уточнены `steps`, `track_number`, `total_payable`, `url`; пояснено, что `OnlineOrderHistoryService` / `OrderEcommerceDataService` к этой странице не относятся |

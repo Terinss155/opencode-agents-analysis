@@ -1,5 +1,10 @@
 # Бизнес-домены
 
+> Сверено с `origin/develop` `dd4a997ac0`, 07.11.2026 (пути, флоу создания заказа, счётчики).
+> Изменения сверки: исправлен флоу создания заказа (сайт не использует `CreateOrderServiceSite`,
+> события перечислены по каналам), добавлены веб-бронирование, `src/User` (userApi), SMS-авторизация МП,
+> пересчитаны объёмы доменов и флагов.
+
 Для каждого домена указано, где лежит код, какие перечисления определяют поведение и как
 распределена логика между стеками.
 
@@ -96,7 +101,7 @@ MODE_RESERVATION    = 'reservation'       // резерв в магазине
 | Область | Путь |
 |---|---|
 | Модель корзины (общая) | `modules/cart/models/Cart.php` |
-| Базовая логика | `src/Modules/Cart/Service/AbstractCartService.php` (~2600 строк) |
+| Базовая логика | `src/Modules/Cart/Service/AbstractCartService.php` (~2750 строк) |
 | Реализации режимов | `CartService/CartService.php`, `ExpressCartService.php`, `PreorderCartService.php`, `ShopCartService.php` — все в `src/Modules/Cart/Service/`; `ReservationCartService.php` — в другом модуле, `src/Modules/Reservation/Service/`, импортируется в `CartServiceFactory` |
 | Web API | `src/Modules/Cart/Controllers/CartApiController.php`, `CartDeliveryController.php`, `CartPaymentController.php` |
 | Mobile API | `src/Modules/Mobile/Controllers/Cart*.php` |
@@ -120,8 +125,8 @@ MODE_RESERVATION    = 'reservation'       // резерв в магазине
 6. Список способов оплаты — `CartPaymentTypeService::getPaymentFilters()` фильтрует по службе
    доставки, сумме заказа и платформе через 12 классов-фильтров (`src/Modules/Cart/Filter/Payment/`);
    `CartPaymentServiceFactory` выбирает не фильтры, а конкретный `CartPaymentService*` под режим
-   корзины. Рядом в `src/Modules/Cart/Filter/Delivery/` — фильтры доставки; всего в каталоге
-   `Filter/` 25 файлов, включая абстрактные классы и интерфейсы.
+   корзины. Рядом в `src/Modules/Cart/Filter/Delivery/` — 10 фильтров доставки; всего в каталоге
+   `Filter/` 26 файлов (12 + 10 + 2 абстрактных класса + 2 интерфейса).
 
 ## Заказы
 
@@ -131,13 +136,16 @@ MODE_RESERVATION    = 'reservation'       // резерв в магазине
 |---|---|
 | Модель (современная) | `src/Modules/Order/Model/Order.php` |
 | Модель (легаси) | `modules/orders/models/Order.php` |
-| Создание | `src/Modules/Order/Services/CreateOrder/` — `AbstractCreateOrderService`, `CreateOrderServiceSite`, `CreateOrderServiceMobile`, `CreateReservationServiceMobile` |
-| Сборка DTO | `src/Modules/Order/Builder/CreateOrderDtoBuilderSite.php`, `CreateOrderDtoBuilderMobile.php` |
-| Валидация | `src/Modules/Order/Validators/CreateOrderCartSiteValidator.php`, `CreateOrderCartMobileValidator.php` |
-| Основной сервис | `src/Modules/Order/Services/OrderService.php` |
-| Побочные эффекты | `src/Modules/Order/AfterSaveEvent/` (26 классов) |
+| Создание (сайт, обычный заказ) | `modules/orders/controllers/OrdersController.php` — `proceed()` (`:216`) → `createOrderForCart()` → `CartOrderCreateDtoPrepareService` + `OrderService::createOrder()` (`:360`); отдельного сервиса нет |
+| Создание (МП и брони) | `src/Modules/Order/Services/CreateOrder/` — `AbstractCreateOrderService`, `CreateOrderServiceMobile`, `AbstractCreateReservationService`, `CreateReservationServiceMobile`, `CreateReservationServiceSite` (веб-бронирование, ECOMDEV-2222) |
+| Мёртвый код | `CreateOrderServiceSite` — нигде не вызывается (подтверждено и в `openspec/changes/archive/2026-10-06-ecomdev-2222-web-reservation-order/design.md`) |
+| Сборка DTO | `src/Modules/Order/Services/CartOrderCreateDtoPrepareService.php` (сайт, Mercaux/QR); `src/Modules/Order/Builder/CreateOrderDtoBuilderMobile.php` (МП), `CreateOrderDtoBuilderSite.php` (только веб-бронирование) |
+| Валидация | сайт — приватные `validateCartData()`/`cartValidate()` в самом `OrdersController`; МП — `src/Modules/Order/Validators/CreateOrderCartMobileValidator.php`; `CreateOrderCartSiteValidator.php` используется только `CreateReservationServiceSite` |
+| Основной сервис | `src/Modules/Order/Services/OrderService.php` (`createOrder()` — `:105`) |
+| Побочные эффекты | `src/Modules/Order/AfterSaveEvent/` (26 файлов: 25 событий + `AbstractSendCancelToYandexEvent`); набор событий задаёт вызывающий код |
 | Web-контроллер | `modules/orders/controllers/OrdersController.php` |
 | Mobile-контроллер | `src/Modules/Mobile/Controllers/OrdersController.php` |
+| Веб-бронирование | `src/Modules/Reservation/Controller/ReservationController.php` → `Operation/CreateOrderOp` → `CreateReservationServiceSite` (`POST reservation`, `config/url.php:288`) |
 | Синхронизация с RCRM | `src/Modules/Rcrm/Service/RcrmOrderCreateService.php`, `RcrmOrderUpdateService.php` |
 | Статусы для админки | `modules/statuses/` |
 
@@ -185,22 +193,34 @@ sequenceDiagram
     FE->>V: запрос создания заказа
     V->>V: проверка корзины и остатков
     V->>B: сборка OrderCreateDto
-    B->>OS: createOrder(dto)
-    OS->>DB: транзакция: заказ + позиции + списание остатков
+    B->>OS: createOrder(dto, ExternalServiceSendingDto, события)
+    OS->>DB: транзакция: заказ + позиции + orderBeforeSave
     DB-->>OS: commit
-    OS->>ER: побочные эффекты (26 обработчиков)
+    OS->>ER: AfterSaveEvent — набор от вызывающего (5–10 событий)
     OS->>OB: запись в outbox: Mindbox, 1С, RCRM
     OS->>FE: ответ с данными оплаты
 ```
 
-Различия между каналами:
+Списания остатков внутри транзакции нет (в `OrderService::createOrder()` — TODO-комментарий);
+буфер остатков обновляет событие `UpdateQuantityBufferEvent` после коммита. Outbox пишется
+после событий, по целям из `ExternalServiceSendingDto` (`rcrm`, `onec`, `mindbox`).
 
-- **Сайт** — `modules/orders/controllers/OrdersController`, подготовка DTO через
-  `CartOrderCreateDtoPrepareService`, при онлайн-оплате редирект на `/order/payment/{hash}`.
-- **Мобильные приложения** — `CreateOrderServiceMobile`, ответ формирует
-  `OrderCreateResponseTransformer` и включает `payment.send` (токен YooKassa) либо `payment_url`.
+Различия между каналами (набор `AfterSaveEvent` передаёт вызывающий код):
 
-Обе ветки вызывают один и тот же `OrderService::createOrder()`.
+| Канал | Вход | Сервис | События |
+|---|---|---|---|
+| Сайт | `POST order/proceed-new` (а также `proceed-preorder`, `proceed-from-shop`) → `OrdersController::proceed()` | `CartOrderCreateDtoPrepareService` + `OrderService::createOrder()` напрямую (`OrdersController.php:360`) | 5: `UpdateOrdersCounter`, `UpdateQuantityBuffer`, `ReindexStocksByProductIds`, `UpdateOrderStatusTimer`, `LockGiftcard` |
+| МП, новый | `POST mobile/orders` (в Go-шлюзе — `POST v1/orders`) → `Mobile\OrdersController::actionIndex()` → `createOrder()` (`:235`) | `CreateOrderServiceMobile` (`:132-141`) | 10: те же счётчик/буфер/переиндексация/таймер/сертификаты + `UpdateUserDataFromOrder`, `DismissPromoCode`, `PushRoistatAnalytics`, `PushCreateOrderShopStocksJob`, `PushMindboxUpdateOrderGivenBonuses` |
+| МП, старый | `PUT mobile/orders` → `proceedOrder()` → `createOrderForCart()` (`:688`) | `OrderService::createOrder()` напрямую (`:731`) | 5 — как у сайта |
+| Брони (сайт и МП) | `POST reservation` / `POST mobile/reservation` | `CreateReservationServiceSite` / `CreateReservationServiceMobile` | 9 (`AbstractCreateReservationService::getAfterSaveEventsDto()`), в т.ч. `ReservationExpirationEvent` |
+
+- **Сайт** — при онлайн-оплате редирект на `/order/payment/{hash}`; заказы бронирования
+  (`$cart->getIsReservation()`) через `proceed()` не создаются — для них отдельный `POST reservation`.
+- **Мобильные приложения** — ответ формирует `src/Modules/Mobile/Transformer/OrderCreateResponseTransformer.php`
+  и включает `payment.send` (токен YooKassa) либо `payment_url`.
+
+Все ветки в итоге вызывают один и тот же `OrderService::createOrder()`, но с разными наборами событий —
+это источник расхождений между каналами.
 
 ### Синхронизация с внешними системами
 
@@ -276,7 +296,7 @@ ATOL — не платёжный провайдер, а фискализация
 | Гео | `src/Modules/Delivery/Service/GeoService.php`, `LocationService.php` |
 | Адреса | `modules/users/models/Address.php` |
 | Самовывоз | `src/Modules/Delivery/Helper/PickupHelper.php` |
-| Интервалы | через микросервис BFB (`MonolithBfbMsClient`) |
+| Интервалы | через микросервис BFB (`modules/common/client/MonolithBfbMsClient.php`, вызывается из `src/Modules/Delivery/Service/DeliveryService.php`); мобильные эндпоинты v1 `delivery/intervals`, `delivery/taxes`, `locations/geo` и `TaxRepository` удалены в ECOMDEV-2180 |
 
 ```php
 // src/Modules/Delivery/Enum/OrderTypeEnum.php
@@ -297,7 +317,13 @@ ORDER = 0, CNC = 1, PREORDER = 2
 | JWT | `src/Auth/Service/JwtService.php`, `AuthMethod/JwtHttpBearerAuthMethod.php` |
 | Сервис авторизации | `src/Modules/Auth/Service/AuthService.php` |
 | Мобильные сессии | `modules/mobile/models/UserMobileSession.php`, `src/Modules/Mobile/Services/MobileSessionService.php` |
+| Вход МП по коду из SMS | `src/Modules/Mobile/Controllers/UserController::actionAuthPhoneCode` (`:349`, `/mobile/user/auth-phone-code`); клиенты `src/Auth/Client/MindboxPhoneCodeClient.php` / `LocalPhoneCodeClient.php` (выбор по окружению в `config/common.php:341`) — ECOMDEV-2342 |
+| Устройства МП в Mindbox | `src/Integration/Mindbox/` (`MindboxMobileDeviceService`, `MindboxMobileClient`) — события асинхронно через очередь `mindbox.mobile-device.v1.command`, `removeDevice` для МП убран (ECOMDEV-2342); прежний `src/Modules/Mobile/Services/MobileMindboxAuthService.php` удалён |
 | Легаси-токены API | `modules/api2/auth/HttpBearerAuth.php` |
+| API пользователей для внешних систем | `src/User/Controller/UserApiController.php` (Yii ID `userApi`): `GET user/search`, `GET user/{id}/orders`, `POST user/create`, `PATCH user/{id}` (`config/url.php:142-145`), авторизация `HttpBearerAuth` |
+| Права пользователя | `src/User/Controller/ProfileController::actionPermissions` → `/profile/permissions` (ECOMDEV-2182) |
+| Активности пользователя | `src/Modules/User/Service/UserActivitiesService.php`, `Repository/UserActivitiesRepository.php`, `Models/UserActivityModel.php` — перенесено из удалённого `modules/userActivities` (ECOMDEV-2310) |
+| Последний контекст | `src/Modules/Mainpage/Service/LastContextService.php`: сайт — `POST /home/last-context` (`MainpageController::actionLastContext`, `:168`), МП — `GET/PUT mobile/user/last-context` (`Mobile\UserController::actionLastContext`, `:929`) |
 | Бонусы | `modules/bonuses/models/Bonus.php`, `modules/mindbox/services/MindboxBonusService.php` |
 | Подписки | `modules/subscription/`, `src/Modules/Subscription/` |
 
@@ -320,7 +346,7 @@ ORDER = 0, CNC = 1, PREORDER = 2
 | Контентные страницы | `modules/content/` — `ContentController`, `AboutController`, `ShowroomsController` |
 | Лендинги (легаси) | `modules/home/` — `LandingPageController` + PHP-шаблоны |
 | Главная (современная) | `src/Modules/Mainpage/` |
-| Баннеры и блоки | `modules/blocks/` |
+| Баннеры и блоки | `modules/blocks/` (админки «Блок категорий» `BlockCategory*` в `modules/catalog/` и «MOBILE Баннер» в `modules/mobile/` удалены в ECOMDEV-2228) |
 | Лукбук | `modules/lookbook/`, `src/Modules/Lookbook/` |
 | Блог, новости, вакансии, уход | соответствующие модули |
 
@@ -346,7 +372,7 @@ ORDER = 0, CNC = 1, PREORDER = 2
 
 | Компонент | Путь |
 |---|---|
-| Перечисление алиасов | `src/Modules/Common/Enum/Parameters.php` — 47 констант |
+| Перечисление алиасов | `src/Modules/Common/Enum/Parameters.php` — 52 константы (новые, напр., `early_access_vic_only` — ECOMDEV-2460, `mindbox_integration_enabled`) |
 | Категории | `src/Modules/Common/Enum/ParameterCategoryEnum.php` — `cart`, `catalog`, `home`, `integrations`, `menu`, `orders`, `processing` |
 | Хранение | таблица `parameters`, модель `modules/cms/models/Parameter.php` |
 | Админка | `ParameterBackendController` с валидацией по JSON-схеме |
@@ -380,7 +406,7 @@ ORDER = 0, CNC = 1, PREORDER = 2
 Мобильные параметры дополнительно описаны в `src/Modules/Mobile/Enum/AndroidParametersEnum.php`
 и перечислениях `MobileV2`.
 
-**Важно:** количество чтений (`valueOf` вызывается 233 раза в 111 файлах) заметно больше
+**Важно:** количество чтений (`valueOf` вызывается 248 раз в 120 файлах) заметно больше
 числа объявленных констант — часть флагов читается строковым алиасом мимо enum.
 См. [09-pitfalls.md](09-pitfalls.md).
 
@@ -391,9 +417,10 @@ ORDER = 0, CNC = 1, PREORDER = 2
 
 | Домен | Где код | Объём | Что делает |
 |---|---|---|---|
-| Отзывы (Feedback) | `modules/feedback/` (легаси, включает `console/controllers/dto/forms/repository`), `src/Modules/Feedback/` | 70 + 13 файлов | Сбор и модерация отзывов о заказе/товаре/магазине; синхронизация через `Feedbacks\MobileClient` (gRPC-стаб, см. [05-api.md](05-api.md)) |
+| Отзывы (Feedback) | `modules/feedback/` (легаси, включает `console/controllers/dto/forms/repository`), `src/Modules/Feedback/` | 59 + 13 файлов | Сбор и модерация отзывов о заказе/товаре/магазине; синхронизация через `Feedbacks\MobileClient` (gRPC-стаб, см. [05-api.md](05-api.md)) |
 | Синхронизация с 1С (OneC) | `src/Modules/OneC/` (Dto, Transformer, Enum, Controller, Configurator, Service, Client) | 35 файлов | Обмен номенклатурой, остатками, заказами и сертификатами по SOAP; см. [08-integrations.md](08-integrations.md) |
 | A/B-тестирование | `modules/abTest/` (models, controllers, services, repositories) | 16 файлов | Управление вариантами экспериментов через админку, таблицы `ab_test`/`ab_test_variant` |
-| Резерв в магазине (Reservation) | `src/Modules/Reservation/` (Dto, Model, Service, Validator, Repository) | 14 файлов | Отдельный домен для режима `MODE_RESERVATION`: `ReservationCartService`, `OrderReservationExpiration`, флоу оплаты при получении |
-| Маркетинг | `modules/marketing/` (легаси), `src/Modules/Marketing/` | 10 + 4 файла | Промо-механики, вспомогательные экстракторы |
+| Резерв в магазине (Reservation) | `src/Modules/Reservation/` (Controller, Operation, Dto, Model, Service, Validator, Repository, Exception); Yii ID `reservation` | 34 файла | Отдельный домен для режима `MODE_RESERVATION`: `ReservationCartService`, `OrderReservationExpiration`, флоу оплаты при получении. С ECOMDEV-2195/2197/2207/2222 — веб-бронирование: `ReservationController` (`POST reservation/cart`, `GET reservation/expiration`, `GET reservation/instructions`, `POST reservation` — `config/url.php:285-288`); МП — `src/Modules/Mobile/Controllers/ReservationController.php` (`config/url.php:280-284`) |
+| Маркетинг | `modules/marketing/` (легаси), `src/Modules/Marketing/` | 14 + 4 файла | Промо-механики, вспомогательные экстракторы |
+| Скидки (новый слой) | `src/Modules/Discount/` | 2 файла | `DiscountService`, `DiscountRepository` — в `develop` после 07.10.2026 (ECOMDEV-1655), легаси-логика остаётся в `modules/discounts/` |
 | Wishlist (современный) | `src/Modules/Wishlist/` | 3 файла | `WishlistService`, `WishlistController` — используется наравне с легаси `modules/wishlist/` |

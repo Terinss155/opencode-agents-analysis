@@ -7,7 +7,7 @@
 | **Владелец решения** | Не определён; озвучила Project Manager — Катя Тихомирова |
 | **Область** | Архитектура / Данные |
 | **Версия** | v2 |
-| **Предыдущая версия** | [[2026-09-24 15-01] ADR-RET-018-return-master-system-v1.md](<./[2026-09-24 15-01] ADR-RET-018-return-master-system-v1.md>) |
+| **Предыдущая версия** | [[2026-09-24 15-01] ADR-RET-018-return-master-system-v1.md](<./archive/[2026-09-24 15-01] ADR-RET-018-return-master-system-v1.md>) |
 | **Заменяет** | ADR-RET-018 |
 
 ## Контекст
@@ -53,7 +53,7 @@
 
 ## Связанные артефакты
 
-- `ADR-RET-018` — [предыдущая версия](<./[2026-09-24 15-01] ADR-RET-018-return-master-system-v1.md>).
+- `ADR-RET-018` — [предыдущая версия](<./archive/[2026-09-24 15-01] ADR-RET-018-return-master-system-v1.md>).
 - Статусы заявки — [диаграмма состояний](../diagrams/state/return-status_state.md).
 
 ## История изменений

@@ -7,7 +7,7 @@
 | **Владелец решения** | Product Manager — Катя Филатова; Acting Head of Transport Logistics — Артём Лисин; участники: System Analyst (BTS) — Елена Васильева, System Analyst — Катя Лемешева |
 | **Область** | Продукт / Логистика |
 | **Версия** | v2 |
-| **Предыдущая версия** | [[2026-10-14 15-00] ADR-RET-063-courier-date-range-v1.md](<./[2026-10-14 15-00] ADR-RET-063-courier-date-range-v1.md>) |
+| **Предыдущая версия** | [[2026-10-14 15-00] ADR-RET-063-courier-date-range-v1.md](<./archive/[2026-10-14 15-00] ADR-RET-063-courier-date-range-v1.md>) |
 | **Заменяет** | ADR-RET-063 |
 
 ## Контекст
@@ -67,7 +67,7 @@
 
 ## Связанные артефакты
 
-- `ADR-RET-063` — [предыдущая версия](<./[2026-10-14 15-00] ADR-RET-063-courier-date-range-v1.md>).
+- `ADR-RET-063` — [предыдущая версия](<./archive/[2026-10-14 15-00] ADR-RET-063-courier-date-range-v1.md>).
 - `ADR-RET-076` — [интервал курьерского возврата СДЭК](<./[2026-10-20 15-29] ADR-RET-076-cdek-return-courier-interval-v1.md>).
 - US 1.3 — [User Story](../user-story/user-story-mvp.md).
 

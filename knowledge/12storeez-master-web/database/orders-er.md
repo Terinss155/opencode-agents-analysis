@@ -13,6 +13,8 @@
 - Для большинства дочерних таблиц связь показана как `cms_orders.id = <table>.order_id`.
 - Для `cms_promo_codes` связь обратная: `cms_orders.promo_code_id = cms_promo_codes.id`.
 - Кардинальности в Mermaid предварительные и отражают логическую модель. Их при необходимости можно уточнить отдельно.
+- **Сверено с `origin/develop` `dd4a997ac0`, 07.11.2026** — по моделям (`src/Modules/Order/Model/Order.php`, `modules/orders/models/OrderPosition.php`, `src/Modules/Order/Model/OfflineOrder*.php`, `src/Modules/Reservation/Model/OrderReservationExpiration.php`, `modules/statuses/models/MbStatusesMap.php`) и миграциям `migrations/`; БД не запрашивалась. Результат сверки — в разделе «История изменений».
+- Каждое изменение колонок `cms_orders` / `cms_order_positions` в миграциях дублируется в `cms_orders_history` / `cms_order_positions_history`, после чего пересоздаются триггеры истории (`OrderService::updateTriggers()`). Таблицы истории на диаграмме не показаны.
 
 ```mermaid
 erDiagram
@@ -38,14 +40,18 @@ erDiagram
     cms_orders ||--o{ cms_order_return_positions : "cms_order_return_positions.order_id = cms_orders.id"
     cms_orders ||--o| cms_order_free_delivery_snapshots : "cms_order_free_delivery_snapshots.order_id = cms_orders.id"
     cms_orders ||--o{ cms_users_activities : "cms_users_activities.order_id = cms_orders.id"
+    cms_orders ||--o{ cms_offline_orders : "cms_offline_orders.order_id = cms_orders.id"
+    cms_offline_orders ||--o{ cms_offline_order_positions : "cms_offline_order_positions.offline_order_id = cms_offline_orders.id"
+    cms_orders ||--o| cms_offline_order_retry_queue : "cms_offline_order_retry_queue.order_id = cms_orders.id"
+    cms_orders ||--o| cms_order_reservation_expiration : "cms_order_reservation_expiration.order_id = cms_orders.id"
 
     cms_order_positions ||--o{ cms_order_return_positions : "cms_order_return_positions.position_id = cms_order_positions.id"
     cms_order_statuses ||--o{ cms_orders : "cms_orders.status = cms_order_statuses.internal_id"
     cms_order_position_statuses ||--o{ cms_order_positions : "cms_order_positions.status = cms_order_position_statuses.internal_id"
     cms_order_statuses_wms ||--o{ cms_orders : "cms_orders.status_wms = cms_order_statuses_wms.code"
     cms_order_return_statuses_wms ||--o{ cms_orders : "cms_orders.return_status_wms = cms_order_return_statuses_wms.code"
-    cms_order_statuses ||--o{ cms_mb_statuses_map : "cms_mb_statuses_map.order_status_id = cms_order_statuses.id"
-    cms_order_position_statuses ||--o{ cms_mb_statuses_map : "cms_mb_statuses_map.order_position_status_id = cms_order_position_statuses.id"
+    cms_order_statuses ||--o{ cms_mb_statuses_map : "cms_mb_statuses_map.order_status_id = cms_order_statuses.internal_id"
+    cms_order_position_statuses ||--o{ cms_mb_statuses_map : "cms_mb_statuses_map.order_position_status_id = cms_order_position_statuses.internal_id"
     cms_return_reasons_groups ||--o{ cms_return_reasons : "cms_return_reasons.group_id = cms_return_reasons_groups.id"
     cms_return_reasons ||--o{ cms_return_reasons_content : "cms_return_reasons_content.parent_id = cms_return_reasons.id"
     cms_return_reasons ||--o{ cms_orders : "cms_orders.return_reason = cms_return_reasons.code"
@@ -61,16 +67,16 @@ erDiagram
         string status_tbank_dolyami
         bigint lamoda_id
         string lamoda_last_status
-        int status_alpha
-        int status_split
-        int status_yandex_pay
-        int status_yandex_sbp
+        string status_alpha
+        string status_split
+        string status_yandex_pay
+        string status_yandex_sbp
         bigint user_id
         datetime created_at
         decimal promo
         decimal sum
         decimal discount_sum
-        decimal discount_val
+        int discount_val
         decimal discount_manual
         decimal discount_promo
         decimal discount_bonus
@@ -271,6 +277,7 @@ erDiagram
         string size_title_ru
         string size_title_en
         string last_change_source
+        string experiment
         int is_preorder
         bigint pickup_point_id
         int is_click_and_collect
@@ -619,6 +626,49 @@ erDiagram
         string title
     }
 
+
+    cms_offline_orders {
+        int id PK
+        int order_id FK
+        string receipt_guid
+        decimal total_sum
+        int given_bonus
+        timestamp created_at
+        timestamp updated_at
+    }
+
+
+    cms_offline_order_positions {
+        int id PK
+        int offline_order_id FK
+        bigint barcode
+        string article
+        string title
+        string color
+        string size
+        int qty
+        decimal price
+        decimal discount
+        int row_receipt
+    }
+
+
+    cms_offline_order_retry_queue {
+        int id PK
+        int order_id FK
+        int retry_count
+        timestamp next_retry_at
+        timestamp created_at
+    }
+
+
+    cms_order_reservation_expiration {
+        int id PK
+        int order_id FK
+        timestamp expires_at
+        timestamp created_at
+    }
+
 ```
 
 ## Таблицы на диаграмме
@@ -651,6 +701,10 @@ erDiagram
 26. `cms_return_reasons_content` — локализованный/дополнительный контент причины возврата; связывается с причиной через `parent_id`.
 27. `cms_order_statuses_wms` — справочник WMS-статусов заказа: `id`, символьный `code` и название `title`; `cms_orders.status_wms` маппится на `code`.
 28. `cms_order_return_statuses_wms` — справочник WMS-статусов возврата: `id`, символьный `code` и название `title`; `cms_orders.return_status_wms` маппится на `code`. Фактическое использование требует дополнительной проверки, так как заполненные значения `return_status_wms` в просмотренных записях `cms_orders` не обнаружены.
+29. `cms_offline_orders` — офлайн-чек, привязанный к заказу (`m260416_115248_add_receipt_logic_to_orders_and_other`): GUID чека, сумма покупки, начисленные бонусы; `receipt_guid` уникален. Модель `src/Modules/Order/Model/OfflineOrder.php`; заполняется консьюмером `src/Modules/Order/Console/OfflineOrderController.php` (`actionCreate`, повтор — `actionRetry`). В этой же миграции в `cms_orders` / `cms_orders_history` добавлена колонка `receipt_guid`.
+30. `cms_offline_order_positions` — позиции офлайн-чека (баркод, артикул, название, цвет, размер, количество, цена, скидка, номер строки чека); внешний ключ `offline_order_id → cms_offline_orders.id` с `CASCADE`. Модель `src/Modules/Order/Model/OfflineOrderPosition.php`.
+31. `cms_offline_order_retry_queue` — очередь повторных попыток создания офлайн-заказа (`m260420_122824_add_offline_order_retry_queue_table`): число попыток, время следующей попытки. Модель `src/Modules/Order/Model/OfflineOrderRetryQueue.php`, репозиторий `OfflineOrderRetryQueueRepository`.
+32. `cms_order_reservation_expiration` — срок истечения брони для заказа-брони (`m260417_150054_1339_add_order_reservation_expiration_table`): `expires_at`, индекс `idx_order_id`. Модель `src/Modules/Reservation/Model/OrderReservationExpiration.php`, используется `ReservationExpirationService`.
 
 ## Связи таблиц
 
@@ -682,6 +736,17 @@ cms_giftcard_sell.order_id = cms_orders.id
 cms_order_return_positions.order_id = cms_orders.id
 cms_order_free_delivery_snapshots.order_id = cms_orders.id
 cms_users_activities.order_id = cms_orders.id
+cms_offline_orders.order_id = cms_orders.id
+cms_offline_order_retry_queue.order_id = cms_orders.id
+cms_order_reservation_expiration.order_id = cms_orders.id
+```
+
+> Для `cms_offline_orders`, `cms_offline_order_retry_queue`, `cms_order_reservation_expiration` внешний ключ на `cms_orders` в миграциях не создан — связь логическая (код ищет заказ по `order_id` через `OrderRepository::findOne()`).
+
+### Связи офлайн-чеков
+
+```text
+cms_offline_order_positions.offline_order_id = cms_offline_orders.id
 ```
 
 ### Связи оплат, чеков и фискальных документов
@@ -702,15 +767,17 @@ cms_order_return_positions.order_id = cms_orders.id
 
 ```text
 cms_orders.status = cms_order_statuses.internal_id
-cms_mb_statuses_map.order_status_id = cms_order_statuses.id
+cms_mb_statuses_map.order_status_id = cms_order_statuses.internal_id
 ```
 
 ### Связи статусов позиций заказа
 
 ```text
 cms_order_positions.status = cms_order_position_statuses.internal_id
-cms_mb_statuses_map.order_position_status_id = cms_order_position_statuses.id
+cms_mb_statuses_map.order_position_status_id = cms_order_position_statuses.internal_id
 ```
+
+> Сопоставление `cms_mb_statuses_map` идёт по `internal_id`, а не по `id`: `MbStatusesMap::getOrderStatus()` / `getPositionStatus()` — `hasOne(..., ['internal_id' => 'order_status_id'])` и `['internal_id' => 'order_position_status_id']` (`modules/statuses/models/MbStatusesMap.php:62`, `:67`).
 
 ### Связи WMS-статусов
 
@@ -728,4 +795,10 @@ cms_orders.return_reason = cms_return_reasons.code
 cms_return_reasons.group_id = cms_return_reasons_groups.id
 cms_return_reasons_content.parent_id = cms_return_reasons.id
 ```
+
+## История изменений
+
+| Дата | Изменение |
+|---|---|
+| 07.11.2026 | Сверено с `origin/develop` `dd4a997ac0` по моделям и миграциям. Исправлено: связь `cms_mb_statuses_map` со справочниками статусов — по `internal_id`, а не по `id`; типы `status_alpha`, `status_split`, `status_yandex_pay`, `status_yandex_sbp` — строки (миграции `m250904_130123`, `m260520_121200`, `m260625_170000`, модель), `discount_val` — `integer` (`m251120_122828`, «Разовая скидка (руб)»). Добавлено: `cms_order_positions.experiment` (`m260916_120000_ecomdev_2105_orders_and_mobile_toggle`, вариант АБ-теста ECOMDEV-1821, заполняется в `OrderPositionBuilder.php:100` из позиции корзины); таблицы `cms_offline_orders`, `cms_offline_order_positions`, `cms_offline_order_retry_queue`, `cms_order_reservation_expiration`; примечание о таблицах истории. Из 12 миграций после `be3cd759d2` ни одна не меняет таблицы заказов. Не проверено: `is_customization` есть только в docblock моделей `Order` (миграции нет, в коде не используется) — на диаграмму не добавлен; поля базовой схемы (до первой миграции в репозитории) по миграциям не подтверждаются; из них `cms_order_positions.is_added_after_pay` в коде `origin/develop` не встречается вовсе, `pickup_point_id` — только в `OrderPositionHistory` и FK `fk_order_positions_pickup_point_id` в `OrderPositionRepository.php:91-103`, `dl_version` — в правилах модели и как якорь `after('dl_version')` в `m250423_090234`. |
 

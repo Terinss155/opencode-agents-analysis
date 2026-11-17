@@ -1,0 +1,451 @@
+openapi: 3.0.3
+info:
+  title: Возвраты — обмен 1С → сайт
+  version: '0.1.0'
+  description: |
+    Методы, которыми 1С передаёт на сайт изменения заявки на возврат. Только поля заявки на возврат;
+    поля заказа не передаются.
+
+    Основание: модель данных заявки — ECOMDEV-2587 (`cms_returns`, `cms_return_positions`);
+    статусная модель — `ADR-RET-099`, схема статусов версии 4 (`diagrams/state/return-status-v4_state.md`);
+    сквозной номер присваивает 1С — `ADR-RET-098`; обмен возвратами идёт через сайт — `ADR-RET-044`;
+    возврат в магазине — в 1С КА — `ADR-RET-051`.
+
+    Образец формата — действующий метод 1С `POST /api2/orders/order-update`: код статуса строкой,
+    конверт ответа `success` / `error`.
+
+    | Переход | Событие | Метод |
+    |---|---|---|
+    | S26 | Магазин принял изделия без заявки, 1С создала заявку | `POST /api2/returns/store-create` |
+    | S1, S28 | 1С проверила количество: подтвердила или отказала | `POST /api2/returns/validation-result` |
+    | P1, S3 | Склад или магазин приняли изделия | `POST /api2/returns/status-update` |
+    | S9 | Магазин отменил заявку в свой магазин | `POST /api2/returns/status-update` |
+    | S8 | Клиенту вернули деньги | `POST /api2/returns/status-update` |
+
+    Повтор запроса с теми же данными не создаёт дубль и не меняет заявку повторно: ответ — `200`.
+servers:
+  - url: /
+    description: Монолит 12storeez-master-web, интеграционные методы `api2`
+tags:
+  - name: returns-onec
+    description: Изменения заявки на возврат из 1С
+paths:
+  /api2/returns/store-create:
+    post:
+      tags: [returns-onec]
+      operationId: returnStoreCreate
+      summary: Создать заявку при возврате в магазине
+      description: |
+        S26. Клиент сдал изделия интернет-заказа в магазине без заявки. 1С КА создаёт заявку и передаёт
+        её на сайт уже принятой.
+
+        Сайт:
+        - создаёт заявку с каналом `store` и статусом «Возврат принят», без валидации сайта и 1С;
+        - создаёт по строке `cms_return_positions` на каждое изделие: позиция с `quantity = 2` — две строки;
+          статус позиции возврата — «Принято»;
+        - переводит позиции заказа в «Частичный возврат» или «Возврат» (переходы O3, O4);
+        - сохраняет `number` и `onec_id`.
+
+        Повтор с тем же `onec_id` возвращает `200` и не создаёт вторую заявку.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StoreReturnCreateRequest'
+            example:
+              order_id: 1854321
+              number: R000123
+              onec_id: 6f1c2b7e-3a4d-11ef-9a1b-005056a1c2d3
+              store_code: 12
+              received_at: '2026-11-20T14:05:00+03:00'
+              positions:
+                - order_position_id: 4512001
+                  quantity: 1
+                  reason_code: '1206'
+      responses:
+        '200':
+          description: Заявка создана или уже была создана этим `onec_id`
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+              example:
+                success: true
+                number: R000123
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api2/returns/validation-result:
+    post:
+      tags: [returns-onec]
+      operationId: returnValidationResult
+      summary: Передать результат проверки в 1С
+      description: |
+        S1, S28. Ответ 1С на заявку, которую сайт отправил в статусе «Заявка на проверке в 1С»
+        (рабочее название «Заполнено корректно по данным сайта»). 1С проверяет только количество:
+        нельзя вернуть больше, чем куплено; изделие уже возвращено или по нему есть другая заявка — отказ.
+
+        Сайт:
+        - `accepted` — переводит заявку в «Заявка на возврат принята», сохраняет `number` и `onec_id`;
+        - `rejected` — переводит заявку в «Заявка ожидает обработки», причину отказа записывает
+          в комментарий для оператора RetailCRM.
+
+        Результат принимается, только если заявка в статусе «Заявка на проверке в 1С». В другом статусе — `409`.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ValidationResultRequest'
+            examples:
+              accepted:
+                summary: 1С подтвердила
+                value:
+                  return_id: 9001
+                  number: R000124
+                  onec_id: 7a2d3c8f-3a4d-11ef-9a1b-005056a1c2d3
+                  result: accepted
+              rejected:
+                summary: 1С отказала
+                value:
+                  return_id: 9002
+                  number: R000125
+                  onec_id: 8b3e4d90-3a4d-11ef-9a1b-005056a1c2d3
+                  result: rejected
+                  rejected_positions:
+                    - order_position_id: 4512002
+                      comment: Изделие уже возвращено в магазине 15.11.2026
+      responses:
+        '200':
+          description: Результат принят, статус заявки изменён
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+              example:
+                success: true
+                number: R000124
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api2/returns/status-update:
+    post:
+      tags: [returns-onec]
+      operationId: returnStatusUpdate
+      summary: Передать приёмку, отмену или возврат денег
+      description: |
+        Изменение заявки по событию в 1С.
+
+        | Событие | `status` | `positions` |
+        |---|---|---|
+        | P1 — часть изделий принята, итог есть не по всем позициям | не передаётся | обязательно: позиции с итогом |
+        | S3 — по всем позициям есть итог | `received` | обязательно: итог по всем позициям, которые не передавались ранее |
+        | S9 — магазин отменил заявку в свой магазин | `cancelled` | не передаётся: все позиции получают «Отменено» |
+        | S8 — клиенту вернули деньги | `completed` | не передаётся |
+
+        Сайт:
+        - по позициям ставит статус позиции возврата «Принято» или «Отменено» и пересчитывает статус
+          позиции заказа (переходы O2–O4, O6);
+        - `received` — заявка «Возврат принят», заполняется `received_at`;
+        - `cancelled` — заявка «Возврат отменен», заполняется `cancelled_at`; только из «Заявка на возврат принята»
+          и только для заявки со способом «Магазин 12 STOREEZ» в магазин `store_code` из заявки;
+        - `completed` — заявка «Возврат завершен», заполняется `completed_at`; только из «Возврат принят».
+
+        Переход, недопустимый из текущего статуса заявки, — `409`.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StatusUpdateRequest'
+            examples:
+              received:
+                summary: S3 — изделия приняты на складе, одно не сдано
+                value:
+                  return_id: 9001
+                  number: R000124
+                  onec_id: 7a2d3c8f-3a4d-11ef-9a1b-005056a1c2d3
+                  status: received
+                  changed_at: '2026-11-25T11:20:00+03:00'
+                  positions:
+                    - order_position_id: 4512003
+                      status: accepted
+                      quantity: 1
+                    - order_position_id: 4512004
+                      status: cancelled
+                      quantity: 1
+              cancelled:
+                summary: S9 — магазин не принял изделия
+                value:
+                  return_id: 9003
+                  number: R000126
+                  onec_id: 9c4f5ea1-3a4d-11ef-9a1b-005056a1c2d3
+                  status: cancelled
+                  changed_at: '2026-11-21T18:40:00+03:00'
+              completed:
+                summary: S8 — деньги возвращены
+                value:
+                  return_id: 9001
+                  number: R000124
+                  onec_id: 7a2d3c8f-3a4d-11ef-9a1b-005056a1c2d3
+                  status: completed
+                  changed_at: '2026-11-27T10:00:00+03:00'
+      responses:
+        '200':
+          description: Изменение принято
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+              example:
+                success: true
+                number: R000124
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+components:
+  schemas:
+    ReturnNumber:
+      type: string
+      description: Сквозной номер заявки на возврат — латинская `R` и порядковый номер. Присваивает 1С
+      pattern: '^R[0-9]+$'
+      maxLength: 32
+      example: R000124
+
+    OnecId:
+      type: string
+      description: Внутренний идентификатор заявки в 1С (GUID). Сайт хранит в `cms_returns.onec_id`
+      maxLength: 64
+      example: 7a2d3c8f-3a4d-11ef-9a1b-005056a1c2d3
+
+    ReturnRef:
+      type: object
+      description: Ссылка на заявку, созданную на сайте
+      required: [return_id, number, onec_id]
+      properties:
+        return_id:
+          type: integer
+          description: ID заявки на сайте (`cms_returns.id`), который сайт передал в 1С при отправке заявки
+          example: 9001
+        number:
+          $ref: '#/components/schemas/ReturnNumber'
+        onec_id:
+          $ref: '#/components/schemas/OnecId'
+
+    StoreReturnCreateRequest:
+      type: object
+      required: [order_id, number, onec_id, store_code, received_at, positions]
+      properties:
+        order_id:
+          type: integer
+          description: ID интернет-заказа на сайте (`cms_orders.id`)
+          example: 1854321
+        number:
+          $ref: '#/components/schemas/ReturnNumber'
+        onec_id:
+          $ref: '#/components/schemas/OnecId'
+        store_code:
+          type: integer
+          description: Код магазина, принявшего изделия (`cms_delivery_tk.store_code`)
+          example: 12
+        received_at:
+          type: string
+          format: date-time
+          description: Когда магазин принял изделия. Сайт записывает в `received_at` заявки
+          example: '2026-11-20T14:05:00+03:00'
+        positions:
+          type: array
+          minItems: 1
+          description: Принятые изделия по позициям заказа
+          items:
+            $ref: '#/components/schemas/StoreReturnPosition'
+
+    StoreReturnPosition:
+      type: object
+      required: [order_position_id, quantity]
+      properties:
+        order_position_id:
+          type: integer
+          description: ID позиции заказа (`cms_order_positions.id`). Позиция принадлежит заказу `order_id`
+          example: 4512001
+        quantity:
+          type: integer
+          minimum: 1
+          description: Сколько изделий позиции принято. Не больше количества, доступного к возврату
+          example: 1
+        reason_code:
+          type: string
+          description: Код причины возврата из справочника `cms_return_reasons`
+          example: '1206'
+
+    ValidationResultRequest:
+      allOf:
+        - $ref: '#/components/schemas/ReturnRef'
+        - type: object
+          required: [result]
+          properties:
+            result:
+              type: string
+              enum: [accepted, rejected]
+              description: |
+                `accepted` — количество подтверждено, заявка принята (S1);
+                `rejected` — отказ (S28)
+              example: rejected
+            rejected_positions:
+              type: array
+              minItems: 1
+              description: Обязательно при `result = rejected`. Позиции, по которым 1С отказала, и причина
+              items:
+                $ref: '#/components/schemas/RejectedPosition'
+
+    RejectedPosition:
+      type: object
+      required: [order_position_id, comment]
+      properties:
+        order_position_id:
+          type: integer
+          description: ID позиции заказа (`cms_order_positions.id`) из заявки
+          example: 4512002
+        comment:
+          type: string
+          maxLength: 1000
+          description: Причина отказа для оператора RetailCRM
+          example: Изделие уже возвращено в магазине 15.11.2026
+
+    StatusUpdateRequest:
+      allOf:
+        - $ref: '#/components/schemas/ReturnRef'
+        - type: object
+          required: [changed_at]
+          properties:
+            status:
+              type: string
+              enum: [received, cancelled, completed]
+              description: |
+                Новый статус заявки: `received` — «Возврат принят» (S3), `cancelled` — «Возврат отменен» (S9),
+                `completed` — «Возврат завершен» (S8). Не передаётся, если меняются только позиции (P1)
+              example: received
+            changed_at:
+              type: string
+              format: date-time
+              description: Когда событие произошло в 1С
+              example: '2026-11-25T11:20:00+03:00'
+            positions:
+              type: array
+              minItems: 1
+              description: Итог по позициям. Обязательно, если `status` не передан или равен `received`
+              items:
+                $ref: '#/components/schemas/PositionResult'
+
+    PositionResult:
+      type: object
+      required: [order_position_id, status, quantity]
+      properties:
+        order_position_id:
+          type: integer
+          description: ID позиции заказа (`cms_order_positions.id`) из заявки
+          example: 4512003
+        status:
+          type: string
+          enum: [accepted, cancelled]
+          description: '`accepted` — «Принято», `cancelled` — «Отменено»: клиент не сдал изделие'
+          example: accepted
+        quantity:
+          type: integer
+          minimum: 1
+          description: Сколько изделий позиции получают этот статус
+          example: 1
+
+    SuccessResponse:
+      type: object
+      required: [success, number]
+      properties:
+        success:
+          type: boolean
+          enum: [true]
+        number:
+          $ref: '#/components/schemas/ReturnNumber'
+
+    ErrorResponse:
+      type: object
+      required: [success, error_code, error]
+      properties:
+        success:
+          type: boolean
+          enum: [false]
+        error_code:
+          type: string
+          description: Код ошибки для разбора в 1С
+          example: invalid_transition
+        error:
+          type: string
+          description: Текст ошибки
+          example: Заявка R000124 в статусе «Возврат принят», отмена недоступна
+
+  responses:
+    BadRequest:
+      description: |
+        Неверный запрос: нет обязательного поля, неверный тип или формат.
+        `error_code`: `validation_error`; для `store-create` также `quantity_exceeded` — изделий больше,
+        чем доступно к возврату; `position_not_in_order` — позиция не из заказа `order_id`
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            success: false
+            error_code: validation_error
+            error: 'Поле positions обязательно'
+    NotFound:
+      description: |
+        Не найден заказ (`order_not_found`), заявка (`return_not_found`) или позиция заказа
+        (`position_not_found`). Заявка ищется по `return_id`, `number` и `onec_id` должны ей соответствовать
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            success: false
+            error_code: return_not_found
+            error: Заявка 9001 не найдена
+    Conflict:
+      description: |
+        Изменение противоречит состоянию заявки. `error_code`: `invalid_transition` — переход недопустим
+        из текущего статуса; `number_taken` — номер уже занят другой заявкой
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            success: false
+            error_code: invalid_transition
+            error: Заявка R000124 в статусе «Возврат принят», отмена недоступна
+    ServerError:
+      description: Внутренняя ошибка сайта; 1С повторяет запрос
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            success: false
+            error_code: internal_error
+            error: Внутренняя ошибка

@@ -47,7 +47,7 @@
 ## Связанные артефакты
 
 - `ADR-RET-027` — [хранение причины в RetailCRM](<./[2026-09-25 13-30] ADR-RET-027-return-reason-storage-in-retailcrm-v1.md>).
-- `ADR-RET-041` — [экспертиза вне объёма проекта](<./[2026-10-02 10-00] ADR-RET-041-return-expertise-out-of-scope-v1.md>).
+- `ADR-RET-041` — [экспертиза вне объёма проекта](<./archive/[2026-10-02 10-00] ADR-RET-041-return-expertise-out-of-scope-v1.md>).
 - `FR-02`, `OQ-32` — [BRD](../brd.md).
 
 ## История изменений

@@ -48,7 +48,7 @@
 
 ## Связанные артефакты
 
-- `ADR-RET-038` — [возврат в магазине без заявки](<./[2026-10-01 14-59] ADR-RET-038-store-walk-in-return-processing-v2.md>).
+- `ADR-RET-038` — [возврат в магазине без заявки](<./archive/[2026-10-01 14-59] ADR-RET-038-store-walk-in-return-processing-v2.md>).
 - `BO-3`, `RULE-02`, `RULE-03` — [BRD](../brd.md).
 
 ## История изменений

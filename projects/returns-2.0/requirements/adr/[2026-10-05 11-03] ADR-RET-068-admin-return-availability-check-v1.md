@@ -52,7 +52,7 @@
 
 ## Связанные артефакты
 
-- `ADR-RET-057` — [даты и интервалы курьера от логистики](<./[2026-10-14 11-59] ADR-RET-057-courier-intervals-from-logistics-v1.md>).
+- `ADR-RET-057` — [даты и интервалы курьера от логистики](<./archive/[2026-10-14 11-59] ADR-RET-057-courier-intervals-from-logistics-v1.md>).
 - `ADR-RET-059` — [возвраты в админке сайта](<./[2026-10-14 11-59] ADR-RET-059-returns-admin-view-only-v1.md>).
 - `ADR-RET-060` — [способы возврата по населённому пункту](<./[2026-10-14 15-00] ADR-RET-060-geo-based-return-methods-v3.md>).
 

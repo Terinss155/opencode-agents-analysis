@@ -55,7 +55,7 @@
 ## Связанные артефакты
 
 - `ADR-RET-060` — [объём интеграции с логистикой](<./[2026-10-14 15-00] ADR-RET-060-geo-based-return-methods-v3.md>).
-- `ADR-RET-057` — [даты и интервалы курьера от сервиса логистики](<./[2026-10-14 11-59] ADR-RET-057-courier-intervals-from-logistics-v1.md>).
+- `ADR-RET-057` — [даты и интервалы курьера от сервиса логистики](<./archive/[2026-10-14 11-59] ADR-RET-057-courier-intervals-from-logistics-v1.md>).
 - `FR-13`, `FR-42` — [BRD](../brd.md).
 
 ## История изменений

@@ -65,7 +65,7 @@ Project Manager подтвердила, что признак сегмента �
 
 ## Связанные артефакты
 
-- `ADR-RET-033` — [нет автоотмены в MVP](<./[2026-10-01 14-59] ADR-RET-033-return-auto-cancel-v1.md>).
+- `ADR-RET-033` — [нет автоотмены в MVP](<./archive/[2026-10-01 14-59] ADR-RET-033-return-auto-cancel-v1.md>).
 - `RULE-10`, `C-6`, `OQ-4` — [BRD](../brd.md).
 
 ## История изменений
