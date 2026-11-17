@@ -142,18 +142,18 @@
 | № | Вопрос | Кому | Тема | Где отражено |
 |---|---|---|---|---|
 | 1 | Хватит ли сайту и приложению полей из ответа Ирины; какие доработки сервиса Mindbox нужны, кроме `lines[].appliedPromotions.spentBonusPointsAmount` в ответе предрасчёта? | System Analyst — Катя Лемешева, Backend Developer | 2 | [refund-bonus_questions.md](../requirements/questions/refund-bonus_questions.md) |
-| 2 | Вернёт ли Mindbox ошибку, если все или часть позиций возвращены, а заказ остаётся «Выполнен»? | Менеджер Mindbox Ирина | 4 | — |
-| 3 | Подходят ли текущие операции Mindbox под новую статусную модель или нужны новые операции предрасчёта и изменения? | Менеджер Mindbox Ирина | 4, 7 | `ADR-RET-092` |
+| 2 | Вернёт ли Mindbox ошибку, если все или часть позиций возвращены, а заказ остаётся «Выполнен»? | Менеджер Mindbox Ирина | 4 | [refund-bonus_questions.md](../requirements/questions/refund-bonus_questions.md), вопрос 12 |
+| 3 | Подходят ли текущие операции Mindbox под новую статусную модель или нужны новые операции предрасчёта и изменения? | Менеджер Mindbox Ирина | 4, 7 | [refund-bonus_questions.md](../requirements/questions/refund-bonus_questions.md), вопрос 16; `ADR-RET-092` |
 | 4 | Нужны ли в Mindbox новые статусы позиций; каким статусом передаются позиции возврата? | Менеджер Mindbox Ирина | 3, 4 | [refund-bonus_questions.md](../requirements/questions/refund-bonus_questions.md), вопрос 4 |
-| 5 | Как Mindbox считает баллы при повторном возврате по заказу: накопительно или только за текущие позиции? | Менеджер Mindbox Ирина | 5 | — |
-| 6 | Правильно ли Mindbox считает баллы к возврату при промокодах; как делится скидка строки? | Менеджер Mindbox Ирина | 6 | — |
+| 5 | Как Mindbox считает баллы при повторном возврате по заказу: накопительно или только за текущие позиции? | Менеджер Mindbox Ирина | 5 | [refund-bonus_questions.md](../requirements/questions/refund-bonus_questions.md), вопрос 13 |
+| 6 | Правильно ли Mindbox считает баллы к возврату при промокодах; как делится скидка строки? | Менеджер Mindbox Ирина | 6 | [refund-bonus_questions.md](../requirements/questions/refund-bonus_questions.md), вопрос 14 |
 | 7 | Влияет ли деление строки позиции заказа на обмены с RetailCRM и 1С; нужен ли статус «Частичный возврат»? | System Analyst, Backend Developer | 8 | [order-position-split_questions.md](../requirements/questions/order-position-split_questions.md) |
 | 8 | Изменения позиций исходного заказа передаются в RetailCRM и 1С обменом по заказам или каждая система меняет статусы сама по данным возврата? | System Analyst, Backend Developer | 9 | [retailcrm-exchange_questions.md](../requirements/questions/retailcrm-exchange_questions.md), вопрос 13 |
 | 9 | Сайт учитывает заявки на возврат при каждой отправке заказа в Mindbox? Откуда берётся статус строки для Mindbox: из данных заявки или по паре «статус заказа + статус позиции»? | Backend Developer, System Analyst | 12 | — |
 | 10 | Работает ли на проде передача номера заказа в расчёт Mindbox? Действие: Оля проверяет | Backend Developer — Оля Свистунова | 12 | [refund-bonus_questions.md](../requirements/questions/refund-bonus_questions.md), вопрос 8 |
 | 11 | Тип доставки курьера СДЭК на возврат привязывается к существующей ТК в 1С или к новой? Есть ли ограничения по весу? Действие: Катя Лемешева спрашивает Софью Попкову | System Analyst — Катя Лемешева, Софья Попкова | 11 | [return-carriers_questions.md](../requirements/questions/return-carriers_questions.md), вопрос 5 |
 | 12 | Переключение старого и нового процесса в обмене с Mindbox — через фичетоглы из существующей задачи? | Backend Developer | 13 | — |
-| 13 | Действие: описать Ирине новый процесс и провести с ней встречу | System Analyst — Катя Лемешева | 9а | — |
+| 13 | Действие: описать Ирине новый процесс и провести с ней встречу | System Analyst — Катя Лемешева | 9а | [refund-bonus_questions.md](../requirements/questions/refund-bonus_questions.md), «Сообщения для Mindbox и команды BTS» |
 
 ## Особенности процессов
 
