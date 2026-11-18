@@ -66,7 +66,7 @@ US2 (список возвратов) и US3 (карточка возврата)
 ## Связанные артефакты
 
 - `RULE-02`, `RULE-17`, `FR-09`, `FR-26`, `INT-01`, `OQ-8`, `OQ-34` — [BRD](../brd.md).
-- `ADR-RET-024` — [электронное заявление не хранится](<./[2026-09-17 15-01] ADR-RET-024-electronic-return-application-storage-v1.md>).
+- `ADR-RET-024` (заменён `ADR-RET-105`) — [электронное заявление не хранится](<./archive/[2026-09-17 15-01] ADR-RET-024-electronic-return-application-storage-v1.md>).
 - `ADR-RET-036` — [номер заявки и QR-код](<./archive/[2026-10-01 14-59] ADR-RET-036-return-numbering-master-v1.md>).
 - `ADR-RET-051` — [возврат в магазине по QR-коду](<./[2026-10-07 16-30] ADR-RET-051-store-walk-in-return-processing-v3.md>).
 - ECOMDEV-2275 US2, ECOMDEV-2276 US3 — [User Story](../user-story/user-story-mvp.md).

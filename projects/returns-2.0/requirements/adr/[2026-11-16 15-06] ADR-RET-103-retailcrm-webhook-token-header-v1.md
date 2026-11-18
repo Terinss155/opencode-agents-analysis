@@ -59,7 +59,7 @@ RetailCRM передаёт токен вебхука в заголовке `X-Ap
 
 ## Связанные артефакты
 
-- `ADR-RET-102` — [параметр `type` в вебхуке RetailCRM](<./[2026-11-16 15-06] ADR-RET-102-retailcrm-webhook-order-type-v1.md>).
+- `ADR-RET-104` — [тип заказа в вебхуке RetailCRM по `orderType`, v2](<./[2026-11-16 15-06] ADR-RET-104-retailcrm-webhook-order-type-v2.md>).
 - Вопросы по реквизитам — [stage-0-bank-details_questions.md](../questions/stage-0-bank-details_questions.md).
 - Вопросы обмена — [retailcrm-exchange_questions.md](../questions/retailcrm-exchange_questions.md).
 
