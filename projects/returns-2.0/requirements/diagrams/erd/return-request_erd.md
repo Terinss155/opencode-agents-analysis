@@ -259,7 +259,7 @@ cms_return_statuses ||--o{ cms_return_history : "статус версии"
 | 1 | `id` | `int(11)`, PK, AI | Нет | |
 | 2 | `return_id` | `int(11)`, FK → `cms_returns.id` | Нет | Заявка |
 | 3 | `version` | `int(10) unsigned` | Нет | Версия заявки, с которой действуют реквизиты |
-| 4 | `payload_encrypted` | `text` | Нет | Реквизиты одним зашифрованным блоком: фамилия, имя, отчество держателя счёта, БИК, номер лицевого счёта, номер карты. Шифрует приложение, ключ — в секрет-хранилище инфраструктуры |
+| 4 | `payload_encrypted` | `text` | Нет | Реквизиты одним зашифрованным блоком: фамилия, имя, отчество держателя счёта, БИК, номер лицевого счёта; номер карты — только если номер счёта начинается с «30232810» (кредитный счёт). Шифрует приложение, ключ — в секрет-хранилище инфраструктуры |
 | 5 | `is_bank_details_confirmed` | `tinyint(1)`, default `0` | Нет | Клиент подтвердил реквизиты галочкой в форме; передаётся в 1С |
 | 6 | `created_at` | `datetime` | Нет | |
 
@@ -291,6 +291,6 @@ cms_return_statuses ||--o{ cms_return_history : "статус версии"
 | Вопрос | Что зависит |
 |---|---|
 | Где хранить номер «Р…» от 1С и GUID 1С; что в `number` до ответа 1С ([return-number_questions.md](../../questions/return-number_questions.md)) | `number`, `onec_id` |
-| Нужен ли номер карты в реквизитах ([stage-0-bank-details_questions.md](../../questions/stage-0-bank-details_questions.md)) | состав `payload_encrypted` |
+| Нужно ли ГОСТ-шифрование для номера карты кредитного счёта ([stage-0-bank-details_questions.md](../../questions/stage-0-bank-details_questions.md), ИБ-1) | шифрование `payload_encrypted` |
 | На какую строку позиции заказа ссылается изделие, если строка делится при частичном возврате ([order-position-split_questions.md](../../questions/order-position-split_questions.md)) | `order_position_id`, `previous_position_status` |
 | Где хранить остаток списанных баллов по заказу и номера строк Mindbox после фиксации возврата ([BL-RET-BONUS](../../backend/return-bonus_backend.md), п. 3) | новые поля или таблица по заказу |
