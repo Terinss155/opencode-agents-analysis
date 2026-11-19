@@ -2,7 +2,15 @@
 
 **Системы:** монолит, `monolith-bfb-ms`, `mindbox-srv-go` (команда BTS), Mindbox
 **Связанные артефакты:** US 1.4, US 1.5, US 3 — [SRS сайта](../srs/srs-web-mvp.md), [SRS МП](../srs/srs-mobile-mvp.md); `ADR-RET-092`, `ADR-RET-099`, `ADR-RET-101`, `ADR-RET-039`; [доступное к возврату количество](./available-return-quantity_backend.md)
-**Решения и открытые вопросы:** [mindbox-exchange_questions.md](../questions/mindbox-exchange_questions.md) — операции, строки, статусы, `mindbox-srv-go`; [refund-bonus_questions.md](../questions/refund-bonus_questions.md) — правила баллов для клиента. В тексте нерешённое отмечено «вопрос N» — по `mindbox-exchange_questions.md`, если не указан другой файл
+**Решения и открытые вопросы:** 
+- [mindbox-exchange_questions.md](../questions/mindbox-exchange_questions.md) — операции, строки, статусы, `mindbox-srv-go`; 
+- [refund-bonus_questions.md](../questions/refund-bonus_questions.md) — правила баллов для клиента. В тексте нерешённое отмечено «вопрос N» — по `mindbox-exchange_questions.md`, если не указан другой файл
+
+## Коротко
+
+Документ описывает, как система возвращает клиенту баллы при возврате товара. Когда клиент оформляет возврат, сайт спрашивает у Mindbox, сколько баллов вернётся, и показывает это число на экране. Когда склад или магазин принял товар, сайт сообщает Mindbox, что возврат состоялся, и Mindbox возвращает баллы на счёт клиента. Если потом заказ снова меняется, возврат не теряется.
+
+Описано, как это работает сейчас, что нужно доработать на сайте и в сервисе связи с Mindbox и какие вопросы ещё открыты.
 
 ## Цель
 

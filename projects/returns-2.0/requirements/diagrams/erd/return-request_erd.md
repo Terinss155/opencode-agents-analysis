@@ -1,6 +1,6 @@
 # ERD-RET: Модель данных заявки на возврат
 
-**Основа:** задача [ECOMDEV-2587](<../../tasks/US-01/ECOMDEV-2587 [B] Возвраты. Модель данных заявки на возврат.md>) (по Трекеру на 16.11.2026), ADR архитектурного комитета ADR-0002…0006; статусная модель — `ADR-RET-099`; баллы и суммы к возврату — [BL-RET-BONUS](../../backend/return-bonus_backend.md), SRS US 1.5
+**Основа:** задача [ECOMDEV-2587](<../../tasks/US-01/ECOMDEV-2587 [B] Возвраты. Модель данных заявки на возврат.md>) (по Трекеру на 16.11.2026), ADR архитектурного комитета ADR-0002…0006; статусная модель — `ADR-RET-099`; баллы и суммы к возврату — [BL-RET-BONUS](../../backend/mindbox-return-bonus_backend.md), SRS US 1.5
 **СУБД:** MariaDB 10.3, схема монолита
 **SQL-скрипт:** [return-request_sql.sql](./return-request_sql.sql)
 
@@ -182,7 +182,7 @@ cms_return_statuses ||--o{ cms_return_history : "статус версии"
 | 6 | `reason_id` | `int(11)`, FK → `cms_return_reasons.id` | Да | Причина. `NULL`, если у группы нет причин: выбор группы считается выбором причины |
 | 7 | `previous_position_status` | `int(2)` | Нет | Статус позиции заказа до создания заявки — восстанавливается, когда по позиции не осталось действующих заявок |
 | 8 | `refund_amount` | `decimal(10,2)` | Да | **(предложено)** Сумма к возврату за изделие, рассчитанная при создании заявки (SRS US 1.5) |
-| 9 | `refund_bonus_amount` | `decimal(10,2)` | Да | **(предложено)** Баллы к возврату за изделие — списанные баллы строки этого изделия из расчёта Mindbox при создании заявки ([BL-RET-BONUS](../../backend/return-bonus_backend.md), п. 2.2). `NULL`, если баллы не рассчитаны |
+| 9 | `refund_bonus_amount` | `decimal(10,2)` | Да | **(предложено)** Баллы к возврату за изделие — списанные баллы строки этого изделия из расчёта Mindbox при создании заявки ([BL-RET-BONUS](../../backend/mindbox-return-bonus_backend.md), п. 2.2). `NULL`, если баллы не рассчитаны |
 | 10 | `created_at` | `datetime` | Нет | |
 | 11 | `updated_at` | `datetime` | Нет | |
 
@@ -293,4 +293,4 @@ cms_return_statuses ||--o{ cms_return_history : "статус версии"
 | Где хранить номер «Р…» от 1С и GUID 1С; что в `number` до ответа 1С ([return-number_questions.md](../../questions/return-number_questions.md)) | `number`, `onec_id` |
 | Нужно ли ГОСТ-шифрование для номера карты кредитного счёта ([stage-0-bank-details_questions.md](../../questions/stage-0-bank-details_questions.md), ИБ-1) | шифрование `payload_encrypted` |
 | На какую строку позиции заказа ссылается изделие, если строка делится при частичном возврате ([order-position-split_questions.md](../../questions/order-position-split_questions.md)) | `order_position_id`, `previous_position_status` |
-| Где хранить остаток списанных баллов по заказу и номера строк Mindbox после фиксации возврата ([BL-RET-BONUS](../../backend/return-bonus_backend.md), п. 3) | новые поля или таблица по заказу |
+| Где хранить остаток списанных баллов по заказу и номера строк Mindbox после фиксации возврата ([BL-RET-BONUS](../../backend/mindbox-return-bonus_backend.md), п. 3) | новые поля или таблица по заказу |

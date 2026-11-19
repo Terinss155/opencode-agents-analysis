@@ -188,5 +188,5 @@
 
 | Задача | Исполнитель | Статус | Что даёт / связь |
 |---|---|---|---|
-| [TNT-2687](https://tracker.yandex.ru/TNT-2687) Необходимо добавить передачу номера заказа в методе calculate | Крамаровский | Закрыт (14.10) | ID заказа в расчёте; в `mindbox.proto` на `origin/master` поля нет. ECOMDEV-1185; [return-bonus_backend.md](../backend/return-bonus_backend.md), [mindbox-exchange_questions.md](../questions/mindbox-exchange_questions.md), вопрос 15 |
+| [TNT-2687](https://tracker.yandex.ru/TNT-2687) Необходимо добавить передачу номера заказа в методе calculate | Крамаровский | Закрыт (14.10) | ID заказа в расчёте; в `mindbox.proto` на `origin/master` поля нет. ECOMDEV-1185; [mindbox-return-bonus_backend.md](../backend/mindbox-return-bonus_backend.md), [mindbox-exchange_questions.md](../questions/mindbox-exchange_questions.md), вопрос 15 |
 

@@ -138,7 +138,7 @@ sequence → экран → NFR → тест`. Связывает идентиф
 |---|---|---|---|---|
 | BL-RET-ELIG-01 | Бэк-логика | `./backend/return-eligibility_backend.md` | backend-logic | DRAFT |
 | BL-RET-QTY-01 | Бэк-логика | `./backend/available-return-quantity_backend.md` | backend-logic | DRAFT |
-| BL-RET-BONUS | Бэк-логика | `./backend/return-bonus_backend.md` | backend-logic | DRAFT |
+| BL-RET-BONUS | Бэк-логика | `./backend/mindbox-return-bonus_backend.md` | backend-logic | DRAFT |
 | ERD-RET | Модель данных | `./diagrams/erd/return-request_erd.md` + `return-request_sql.sql` | erd-model | DRAFT |
 | SCR-RET-01 | Экран | `./screen-spec/screen-spec.md` (SCR-RET-01) | screen-spec | DRAFT |
 | SCR-RET-02 | Экран | `./screen-spec/screen-spec.md` (SCR-RET-02) | screen-spec | DRAFT |
