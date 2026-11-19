@@ -85,7 +85,7 @@ stateDiagram-v2
     SiteValid --> OneCCheck : S37 ✱ Сайт: отправил заявку в 1С
     OneCCheck --> Accepted : S1 ✱ 1С: возврат возможен, количество не превышает купленное
     OneCCheck --> Pending : S28 ✱ 1С: изделие уже возвращено или заявлено, заявка уходит Дружбе на ручную обработку
-    Pending --> Processed : S29 ✱ RetailCRM: Дружба дополнила данные или убрала позицию
+    Pending --> Processed : S29 ✱ RetailCRM: Дружба дополнила данные, убрала или отменила позицию ❓5
     Accepted --> Received : S3 1С: склад или магазин приняли изделия
     Accepted --> Received : S33 RetailCRM: Дружба вручную, ТК потеряла возврат или деньги возвращают до поступления
     Accepted --> Confirm : S4 RetailCRM: за 30 дней изделия не приняты, заявка уходит Дружбе на обзвон
@@ -323,7 +323,7 @@ stateDiagram-v2
 | Частичный возврат | `return-partial` — предложено RetailCRM; нужен ли статус — ❓6 | `ADR-RET-101`, решение 2 |
 | Возврат | `lost` (`internal_id = 9`) — согласовано | `ADR-RET-101`, решение 1 |
 
-Сопоставление статусов позиции с Mindbox — [order-position-split_questions.md](../../questions/order-position-split_questions.md), вопрос 7.
+Сопоставление статусов позиции с Mindbox — [mindbox-exchange_questions.md](../../questions/mindbox-exchange_questions.md), вопрос 2.
 
 ## 4. Связь уровней по событиям
 
