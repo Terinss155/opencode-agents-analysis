@@ -323,7 +323,7 @@ stateDiagram-v2
 | Частичный возврат | `return-partial` — предложено RetailCRM; нужен ли статус — ❓6 | `ADR-RET-101`, решение 2 |
 | Возврат | `lost` (`internal_id = 9`) — согласовано | `ADR-RET-101`, решение 1 |
 
-Сопоставление статусов позиции с Mindbox — [mindbox-exchange_questions.md](../../questions/mindbox-exchange_questions.md), вопрос 2.
+Сопоставление статусов позиции с Mindbox — [mindbox-exchange_questions.md](../../questions/mindbox-exchange_questions.md), вопрос 6.
 
 ## 4. Связь уровней по событиям
 
