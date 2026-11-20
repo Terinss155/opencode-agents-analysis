@@ -146,7 +146,7 @@ RetailCRM предложил `return-requested` («Заявка на возвр�
 - Схема статусов, версия 4 — [return-status-v4_state.md](../diagrams/state/return-status-v4_state.md).
 - `ADR-RET-044` — [обмен возвратами через сайт](<../adr/[2026-10-02 10-00] ADR-RET-044-returns-integration-gateway-v2.md>).
 - `ADR-RET-098` — [сквозной номер заявки от 1С](<../adr/[2026-11-12 14-59] ADR-RET-098-return-numbering-master-v2.md>); вопросы — [return-number_questions.md](./return-number_questions.md).
-- `ADR-RET-099` — [статусы заявки на возврат в MVP, v8](<../adr/[2026-11-13 13-30] ADR-RET-099-return-status-model-mvp-v8.md>).
+- `ADR-RET-110` — [статусы заявки на возврат в MVP, v9](<../adr/[2026-11-19 15-00] ADR-RET-110-return-status-model-mvp-v9.md>); `ADR-RET-099` (заменён `ADR-RET-110`).
 - Модель данных заявки — `ECOMDEV-2587` ([tasks/US-01/ECOMDEV-2587 [B] Возвраты. Модель данных заявки на возврат.md](<../tasks/US-01/ECOMDEV-2587 [B] Возвраты. Модель данных заявки на возврат.md>)).
 - Разбор встречи с RetailCRM 10.11.2026 — [[2026-11-10 17-00] 12STOREEZ & Intaro RetailCRM Вопросы по обменам_summary.md](<../../meetings/[2026-11-10 17-00] 12STOREEZ & Intaro RetailCRM Вопросы по обменам_summary.md>).
 - Обмен заказами сайта с 1С, RetailCRM и Mindbox — [order-integration-exchange.md](../../../../knowledge/12storeez-master-web/features/order-integration-exchange.md).

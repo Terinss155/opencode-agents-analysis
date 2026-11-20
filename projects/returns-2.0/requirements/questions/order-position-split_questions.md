@@ -82,6 +82,6 @@
 ## Связанные артефакты
 
 - `ADR-RET-065` — [одинаковые единицы, повторная заявка, v1](<../adr/[2026-10-05 11-03] ADR-RET-065-identical-units-repeat-return-v1.md>).
-- `ADR-RET-099` — [статусы заявки на возврат в MVP, v8](<../adr/[2026-11-13 13-30] ADR-RET-099-return-status-model-mvp-v8.md>).
+- `ADR-RET-110` — [статусы заявки на возврат в MVP, v9](<../adr/[2026-11-19 15-00] ADR-RET-110-return-status-model-mvp-v9.md>); `ADR-RET-099` (заменён `ADR-RET-110`).
 - `ADR-RET-039` — [статус заказа при возврате не меняется](<../adr/[2026-10-02 10-00] ADR-RET-039-return-tag-without-order-status-change-v2.md>).
 - Модель данных заказа — [orders-er.md](../../../../knowledge/12storeez-master-web/database/orders-er.md).

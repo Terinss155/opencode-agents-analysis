@@ -122,10 +122,12 @@
 
 ## #оля-свистунова — Backend Developer
 
-Заполнено только по теме Mindbox.
+Заполнено по теме Mindbox и вопросу Р-7 этапа 0.
 
-- Вопросы — [mindbox-exchange_questions.md](requirements/questions/mindbox-exchange_questions.md), вопросы 6, 12
-- Переписка — [[2026-11-16 16-30] ...итоги 16.11).md](<sources/answers/[2026-11-16 16-30] Переписка Лемешева — Господинова, Свистунова (тип в вебхуке, токен, номер С, итоги 16.11).md>), [[2026-11-11] ...деление строки позиции заказа при возврате).md](<sources/answers/[2026-11-11] Переписка Лемешева — Осипенко, Свистунова (деление строки позиции заказа при возврате).md>)
+- Вопросы — [mindbox-exchange_questions.md](requirements/questions/mindbox-exchange_questions.md), вопросы 6, 12; [stage-0-bank-details_questions.md](requirements/questions/stage-0-bank-details_questions.md), Р-7 — признак подтверждения для возврата через RetailCRM
+- Задачи — [ECOMDEV-2651 [B] Возврат 0.1. Признаки возврата в обмене с 1С.md](<requirements/tasks/stage-0/ECOMDEV-2651 [B] Возврат 0.1. Признаки возврата в обмене с 1С.md>), открытый вопрос Р-7
+- ADR — [[2026-11-19 15-00] ADR-RET-109-phone-bank-details-confirmation-v1.md](<requirements/adr/[2026-11-19 15-00] ADR-RET-109-phone-bank-details-confirmation-v1.md>) — реквизиты из RetailCRM, согласие с решением, возврат из RetailCRM по `channel = support`
+- Переписка — [[2026-11-20 13-00] ...реквизиты из RetailCRM, is_bank_details_confirmed).md](<sources/answers/[2026-11-20 13-00] Переписка Лемешева — Осипенко, Свистунова (реквизиты из RetailCRM, is_bank_details_confirmed).md>), [[2026-11-16 16-30] ...итоги 16.11).md](<sources/answers/[2026-11-16 16-30] Переписка Лемешева — Господинова, Свистунова (тип в вебхуке, токен, номер С, итоги 16.11).md>), [[2026-11-11] ...деление строки позиции заказа при возврате).md](<sources/answers/[2026-11-11] Переписка Лемешева — Осипенко, Свистунова (деление строки позиции заказа при возврате).md>)
 
 ## #intaro — команда RetailCRM
 
