@@ -45,7 +45,7 @@
 | [TNT-2862](https://tracker.yandex.ru/TNT-2862) [Logistics. Backend] Админка. Возвраты в магазин | В работе | Логистика, исполнитель — Крамаровский |
 | [ECOMDEV-1968](https://tracker.yandex.ru/ECOMDEV-1968) [D] Возвраты 2.0 | Беклог | Дизайн, исполнитель — Жуков |
 | [ITGENERAL-33](https://tracker.yandex.ru/ITGENERAL-33) Возвраты 2.0 | Открыт | — |
-| [SUP-110983](https://tracker.yandex.ru/SUP-110983) Создать новый тип доставки «Курьер СДЭК (возврат)» | Новый (17.11) | Техподдержка, автор — Лемешева. Тип доставки `sdek-courier-vzt` в 1С, RetailCRM, на сайте и в логистике, доставка на возврат бесплатная; [return-carriers_questions.md](../questions/return-carriers_questions.md) |
+| [SUP-110983](https://tracker.yandex.ru/SUP-110983) Создать новый тип доставки «Курьер СДЭК (возврат)» | Выполнена (18.11) | Техподдержка, автор — Лемешева, исполнитель — Попкова. Тип доставки `sdek-courier-vzt` в 1С, RetailCRM, на сайте и в логистике, доставка на возврат бесплатная; заведена отдельная ТК, код 568; всё выключено до запуска; [return-carriers_questions.md](../questions/return-carriers_questions.md) |
 
 ## US2. Просмотр списка возвратов — [ECOMDEV-2275](https://tracker.yandex.ru/ECOMDEV-2275)
 
