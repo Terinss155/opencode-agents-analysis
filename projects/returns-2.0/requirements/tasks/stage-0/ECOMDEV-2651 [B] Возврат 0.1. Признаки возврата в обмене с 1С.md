@@ -18,7 +18,7 @@
 {red}(Заказы с возвратом, оформленным до внедрения признака, при повторной выгрузке получат `is_refund_to_original_payment_method = false` — значение поля по умолчанию. Какое значение передавать в 1С — вопрос 1С-12, согласовать до выкатки.)
 
 - Те же поля — в копии тела запроса в журнале обмена `cms_orders_exchange_log`.
-- Остальные поля блоков `customer` и `return` не меняются.
+- Остальные поля блоков `customer` и `return` не меняются. Реквизиты в `customer` (`bank_bic`, `bank_inn`, `bank_name`, `user_account`, `user_card_number`) передаются как сейчас из одноимённых ключей JSON `cms_orders.user_refund`; ключа нет — пустая строка. По возвратам с сайта `bank_inn` в `cms_orders.user_refund` записан пустой строкой (ECOMDEV-2649), поэтому в 1С уходит `bank_inn = ""`, как сейчас.
 
 Пример фрагмента выгрузки, остальные поля AS-IS сокращены. Заказ с возвратом:
 
@@ -52,19 +52,16 @@
 
 ## Тестирование
 
-**Предусловия:** доступно исходящее тело `loadOrder` для проверки: журнал обмена `cms_orders_exchange_log` — для проверки сформированных данных; интеграционный стенд с обменом с 1С — если проверяется приём в 1С. Заказы (условия можно совмещать в одном заказе):
-- без возврата;
-- с возвратом, `cms_orders.user_refund` содержит `is_bank_details_confirmed = true`, `cms_orders.is_refund_to_original_payment_method = false`;
-- с возвратом, параметра `is_bank_details_confirmed` в `cms_orders.user_refund` нет, `cms_orders.is_refund_to_original_payment_method = true`.
-
 {% cut "Критерии приёмки" %}
 
-1. Заказ без возврата → оба поля передаются со значением `null`.
-2. Заказ с возвратом → `is_bank_details_confirmed` передаётся из `cms_orders.user_refund` без изменения значения.
-3. Заказ с возвратом, параметр `is_bank_details_confirmed` отсутствует в `cms_orders.user_refund` → передаётся `null`.
-4. Заказ с возвратом → `is_refund_to_original_payment_method` передаётся из `cms_orders.is_refund_to_original_payment_method` без изменения значения (`true` или `false`).
-5. Тело запроса в журнале обмена соответствует отправленному.
-6. При выгрузке `loadOrder` все остальные поля блоков `customer` и `return` остаются без изменений, кроме добавления двух новых признаков в `customer`.
+1. Заказ без возврата → `is_bank_details_confirmed = null`, `is_refund_to_original_payment_method = null`.
+2. Возврат на сайте или в новой версии МП заказа, оплаченного курьеру; клиент подтвердил реквизиты → `is_bank_details_confirmed = true`, `is_refund_to_original_payment_method = false`.
+3. Возврат на сайте или в новой версии МП заказа с полной или частичной оплатой подарочным сертификатом; клиент подтвердил реквизиты → `is_bank_details_confirmed = true`, `is_refund_to_original_payment_method = false`.
+4. Возврат на сайте заказа, оплаченного онлайн без подарочного сертификата → `is_bank_details_confirmed = null`, `is_refund_to_original_payment_method = true`.
+5. Возврат из старой версии МП заказа, оплаченного курьеру, без передачи подтверждения реквизитов → `is_bank_details_confirmed = null`, `is_refund_to_original_payment_method = false`.
+6. Тело запроса в журнале обмена соответствует отправленному.
+7. При выгрузке `loadOrder` все остальные поля блоков `customer` и `return` остаются без изменений, кроме добавления двух новых признаков в `customer`.
+8. Возврат на сайте с реквизитами → в `customer` реквизиты из `cms_orders.user_refund`, `bank_inn = ""`.
 
 {% endcut %}
 
@@ -72,4 +69,4 @@
 
 | Вопрос | Кому |
 |---|---|
-| 1С-12. Какое значение `is_refund_to_original_payment_method` передавать в 1С при повторной выгрузке заказов с возвратом, оформленным до внедрения признака? Согласовать до выкатки | Мария Мезинова (1С), бизнес-владелец процесса возвратов, Оля Свистунова |
+| 1С-12. Какое значение `is_refund_to_original_payment_method` передавать в 1С при повторной выгрузке заказов с возвратом, оформленным до внедрения признака? Согласовать до выкатки | {red}(не определён) |
