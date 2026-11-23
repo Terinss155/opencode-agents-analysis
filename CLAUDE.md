@@ -8,8 +8,8 @@
 ## Агенты
 - Основной агент по умолчанию — `system-analyst` (как `default_agent` в `opencode.json`).
   Другой основной агент: `claude --agent business-analyst` (`product-owner`, `repository-researcher`).
-- `security-reviewer` — субагент: вызывается из основного в трёх точках из «Рабочего процесса»
-  `AGENTS.md`; пишет только в `projects/<проект>/reviews/security/`.
+- `security-reviewer` — субагент: вызывается из основного агента только по явной просьбе
+  пользователя (`AGENTS.md` → «Рабочий процесс»); пишет только в `projects/<проект>/reviews/security/`.
 - `ui-reviewer` — субагент: вызывается из основного агента по просьбе пользователя; пишет только в
   `projects/<проект>/reviews/ui/`.
 - В Claude нет белого списка скиллов на агента: каждый агент вызывает **только скиллы из своей
