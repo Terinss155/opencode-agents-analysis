@@ -21,6 +21,8 @@
 | [esb-protobufs/](esb-protobufs/repo-map.md) | `12stz/esb-protobufs` (`.proto` + сгенерированные Go/TS, ветка `master`) — общие gRPC-контракты шлюзов и микросервисов | `origin/master` `3ee1f5a` (`v0.9.9`, 05.11.2026), сверено 07.11.2026 |
 | [architecture-docs/](architecture-docs/repo-map.md) | `12stz/architecture-docs` (C4-диаграммы PlantUML, ветка `main`) — сервисы бэкенда, их связи, БД, очереди; TO-BE архитектура 10.2026. **Источник при постановке задач** | `874cecd`, 2026-10-12 (на 07.11.2026 новых коммитов нет) |
 
+Кто есть кто — должности и зоны ответственности сотрудников и подрядчиков, к кому обращаться с вопросом: [people.md](people.md).
+
 Сквозные схемы, которые касаются нескольких репозиториев сразу, лежат в [architecture/](architecture/): [call-chain.html](architecture/call-chain.html) — цепочка iOS → шлюзы `core`/`mobile` → монолит → внешние системы, с пометкой «копия в Go» у ручек `core`, уже перенесённых в Go-шлюз (обновлено по `origin` 07.11.2026); [web-call-chain.html](architecture/web-call-chain.html) — цепочка сайта: браузер → ServicePipe/nginx → монолит (страницы и AJAX) → внешние системы, плюс сравнение с приложением (обновлено по `origin/develop` `dd4a997ac0` 07.11.2026).
 
 Точки входа по монолиту: [repo-map.md](12storeez-master-web/repo-map.md) (карта папок и модулей) и [architecture/README.md](12storeez-master-web/architecture/README.md) (оглавление архитектурных документов 01–09).
