@@ -24,18 +24,6 @@ User-Agent: {User-Agent устройства клиента}
 X-Customer-IP: {IP адрес клиента}
 ```
 
-## Пример запроса
-
-```
-POST https://api.b.mindbox.ru/v3/operations/sync?endpointId=APyqQa0iX&operation=Website.CalculateAuthorizedCart&deviceUUID=7ad01581-84c0-4a3e-bb8f-702f94284e7f
-
-Content-Type: application/json; charset=utf-8
-Accept: application/json
-Authorization: SecretKey GUVK
-User-Agent: Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.1; WOW64; Trident/5.0)
-X-Customer-IP: 127.0.0.1
-```
-
 ```json
 {
   "order": {
@@ -496,6 +484,18 @@ X-Customer-IP: 127.0.0.1
     }
   }
 }
+```
+
+## Пример запроса
+
+```
+POST https://api.b.mindbox.ru/v3/operations/sync?endpointId=APyqQa0iX&operation=Website.CalculateAuthorizedCart&deviceUUID=7ad01581-84c0-4a3e-bb8f-702f94284e7f
+
+Content-Type: application/json; charset=utf-8
+Accept: application/json
+Authorization: SecretKey GUVK
+User-Agent: Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.1; WOW64; Trident/5.0)
+X-Customer-IP: 127.0.0.1
 ```
 
 ## Описание запроса
