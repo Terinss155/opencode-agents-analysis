@@ -48,4 +48,6 @@
 
 ## Объединение в историю
 
-Задачи этапа 0 предложено объединить в одну историю в Трекере (Оля Свистунова, 24.11.2026, [переписка](https://mattermost.12stz.com/12storeez/pl/yazzfyruqfbexrkjwkqf4b7qwh)). История пока не создана, название не выбрано. После создания — добавить её сюда и в [index.md](./index.md).
+История — [ECOMDEV-2796](https://tracker.yandex.ru/ECOMDEV-2796) Возврат 0.1. Банковские реквизиты: единые правила, подтверждение клиентом и передача в 1С (Story, подзадача эпика ECOMDEV-2246, создана 24.11.2026 по предложению Оли Свистуновой, [переписка](https://mattermost.12stz.com/12storeez/pl/yazzfyruqfbexrkjwkqf4b7qwh)).
+
+Подзадачи истории: ECOMDEV-2526, ECOMDEV-2649, ECOMDEV-2651, ECOMDEV-2532, DEVIOS-2709, DEVANDROID-1800. ECOMDEV-2530 закрыта и остаётся подзадачей эпика ECOMDEV-2246.
