@@ -6,6 +6,8 @@
 
 Справочник общий для доставки заказа и курьерского возврата: метод один, поток различается кодом типа доставки и параметром адреса (для возврата — адрес отправки, см. §1).
 
+Как сервис логистики считает даты и интервалы для доставки заказа — какие настройки на них влияют, когда даты берутся из СДЭК, какие ошибки возвращает метод, — описано на странице Вики логистики (ветка `develop`, MR !511 и !521; возвратного потока на странице нет). Копия: [delivery_settings_table_combined.md](../../../projects/orders/sources/delivery_settings_table_combined.md), схема метода — [delivery_intervals_method_develop_all_types.mmd](../../../projects/orders/sources/delivery_intervals_method_develop_all_types.mmd).
+
 ## 1. Контракт
 
 `proto/logistics/winner.proto`, сервис `WinnerService`, метод `rpc Intervals(IntervalsRequest) returns (common.UnifiedResponse)`, HTTP — `POST /api/v1/winner/intervals`.
@@ -31,7 +33,7 @@
 - корпус и строение — в `house` вместе с номером дома («д. 23А, стр 1»); квартира не передаётся;
 - Mobile API Gateway на 05.11.2026 не передаёт в логистику ни адрес, ни признак возврата.
 
-Что из этого уже в контракте (`origin/master` `3ee1f5a`, `v0.9.9`): `is_return` и `sending_address` добавлены (TNT-2837), но `sending_address` и `delivery_address` — **строки**, а не объект с `country_iso`/`region`/`city`/`street`/`house`. Адреса по частям (TNT-2876) в контракте пока нет. `mobile-monorepo-go` на `origin/master` (03.11.2026) подключает `esb-protobufs` `v0.8.99` — в его версии новых полей нет, в коде они не используются.
+Что из этого уже в контракте (`origin/master` `3ee1f5a`, `v0.9.9`): `is_return` и `sending_address` добавлены (TNT-2837), но `sending_address` и `delivery_address` — **строки**, а не объект с `country_iso`/`region`/`city`/`street`/`house`. Адреса по частям (TNT-2876) в контракте пока нет. **Дополнение 25.11.2026:** в `proto-specifications` (GitLab) адрес по частям уже есть — `ClientAddress` с `country_iso`/`region`/`city`/`street`/`house` в `delivery_address` и `sending_address`, плюс `is_return_available` у вариантов доставки (TNT-2888, 10.11.2026; см. [../../proto-specifications/repo-map.md](../../proto-specifications/repo-map.md) §5). Какой контракт подключит логистика, по коду не видно. `mobile-monorepo-go` на `origin/master` (03.11.2026) подключает `esb-protobufs` `v0.8.99` — в его версии новых полей нет, в коде они не используются.
 
 Задачи прямого потока на адрес по частям (iOS, шлюз МП) — [projects/orders](../../../projects/orders/README.md).
 

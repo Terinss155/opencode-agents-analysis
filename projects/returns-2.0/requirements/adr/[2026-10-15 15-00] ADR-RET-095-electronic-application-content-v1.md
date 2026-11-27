@@ -89,7 +89,7 @@
 - `ADR-RET-024` (заменён `ADR-RET-105`) — [электронное заявление не хранится](<./archive/[2026-09-17 15-01] ADR-RET-024-electronic-return-application-storage-v1.md>).
 - `ADR-RET-058` — [документы и QR-код — отдельная история](<./[2026-10-14 11-59] ADR-RET-058-return-documents-separate-story-v1.md>).
 - `ADR-RET-002` — [номер заявки в печатной форме заявления](<./[2026-09-10 14-00] ADR-RET-002-separate-return-request-entity-v1.md>).
-- `ADR-RET-092` — [баллы к возврату через калькуляцию Mindbox, предложено](<./[2026-10-21 16-30] ADR-RET-092-return-bonus-calculation-mindbox-v1.md>).
+- `ADR-RET-092` (заменён `ADR-RET-114`) — [баллы к возврату через калькуляцию Mindbox](<./archive/[2026-10-21 16-30] ADR-RET-092-return-bonus-calculation-mindbox-v1.md>); действующая версия — [`ADR-RET-114`](<./[2026-11-23 12-00] ADR-RET-114-return-bonus-calculation-mindbox-v2.md>).
 - `RULE-02`, `FR-37`, `NFR-01`, `INT-01`, `OQ-34` — [BRD](../brd.md).
 - US3.1 — [user-story-mvp.md](../user-story/user-story-mvp.md); SRS US 3.1 — [srs-mobile-mvp.md](../srs/srs-mobile-mvp.md), [srs-web-mvp.md](../srs/srs-web-mvp.md).
 - Реквизиты возврата — [ERD](../diagrams/erd/return-request_erd.md).
@@ -100,3 +100,4 @@
 |---|---|
 | 07.11.2026 | ADR создан по переписке от 14.10.2026 и транскрибации от 15.10.2026 |
 | 18.11.2026 | Открытый вопрос 1 закрыт по `ADR-RET-105`; решение не менялось |
+| 25.11.2026 | Ссылка на `ADR-RET-092` переведена в `archive/`, добавлена действующая версия `ADR-RET-114`; решение не менялось |

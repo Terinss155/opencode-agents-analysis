@@ -13,6 +13,13 @@
 Родительская задача — ECOMDEV-588. Переписка по ней хранится в проекте возвратов:
 [[2026-03-12] Переписка Васильевой с WEB и MOBILE — интервалы СДЭК для заказов (ECOMDEV-588).md](<../returns-2.0/sources/answers/[2026-03-12] Переписка Васильевой с WEB и MOBILE — интервалы СДЭК для заказов (ECOMDEV-588).md>).
 
+## Источники
+
+| Файл | Что это |
+|---|---|
+| [delivery_settings_table_combined.md](./sources/delivery_settings_table_combined.md) | Копия страницы Вики логистики: настройки, влияющие на сроки, даты и интервалы доставки, условия включения дат СДЭК, порядок выбора источника интервалов (ветки `master` и `develop`, MR !511 и !521) |
+| [delivery_intervals_method_develop_all_types.mmd](./sources/delivery_intervals_method_develop_all_types.mmd) | Схема метода `Winner.Intervals` с той же страницы (Mermaid): путь СДЭК, путь по настройкам, коды ошибок |
+
 ## Связь с другими проектами
 
 - Контракт метода логистики `Intervals`, общий для доставки и возврата, — [knowledge/esb-protobufs/api/logistics-intervals.md](../../knowledge/esb-protobufs/api/logistics-intervals.md).

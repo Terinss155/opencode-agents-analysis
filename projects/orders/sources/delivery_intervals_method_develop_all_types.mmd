@@ -1,0 +1,84 @@
+Ссылка на Яндекс Вики: https://wiki.yandex.ru/teams/web-development/dokumentacija/produkty-i-servisy/produkt-logistika/issledovanija-dlja-servisa-logistiki/issledovanie-nastrojjki-vlijajushhie-na-sroki-daty/
+
+flowchart TD
+    A["Winner.Intervals<br/>delivery_type_code, date, timezone, order_type, delivery_address"] --> B{"delivery_type_code пуст?"}
+    B -- да --> E1["HTTP 400: invalid delivery_type_code"]
+    B -- нет --> C{"timezone и date разобраны?"}
+    C -- нет --> E2["HTTP 400: invalid date"]
+    C -- да --> D{"Тип доставки в кэше?<br/>ключ: код + час"}
+    D -- да --> G["Тип доставки из кэша"]
+    D -- нет --> D1["БД: тип доставки по коду на дату"]
+    D1 --> D2{"Ошибка БД?"}
+    D2 -- да --> E3["HTTP 500: internal error"]
+    D2 -- нет --> D3{"Тип найден?"}
+    D3 -- нет --> E4["HTTP 404: intervals not found"]
+    D3 -- да --> D4["Взять первый найденный тип,<br/>сохранить в кэш"]
+    D4 --> G
+    G --> H["Запомнить timezone и order_type"]
+    H --> I{"Оба флага is_intervals_integration_enabled<br/>включены (ТК в 1С и тип доставки)?"}
+
+    I -- "нет: все типы доставки кроме СДЭК-интеграции" --> F0
+    I -- да --> J{"sdt_code ТК пуст?"}
+    J -- да --> E5["HTTP 400: sdt_code is empty"]
+    J -- нет --> K{"sdt_code = CDEK?"}
+    K -- нет --> E6["HTTP 400: допустим только CDEK"]
+    K -- да --> L{"delivery_address пуст?"}
+    L -- да --> E7["HTTP 400: empty delivery address"]
+    L -- нет --> M["JWT СДЭК"]
+    M --> N{"JWT получен?"}
+    N -- нет --> E3
+    N -- да --> O["Дата приёмки:<br/>date + gap_minutes + consolidation_minutes<br/>не C&C: дата в 23:30 в зоне запроса<br/>C&C: +1 день, 23:30 UTC<br/>заполнить from_days, to_days"]
+    O --> P["Запрос интервалов СДЭК:<br/>адрес из запроса, тариф 482, точка MSK660"]
+    P --> Q{"СДЭК ответил без ошибки?"}
+    Q -- нет --> E8["HTTP 400: ошибка СДЭК API"]
+    Q -- да --> R["Убрать слоты agreed_count = total_count<br/>и даты без слотов"]
+    R --> S{"delivery_interval_days больше 0?"}
+    S -- нет --> E3
+    S -- да --> T["Оставить первые delivery_interval_days дат"]
+    T --> U{"Даты остались?"}
+    U -- нет --> E9["HTTP 404: delivery intervals not received from CDEK"]
+    U -- да --> V["Слоты СДЭК: title и code = ЧЧ:ММ - ЧЧ:ММ,<br/>internal_time_from и internal_time_to пустые"]
+    V --> OK["HTTP 200: from_days, to_days, даты и слоты"]
+
+    F0["Формульный путь"] --> F1["from_days = default_days_from<br/>to_days = default_days_to"]
+    F1 --> F2{"is_only_days_amount?"}
+    F2 -- да --> F3["Список дат пустой"]
+    F3 --> OK2["HTTP 200: только from_days и to_days"]
+    F2 -- нет --> F4["T1 = date + gap_minutes<br/>T2 = T1 + consolidation_minutes<br/>N = дата(T2) − дата(T1), в днях"]
+    F4 --> F5["min_days: C&C = delivery_min_days_cnc (пусто = 0)<br/>иначе delivery_min_days"]
+    F5 --> F6["Первая дата = T1 + (N+1) суток + (min_days − 1) суток"]
+    F6 --> F7["Цикл i = 0 .. delivery_interval_days − 1"]
+    F7 --> F8{"ТК только в рабочие дни<br/>и дата = сб или вс?"}
+    F8 -- да --> F9["Сдвиг: сб +2 дня, вс +1 день"]
+    F8 -- нет --> F10
+    F9 --> F10{"Доставка в пределах 24 ч<br/>от date?"}
+    F10 -- да --> F11["Начало интервалов = T2"]
+    F10 -- нет --> F12["Начало интервалов = 00:00 даты"]
+    F11 --> F13
+    F12 --> F13{"Календарь типа доставки<br/>покрывает дату и содержит интервалы?"}
+    F13 -- да --> F17["Источник: календарь типа"]
+    F13 -- нет --> F14{"Календарь способа доставки<br/>покрывает дату и содержит интервалы?"}
+    F14 -- да --> F17b["Источник: календарь способа"]
+    F14 -- нет --> F15{"Заданы интервалы типа доставки?"}
+    F15 -- да --> F17c["Источник: интервалы типа"]
+    F15 -- нет --> F16{"Заданы интервалы ТК в 1С?"}
+    F16 -- да --> F17d["Источник: интервалы ТК"]
+    F16 -- нет --> F18["Интервалов нет"]
+    F17 --> F19["Фильтр: день недели,<br/>tk_time_from не раньше начала интервалов,<br/>сортировка по длительности"]
+    F17b --> F19
+    F17c --> F19
+    F17d --> F19
+    F19 --> F20{"Остались интервалы?"}
+    F18 --> F20
+    F20 -- нет --> F21["Дата пропущена,<br/>счётчик цикла растёт"]
+    F20 -- да --> F22["Дата + title (DD мес дн) + интервалы"]
+    F21 -.->|"следующая дата"| F7
+    F22 -.->|"следующая дата"| F7
+    F22 --> OK3["HTTP 200: from_days, to_days, даты и интервалы"]
+
+    classDef err fill:#fde8e8,stroke:#c0392b,color:#1f2328;
+    classDef ok fill:#e4eefb,stroke:#2f6fd6,stroke-width:2px,color:#1f2328;
+    classDef cdek fill:#fff4d6,stroke:#d4a017,color:#1f2328;
+    class E1,E2,E3,E4,E5,E6,E7,E8,E9 err;
+    class OK,OK2,OK3 ok;
+    class M,N,O,P,Q,R,S,T,U,V cdek;

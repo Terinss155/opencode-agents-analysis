@@ -1,0 +1,1259 @@
+syntax = "proto3";
+
+option go_package = "gitlab.12storeez.com/backend/go/proto-specifications.git/pkg/go/mindbox";
+
+package mindbox;
+
+service User {
+    rpc Create (UpsertUserRequest) returns (UpsertUserResponse) {
+    }
+    rpc Update (UpsertUserRequest) returns (UpsertUserResponse) {
+    }
+    rpc UpdateMobile (UpsertUserRequest) returns (UpsertUserResponse) {
+    }
+    rpc Delete (DeleteUserRequest) returns (DeleteUserResponse) {
+    }
+    rpc Info (ParamsUser) returns (ResponseUser) {
+    }
+    rpc Orders (ParamsOrders) returns (ResponseOrders) {
+    }
+    rpc SendOSMICard (ParamsOSMICard) returns (ResponseOSMICard) {
+    }
+    rpc BonusesHistory (BonusesHistoryRequest) returns (BonusesHistoryResponse) {
+    }
+    rpc BonusesOffline (BonusesOfflineRequest) returns (BonusesOfflineResponse) {
+    }
+    rpc CheckOffline (CheckOfflineRequest) returns (CheckOfflineResponse) {
+    }
+    rpc CreateOffline (CreateOfflineRequest) returns (CreateOfflineResponse) {
+    }
+    rpc UpdateOffline (UpdateOfflineRequest) returns (StatusResponse) {
+    }
+    rpc CheckEmailSubscription(CheckEmailSubscriptionRequest) returns (CheckEmailSubscriptionResponse) {
+    }
+    rpc OrderSubscription(OrderSubscriptionRequest) returns (OrderSubscriptionResponse) {
+    }
+    rpc LoyaltyBalance(LoyaltyBalanceRequest) returns (LoyaltyBalanceResponse) {
+    }
+}
+
+service Mobile {
+    rpc InitDevice(InitDeviceParams) returns (InitDeviceResponse) {
+    }
+    rpc InitClient(InitClientParams) returns (InitClientResponse) {
+    }
+    rpc RemoveDevice(RemoveDeviceParams) returns (RemoveDeviceResponse) {
+    }
+    rpc Code (ParamsCode) returns (ResponseCode) {
+    }
+    rpc CheckCode (ParamsCheckCode) returns (ResponseCheckCode) {
+    }
+    rpc EditUser (ParamsEditUser) returns (ResponseEditUser) {
+    }
+    rpc IsUserExist (IsUserExistParams) returns (IsUserExistResponse) {
+    }
+    rpc PushClick(PushClickParams) returns (PushClickResponse) {
+    }
+}
+
+service Order {
+    rpc CreateOrder(CreateOrderRequest) returns (CreateOrderResponse) {
+    }
+    rpc UpdateOrder(UpdateOrderRequest) returns (UpdateOrderResponse) {
+    }
+    rpc UpdateOrderV2(UpdateOrderV2Request) returns (UpdateOrderV2Response) {
+    }
+    rpc GetOrderInfo(GetOrderInfoRequest) returns (GetOrderInfoResponse) {
+    }
+    rpc CalculateAuthorized(CalculateRequest) returns (CalculateResponse) {
+    }
+    rpc CalculateUnauthorized(CalculateRequest) returns (CalculateResponse) {
+    }
+    rpc UnauthorizedPreorderOffline(UnauthorizedPreorderOfflineRequest) returns (UnauthorizedPreorderOfflineResponse) {} // tnt-1980
+    rpc AuthorizedPreorderOffline(AuthorizedPreorderOfflineRequest) returns (AuthorizedPreorderOfflineResponse) {} // tnt-1951
+    rpc CreateAnonymousOrderOffline(CreateAnonymousOrderOfflineRequest) returns (StatusResponse) {} // tnt-1952
+    rpc CreateAuthorizedOrderOffline(CreateAuthorizedOrderOfflineRequest) returns (StatusResponse) {} // tnt-1953
+
+}
+
+service Gift {
+    rpc SendCodeByEmail(SendCodeByEmailRequest) returns (SendCodeResponse) {} // tnt-1243
+    rpc SendCodeBySMS(SendCodeBySMSRequest) returns (SendCodeResponse) {}     // tnt-1243
+    rpc VerifyCode(VerifyCodeRequest) returns (VerifyCodeResponse) {}         // tnt-1243
+    rpc VerifyCodeOffline(VerifyCodeOfflineRequest) returns (VerifyCodeOfflineResponse) {} // tnt-1948
+    rpc SendCodeBySmsOffline(SendCodeBySmsOfflineRequest) returns (StatusResponse) {} // tnt-1981
+    rpc SendCodeByEmailOffline(SendCodeByEmailOfflineRequest) returns (StatusResponse) {} // tnt-1946
+    rpc CreateCardOrder(CreateCardOrderRequest) returns (StatusResponse) {} // tnt-2000
+    rpc UpdateStatus(UpdateCardStatusRequest) returns (StatusResponse) {} // tnt-1944
+}
+
+service Cart {
+    rpc Recommendations(RecommendationsRequestCart) returns (RecommendationsResponse) {}
+}
+
+service Product {
+    rpc Recommendations(RecommendationsRequestProduct) returns (RecommendationsResponse) {}
+}
+
+service Mailing {
+    rpc Partnership(PartnershipRequest) returns (PartnershipResponse) {}
+}
+
+service Offline {
+    rpc CodeOffline(CodeOfflineRequest) returns (StatusResponse) {}
+    rpc Return(ReturnOfflineRequest) returns (StatusResponse) {}
+    rpc CheckCodeOffline(CheckCodeOfflineRequest) returns (CheckCodeOfflineResponse) {} // tnt-1975
+    rpc CallCodeOffline(CodeOfflineRequest) returns (StatusResponse) {} // tnt-2695
+}
+
+service ModernRetail {
+    rpc SendCodeBySMS(SendCodeBySMSRequest) returns (SendCodeResponse) {}
+    rpc VerifyCode(VerifyCodeRequest) returns (VerifyCodeResponse) {}
+}
+
+// ReviewsAuth аутентификация по номеру телефона для  feedbacks-tg-bot
+// Если клиента с таким номером нет в Mindbox, SendCode создаёт его автоматически.
+service ReviewsAuth {
+    rpc SendCode(ReviewsSendCodeRequest) returns (ReviewsSendCodeResponse) {}     // операция MobileAuthorizationCodereviews
+    rpc VerifyCode(ReviewsVerifyCodeRequest) returns (ReviewsVerifyCodeResponse) {} // операция MobileAuthorizationCodeCheckreviews
+}
+
+message PushClickParams {
+    string message_unique_key = 1;
+    string button_unique_key = 2;
+}
+
+message PushClickResponse {
+    bool ok = 1;
+}
+
+message IsUserExistParams {
+    string mobile_phone = 1;
+}
+
+message IsUserExistResponse {
+    bool ok = 1;
+    string client_id = 2;
+}
+
+message InitDeviceParams {
+    string device_id = 1;
+    string apns_token = 2;
+}
+
+message InitDeviceResponse {
+    bool ok = 1;
+}
+
+enum Platform {
+    IOS = 0;
+    ANDROID = 1;
+}
+
+message InitClientParams {
+    string device_id = 1;
+    string client_id = 2;
+    Platform platform = 3;
+}
+
+message InitClientResponse {
+    bool ok = 1;
+}
+
+message ParamsUser {
+    string client_id = 1;
+}
+message ResponseUser {
+    string first_name = 1;
+    string last_name = 2;
+    string email = 3;
+    string phone = 4;
+    int32 bonus_total = 5;
+    int32 bonus_available = 6;
+    int32 bonus_blocked = 7;
+    int32 total_paid_amount = 8;
+    NearestExpiration nearest_expiration = 9;
+    // TNT-2474
+    string grade_fnf = 10;
+    string personal_manager_fnf = 11;
+}
+
+message NearestExpiration {
+    int32 total = 1;
+    string date = 2;
+}
+
+message ParamsOrders {
+    string client_id = 1;
+    string date_from = 2;
+    string date_to = 3;
+    int32  limit = 4;
+    int32  page = 5;
+}
+message ResponseOrders {
+    int32 total = 1;
+    repeated ResponseOrderData result = 2;
+}
+
+message ResponseOrderData {
+    string order_id = 1;
+    string created_date = 2;
+    string payment_type = 3;
+    int32 discounted_total_price = 4;
+    int32 payment_amount = 5;
+    int32 applied_discount = 6;
+    int32 acquired_balance_change = 7;
+    int32 created_ts = 8;
+    string available_from_date_time = 9;
+    string balance_change_kind = 10;
+    string balance_change_kind_system_name = 11;
+    string expiration_date_time = 12;
+}
+
+message ParamsCode {
+    string mobile_phone = 1;
+    string device_id = 2;
+    string ip = 3;
+    string platform = 4;
+    string version = 5;
+}
+
+message ResponseCode {
+    bool  ok = 1;
+    int64 timestamp = 2;
+}
+
+message ParamsCheckCode {
+    string mobile_phone = 1;
+    string code = 2;
+}
+message ResponseCheckCode {
+    bool   ok = 1;
+    string status = 2;
+    string client_id = 3;
+    int32  mindbox_id = 4;
+}
+
+message ParamsEditUser {
+    string device_uuid = 1;
+    string client_id = 2;
+    string mobile_phone = 3;
+}
+
+message ResponseEditUser {
+    bool ok = 1;
+}
+
+message ParamsOSMICard {
+    string client_id = 1;
+}
+
+message ResponseOSMICard {
+    bool ok = 1;
+}
+
+message RemoveDeviceParams {
+    string device_id = 1;
+}
+
+message RemoveDeviceResponse {
+    bool ok = 1;
+}
+
+message BonusesHistoryRequest {
+    Pagination pagination = 1;
+    Filters filters = 2;
+    string site_id = 3;
+}
+
+message Pagination {
+    int32 limit = 1;
+    int32 offset = 2;
+}
+
+message Filters {
+    string date_from = 1;
+    string date_to = 2;
+}
+
+message BonusesHistoryResponse {
+    string status = 1;
+    string message = 2;
+    int64 code = 3;
+    repeated BonusesHistoryResponseData data = 4;
+    repeated Error errors = 5;
+}
+
+message Error {
+    string target = 1;
+    int64 code = 2;
+    string message = 3;
+}
+
+message BonusesHistoryResponseData {
+    string order_id = 1;
+    string created_datetime = 2;
+    int32 acquired_balance_change = 3;
+    string available_from_datetime = 4;
+    string balance_change_kind = 5;
+    string expiration_datetime = 6;
+}
+
+message CreateOrderRequest {
+    string order_id = 1;
+    optional string mindbox_user_id = 2;
+    optional string site_user_id = 3;
+    optional string store_code = 4;
+    optional float total_price = 5;
+    optional float delivery_cost = 6;
+    optional string custom_fields = 7;
+    repeated CalculateBonuses bonuses = 8;
+    repeated CalculateRequestedPromotions requested_promotions = 9;
+    repeated PositionsCreateData positions = 10;
+    repeated PaymentsCreateData payments = 11;
+    optional string email = 12;
+    optional string mobile_phone = 13;
+}
+
+message PositionsCreateData {
+    optional string id = 1;
+    int64 quantity = 2;
+    float price = 3;
+    int64 sequence_number = 4;
+    int64 status = 5;
+    optional int64 line_id = 6;
+    optional string custom_fields = 7;
+    repeated CalculateRequestedPromotions requested_promotions = 8;
+}
+
+message PaymentsCreateData {
+    string type = 1;
+    optional float amount = 2;
+}
+
+message CreateOrderResponse {
+    string status = 1;
+    string message = 2;
+    CreateOrderResponseData data = 3;
+    int64 code = 4;
+    repeated Error errors = 5;
+}
+
+message CreateOrderResponseData {
+    int64 mindbox_id = 1;
+}
+
+message UpdateOrderRequest {
+    string order_id = 1;
+    optional int64 order_mindbox_id = 2;
+    optional string store_code = 3;
+    optional string custom_fields = 4;
+    repeated PositionsUpdateData positions = 5;
+    optional string execution_datetime = 6;
+    optional float total_price = 7;
+}
+
+message UpdateOrderV2Request {
+    string order_id = 1;
+    optional string store_code = 2;
+    optional float total_price = 3;
+    optional float delivery_cost = 4;
+    optional string custom_fields = 5;
+    repeated CalculateBonuses bonuses = 6;
+    repeated CalculateRequestedPromotions requested_promotions = 7;
+    repeated PositionsCreateData positions = 8;
+    repeated PaymentsCreateData payments = 9;
+    optional string email = 10;
+    optional string mobile_phone = 11;
+}
+
+message UpdateOrderV2Response {
+    string status = 1;
+    string message = 2;
+    UpdateOrderV2ResponseData data = 3;
+    int64 code = 4;
+    repeated Error errors = 5;
+}
+
+message UpdateOrderV2ResponseData {
+    int64 mindbox_id = 1;
+}
+
+message PositionsUpdateData {
+    optional string id = 1;
+    int64 quantity = 2;
+    float discounted_price = 3;
+    int64 status = 4;
+    optional string custom_fields = 5;
+}
+
+message UpdateOrderResponse {
+    string status = 1;
+    string message = 2;
+    int64 code = 3;
+    repeated Error errors = 4;
+}
+
+message GetOrderInfoRequest {
+    string order_id = 1;
+}
+
+message GetOrderInfoResponse {
+    string status = 1;
+    string message = 2;
+    int64 code = 3;
+    GetOrderInfoResponseData data = 4;
+    repeated Error errors = 5;
+}
+
+message GetOrderInfoResponseData {
+    string id = 1;
+    int64 mindbox_id = 2;
+    string create_datetime = 3;
+    float delivery_cost = 4;
+    float discounted_total_price = 5;
+    string processing_status = 6;
+    optional string custom_fields = 7;
+    repeated GetOrderInfoAppliedPromotions applied_promotions = 8;
+    repeated GetOrderInfoBonusesChanges bonuses_changes = 9;
+    repeated GetOrderInfoPayments payments = 10;
+    repeated GetOrderInfoPositions positions = 11;
+}
+
+message GetOrderInfoAppliedPromotions {
+    string type = 1;
+    float amount = 2;
+    string promotion_name = 3;
+    string promotion_type = 4;
+    string promotion_id = 5;
+    int64 promotion_mindbox_id = 6;
+    string coupon_code = 7;
+}
+
+message GetOrderInfoBonusesChanges {
+    float earned_amount = 1;
+    float spent_amount = 2;
+    string balance_type_name = 3;
+    string balance_type_system_name = 4;
+}
+
+message GetOrderInfoPayments {
+    string type = 1;
+    float amount = 2;
+}
+
+message GetOrderInfoPositions {
+    string id = 1;
+    int64 quantity = 2;
+    float price = 3;
+    float discounted_price = 4;
+    int64 sequence_number = 5;
+    string status = 6;
+    int64 line_id = 7;
+    optional string custom_fields = 8;
+    repeated GetOrderInfoAppliedPromotions applied_promotions = 9;
+}
+
+message CalculateRequest {
+    optional string area_id = 1;
+    optional int64 cashdesk_id = 2;
+    optional float delivery_cost = 3;
+    optional int64 mindbox_user_id = 4;
+    optional string site_user_id = 5;
+    optional string custom_fields = 6;
+    repeated CalculateBonuses bonuses = 7;
+    repeated CalculateCoupons coupons = 8;
+    repeated CalculatePayments payments = 9;
+    repeated CalculatePaymentsByGiftcard payments_by_giftcard = 10;
+    repeated CalculateRequestedPromotions requested_promotions = 11;
+    repeated CalculatePositions positions = 12;
+    optional string order_id = 13;
+    optional int64 mindbox_order_id = 14;
+}
+
+message CalculateBonuses {
+    float amount = 1;
+    optional string balance_type_system_name = 2;
+}
+
+message CalculateCoupons {
+    optional string code = 1;
+}
+
+message CalculatePayments {
+    string type = 1;
+    optional int64 card_hash = 2;
+}
+
+message CalculatePaymentsByGiftcard {
+    string type = 1;
+    string id = 2;
+    optional int64 cvv = 3;
+}
+
+message CalculateRequestedPromotions {
+    string id = 1;
+    string type = 2;
+    float amount = 3;
+    optional string coupon_code = 4;
+}
+
+message CalculatePositions {
+    optional string id = 1;
+    int64 quantity = 2;
+    float price = 3;
+    optional int64 sequence_number = 4;
+    int64 status = 5;
+    optional int64 line_id = 6;
+    optional string custom_fields = 7;
+    repeated CalculateRequestedPromotions requested_promotions = 8;
+}
+
+message CalculateResponse {
+    string status = 1;
+    string message = 2;
+    int64 code = 3;
+    CalculateResponseData data = 4;
+    repeated Error errors = 5;
+}
+
+message CalculateResponseData {
+    int64 mindbox_id = 1;
+    int64 mindbox_user_id = 2;
+    string site_user_id = 3;
+    float delivery_cost = 4;
+    float discounted_total_price = 5;
+    string processing_status = 6;
+    string custom_fields = 7;
+    CalculateResponseTotalBonuses total_bonuses = 8;
+    repeated CalculateResponseAppliedPromotions applied_promotions = 9;
+    repeated CalculateResponseBonusesChanges bonuses_changes = 10;
+    repeated CalculateResponseBonusesInfo bonuses_info = 11;
+    repeated CalculateResponseCoupons coupons = 12;
+    repeated CalculateResponsePayments payments = 13;
+    repeated CalculateResponsePlaceholders placeholders = 14;
+    repeated CalculateResponsePositions positions = 15;
+}
+
+message CalculateResponseTotalBonuses {
+    float available_for_order = 1;
+    float spent_for_order = 2;
+    string status = 3;
+    float available = 4;
+    float blocked = 5;
+    float total = 6;
+}
+
+message CalculateResponseAppliedPromotions {
+    string type = 1;
+    float amount = 2;
+    string promotion_name = 3;
+    string promotion_type = 4;
+    string promotion_id = 5;
+    int64 promotion_mindbox_id = 6;
+    string coupon_code = 7;
+}
+
+message CalculateResponseBonusesChanges {
+    float earned_amount = 1;
+    float spent_amount = 2;
+    string balance_type_name = 3;
+    string balance_type_system_name = 4;
+}
+
+message CalculateResponseBonusesInfo {
+    float available_for_order = 1;
+    float spent_for_order = 2;
+    string status = 3;
+    float available = 4;
+    float blocked = 5;
+    float total = 6;
+    string balance_type_name = 7;
+    string balance_type_system_name = 8;
+}
+
+message CalculateResponseCoupons {
+    float discount_for_order = 1;
+    string available_from = 2;
+    string available_to = 3;
+    string status = 4;
+    string used_datetime = 5;
+    string code = 6;
+}
+
+message CalculateResponsePayments {
+    string type = 1;
+    float available_amount_for_order = 2;
+    CalculateResponseGiftcard giftcard = 3;
+}
+
+message CalculateResponseGiftcard {
+    string id = 1;
+    string status = 2;
+    float available = 3;
+    float total = 4;
+    float used = 5;
+}
+
+message CalculateResponsePlaceholders {
+    string id = 1;
+    repeated CalculateResponseContent content = 2;
+}
+
+message CalculateResponseContent {
+    string type = 1;
+    oneof result {
+        string message = 2;
+        CalculateResponsePossibleDiscounts possible_discounts = 3;
+    }
+    string promotion_id = 4;
+    int64 promotion_mindbox_id = 5;
+    string promotion_name = 6;
+    string promotion_type = 7;
+}
+
+message CalculateResponsePossibleDiscounts {
+    int64 count = 1;
+    float amount = 2;
+    string type = 3;
+    repeated CalculateResponseProduct products = 4;
+}
+
+message CalculateResponseProduct {
+    string id = 1;
+    int64 mindbox_id = 2;
+}
+
+message CalculateResponsePositions {
+    string id = 1;
+    int64 quantity = 2;
+    float price = 3;
+    float discounted_price = 4;
+    int64 sequence_number = 5;
+    string status = 6;
+    int64 line_id = 7;
+    string custom_fields = 8;
+    repeated CalculateResponseAppliedPromotions applied_promotions = 9;
+}
+
+message UpsertUserRequest {
+    string site_id = 1;
+    optional string email = 2;
+    optional string mobile_phone = 3;
+    optional string birthdate = 4;
+    optional string gender = 5;
+    optional string first_name = 6;
+    optional string middle_name = 7;
+    optional string last_name = 8;
+    optional string custom_fields = 9;
+}
+
+message UpsertUserResponse {
+    string status = 1;
+    string message = 2;
+    UpsertUserResponseData data = 3;
+    int64 code = 4;
+    repeated Error errors = 5;
+}
+
+message UpsertUserResponseData {
+    int64 mindbox_id = 1;
+}
+
+message DeleteUserRequest {
+    optional string site_id = 1;
+    optional string mobile_phone = 2;
+    optional string execution_datetime = 3;
+}
+
+message DeleteUserResponse {
+    string status = 1;
+    string message = 2;
+    int64 code = 3;
+    repeated Error errors = 4;
+}
+
+// gifts tnt-1243
+
+// SendCodeByEmail Отправка кода для ПС на почту. При получении запроса проксируем в Mindbox в операцию Giftemail
+message SendCodeByEmailRequest {
+    string email = 1;
+}
+
+// SendCodeBySMS Отправка кода для ПС на телефон. При получении запроса проксируем в Mindbox в операцию Giftsms
+message SendCodeBySMSRequest {
+    string mobile_phone = 1;
+}
+
+message SendCodeResponse {
+    string status = 1;
+    string message = 2;
+    int64 code = 3;
+    SendCodeResponseData data = 4;
+    repeated Error errors = 5;
+}
+
+message SendCodeResponseData {
+    int64 timestamp = 1; // метка времени, когда в следующий раз можно попробовать отправить код повторно
+}
+
+message VerifyCodeRequest {
+    optional string email = 1;
+    optional string mobile_phone = 2;
+    string code = 3;
+}
+
+message VerifyCodeResponse {
+    string status = 1;
+    string message = 2;
+    int64 code = 3;
+    repeated Error errors = 4;
+}
+
+// Card.Recommendations
+message RecommendationsRequestCart {
+    uint32 limit = 1;
+}
+
+// Product.Recommendations
+message RecommendationsRequestProduct {
+    uint32 limit = 1;
+    string product_id = 2;
+}
+
+message RecommendationsResponse {
+    string status = 1;
+    string message = 2;
+    int64 code = 3;
+    repeated string data = 4;
+    repeated Error errors = 5;
+}
+
+message PartnershipRequest {
+    PartnershipCustomer customer = 1;
+    PartnershipCustomerAction customer_action = 2;
+}
+
+message PartnershipCustomer {
+    string email = 1;
+}
+
+message PartnershipCustomerAction {
+    optional string custom_fields = 1;
+}
+
+message PartnershipResponse {
+    string status = 1;
+    string message = 2;
+    int64 code = 3;
+    repeated Error errors = 4;
+}
+
+message BonusesOfflineRequest {
+    BonusesOfflineCustomer customer = 1;
+}
+
+message BonusesOfflineCustomer {
+    BonusesOfflineCustomerIds ids = 1;
+}
+
+message BonusesOfflineCustomerIds {
+    string mindbox_id = 1;
+}
+
+message ResponseMeta {
+    string status = 1;
+    string message = 2;
+    int64 code = 3;
+    repeated Error errors = 4;
+}
+
+message StatusResponse {
+    ResponseMeta meta = 1;
+    StatusResponseData data = 2;
+}
+
+message StatusResponseData {
+    string status = 1;
+}
+
+message BonusesOfflineResponse {
+    ResponseMeta meta = 1;
+    BonusesOfflineResponseData data = 2;
+}
+
+message BonusesOfflineResponseData {
+    string status = 1;
+    repeated BonusesOfflineBalance balances = 2;
+}
+
+message BonusesOfflineBalance {
+    double total = 1;
+    double available = 2;
+    double blocked = 3;
+}
+
+message CodeOfflineRequest {
+    CodeOfflineCustomer customer = 1;
+}
+
+message CodeOfflineCustomer {
+    string mobile_phone = 1;
+}
+
+message CheckCodeOfflineRequest {
+    string authentification_code = 1;
+    CheckCodeOfflineCustomer customer = 2;
+}
+
+message CheckCodeOfflineCustomer {
+    string mobile_phone = 1;
+}
+
+message CheckCodeOfflineResponse {
+    ResponseMeta meta = 1;
+    CheckCodeOfflineResponseData data = 2;
+}
+
+message CheckCodeOfflineResponseData {
+    string status = 1;
+    CheckCodeOfflineResponseCustomer customer = 2;
+}
+
+message CheckCodeOfflineResponseCustomer {
+    CheckCodeOfflineResponseCustomerIds ids = 1;
+    string processing_status = 2;
+}
+
+message CheckCodeOfflineResponseCustomerIds {
+    int64 mindbox_id = 1;
+    string id_fv_true = 2;
+    string storeez_website_id = 3;
+}
+
+message CheckOfflineRequest {
+    CheckOfflineCustomer customer = 1;
+}
+
+message CheckOfflineCustomer {
+    string mobile_phone = 1;
+}
+
+message CheckOfflineResponse {
+    ResponseMeta meta = 1;
+    CheckOfflineResponseData data = 2;
+}
+
+message CheckOfflineResponseData {
+    string status = 1;
+    OfflineCustomer customer = 2;
+    // tnt-2610: balances (3) удалено, балансы клиента отдаёт BonusesOffline (Offline.GetCustomerCards)
+    reserved 3;
+    reserved "balances";
+}
+
+
+message OfflineCustomerData {
+    string first_name = 1;
+    string last_name = 2;
+    string middle_name = 3;
+    string email = 4;
+    string mobile_phone = 5;
+    string birth_date = 6;
+    string sex = 7;
+}
+
+message OfflineCustomerIds {
+    int64 mindbox_id = 1;
+}
+
+message OfflineCustomer {
+    OfflineCustomerIds ids = 1;
+    OfflineCustomerData data = 2;
+    string processing_status = 3;
+}
+
+message CreateOfflineRequest {
+    CreateOfflineCustomer customer = 1;
+}
+
+message CreateOfflineCustomer {
+    OfflineCustomerIds ids = 1;
+    OfflineCustomerData data = 2;
+}
+
+message CreateOfflineResponse {
+    ResponseMeta meta = 1;
+    CreateOfflineResponseData data = 2;
+}
+
+message CreateOfflineResponseData {
+    string status = 1;
+    CreateOfflineResponseCustomer customer = 2;
+}
+
+message CreateOfflineResponseCustomer {
+    OfflineCustomerIds ids = 1;
+}
+
+message UpdateOfflineRequest {
+    UpdateOfflineCustomer customer = 1;
+}
+
+message UpdateOfflineCustomer {
+    OfflineCustomerIds ids = 1;
+    OfflineCustomerData data = 2;
+}
+
+message VerifyCodeOfflineRequest {
+    string authentification_code = 1;
+    VerifyCodeOfflineCustomer customer = 2;
+}
+
+message VerifyCodeOfflineCustomer {
+    string email = 1;
+    string mobile_phone = 2;
+}
+
+message VerifyCodeOfflineResponse {
+    ResponseMeta meta = 1;
+    VerifyCodeOfflineResponseData data = 2;
+}
+
+message VerifyCodeOfflineResponseData {
+    string status = 1;
+    VerifyCodeOfflineResponseCustomer customer = 2;
+}
+
+message VerifyCodeOfflineResponseCustomer {
+    OfflineCustomerIds ids = 1;
+}
+
+message SendCodeBySmsOfflineRequest {
+    SendCodeBySmsOfflineCustomer customer = 1;
+}
+
+message SendCodeBySmsOfflineCustomer {
+    string mobile_phone = 1;
+}
+
+message SendCodeByEmailOfflineRequest {
+    SendCodeByEmailOfflineCustomer customer = 1;
+}
+
+message SendCodeByEmailOfflineCustomer {
+    string email = 1;
+}
+
+message UnauthorizedPreorderOfflineRequest {
+    PreorderOfflineOrder order = 1;
+    string point_of_contact = 2;
+}
+
+message PreorderOfflineOrder {
+    PreorderOfflineOrderIds ids = 1;
+    PreorderOfflineOrderCustomFields custom_fields = 2;
+    repeated PreorderOfflineLine lines = 3;
+    // tnt-2707: баллы к списанию; заполняется только в AuthorizedPreorderOffline, в UnauthorizedPreorderOffline игнорируется.
+    repeated AnonymousOrderOfflineBonusPoint bonus_points = 4;
+}
+
+message PreorderOfflineOrderIds {
+    string external_system_storeez_com = 1;
+}
+
+message PreorderOfflineOrderCustomFields {
+    string stylist = 1;
+    string seller = 2;      // tnt-2705
+    string seller_name = 3; // tnt-2705, в Mindbox/Maestra — customFields.sellername
+}
+
+message PreorderOfflineLine {
+    int64 line_id = 1;
+    int64 line_number = 2;
+    double quantity = 3;
+    double base_price_per_item = 4;
+    PreorderOfflineProduct product = 5;
+    PreorderOfflineLineStatus status = 6;
+    PreorderOfflineLineCustomFields custom_fields = 7;
+    repeated PreorderOfflineRequestedPromotion requested_promotions = 8;
+}
+
+message PreorderOfflineProduct {
+    PreorderOfflineProductIds ids = 1;
+}
+
+message PreorderOfflineProductIds {
+    string storeez_com = 1;
+}
+
+message PreorderOfflineLineStatus {
+    PreorderOfflineLineStatusIds ids = 1;
+}
+
+message PreorderOfflineLineStatusIds {
+    int64 external_id = 1;
+}
+
+message PreorderOfflineLineCustomFields {
+    string sign = 1;
+}
+
+message PreorderOfflineRequestedPromotion {
+    string type = 1;
+    double amount = 2;
+    PreorderOfflinePromotion promotion = 3;
+}
+
+message PreorderOfflinePromotion {
+    PreorderOfflinePromotionIds ids = 1;
+}
+
+message PreorderOfflinePromotionIds {
+    string external_id = 1;
+}
+
+message UnauthorizedPreorderOfflineResponse {
+    ResponseMeta meta = 1;
+    UnauthorizedPreorderOfflineResponseData data = 2;
+}
+
+message UnauthorizedPreorderOfflineResponseData {
+    string status = 1;
+    PreorderOfflineResponseOrder order = 2;
+}
+
+message PreorderOfflineResponseOrder {
+    PreorderOfflineTotalBonusPointsInfo total_bonus_points_info = 1;
+    repeated PreorderOfflineResponseLine lines = 2;
+}
+
+message PreorderOfflineTotalBonusPointsInfo {
+    double available_amount_for_current_order = 1;
+}
+
+message PreorderOfflineResponseLine {
+    // В ответе line_id строка; в запросе PreorderOfflineLine.line_id остаётся int64.
+    string line_id = 1;
+    int64 line_number = 2;
+    PreorderOfflineProduct product = 3;
+    double discounted_price_of_line = 4;
+    repeated PreorderOfflineAppliedPromotion applied_promotions = 5;
+}
+
+message PreorderOfflineAppliedPromotion {
+    string type = 1;
+    double amount = 2;
+    // Приходит только при списании бонусов.
+    optional double spent_bonus_points_amount = 3;
+}
+
+message AuthorizedPreorderOfflineRequest {
+    PreorderOfflineOrder order = 1;
+    string point_of_contact = 2;
+    PreorderOfflineCustomer customer = 3;
+}
+
+message PreorderOfflineCustomer {
+    PreorderOfflineCustomerIds ids = 1;
+}
+
+message PreorderOfflineCustomerIds {
+    string mindbox_id = 1;
+}
+
+message AuthorizedPreorderOfflineResponse {
+    ResponseMeta meta = 1;
+    AuthorizedPreorderOfflineResponseData data = 2;
+}
+
+message AuthorizedPreorderOfflineResponseData {
+    string status = 1;
+    PreorderOfflineResponseOrder order = 2;
+}
+
+message CreateAnonymousOrderOfflineRequest {
+    string transaction_id = 1;
+    string point_of_contact = 2;
+    AnonymousOrderOfflineOrder order = 3;
+}
+
+message AnonymousOrderOfflineOrder {
+    PreorderOfflineOrderIds ids = 1;
+    PreorderOfflineOrderCustomFields custom_fields = 2;
+    repeated AnonymousOrderOfflineBonusPoint bonus_points = 3;
+    double total_price = 4;
+    repeated PreorderOfflineLine lines = 5;
+    repeated AnonymousOrderOfflinePayment payments = 6;
+}
+
+message AnonymousOrderOfflineBonusPoint {
+    double amount = 1;
+}
+
+message AnonymousOrderOfflinePayment {
+    string type = 1;
+    double amount = 2;
+}
+
+message CreateAuthorizedOrderOfflineRequest {
+    string transaction_id = 1;
+    string point_of_contact = 2;
+    AnonymousOrderOfflineOrder order = 3;
+    PreorderOfflineCustomer customer = 4;
+}
+
+message CreateCardOrderRequest {
+    CardOrderCustomer customer = 1;
+    CardOrder order = 2;
+}
+
+message CardOrderCustomer {
+    CardOrderCustomerIds ids = 1;
+    string mobile_phone = 2;
+}
+
+message CardOrderCustomerIds {
+    string storeez_website_id = 1;
+}
+
+message CardOrder {
+    CardOrderIds ids = 1;
+    CardOrderCustomFields custom_fields = 2;
+    double total_price = 3;
+    repeated CardOrderLine lines = 4;
+    string email = 5;
+    string mobile_phone = 6;
+}
+
+message CardOrderIds {
+    string external_system_storeez_com = 1;
+}
+
+message CardOrderCustomFields {
+    string certificate_code = 1;
+    string certificate_date = 2;
+    string communication = 3;
+    string date_sent = 4;
+    string recipient_name = 5;
+    string sender_name = 6;
+}
+
+message CardOrderLine {
+    int64 line_number = 1;
+    double quantity = 2;
+    double base_price_per_item = 3;
+    CardOrderProduct product = 4;
+    CardOrderLineStatus status = 5;
+}
+
+message CardOrderProduct {
+    CardOrderProductIds ids = 1;
+}
+
+message CardOrderProductIds {
+    string storeez_com = 1;
+}
+
+message CardOrderLineStatus {
+    CardOrderLineStatusIds ids = 1;
+}
+
+message CardOrderLineStatusIds {
+    int64 external_id = 1;
+}
+
+message UpdateCardStatusRequest {
+    string order_lines_status = 1;
+    CardStatusOrder order = 2;
+}
+
+message CardStatusOrder {
+    CardOrderIds ids = 1;
+}
+
+message ReturnOfflineRequest {
+    ReturnOfflineOrder order = 1;
+    string point_of_contact = 2;
+}
+
+message ReturnOfflineOrder {
+    PreorderOfflineOrderIds ids = 1;
+    repeated ReturnOfflineLine lines = 2;
+}
+
+message ReturnOfflineLine {
+    int64 line_number = 1;
+    double quantity = 2;
+    int64 status = 3;
+}
+
+message CheckEmailSubscriptionRequest {
+  string email = 1;
+}
+
+message CheckEmailSubscriptionData {
+  string processing_status = 1;
+  bool is_subscribed = 2;
+}
+
+message CheckEmailSubscriptionResponse {
+  string status = 1;
+  string message = 2;
+  int64 code = 3;
+  CheckEmailSubscriptionData data = 4;
+  repeated Error errors = 5;
+}
+
+message OrderSubscriptionRequest {
+  string email = 1;
+  bool is_subscribed = 2;
+  string brand = 3;
+  string point_of_contact = 4;
+}
+
+message OrderSubscriptionResponse {
+  string status = 1;
+  string message = 2;
+  int64 code = 3;
+  repeated Error errors = 4;
+}
+
+message ReviewsSendCodeRequest {
+    string mobile_phone = 1;
+}
+
+message ReviewsSendCodeResponse {
+    string status = 1;
+    string message = 2;
+    int64 code = 3;
+    repeated Error errors = 4;
+}
+
+message ReviewsVerifyCodeRequest {
+    string mobile_phone = 1;
+    string code = 2;
+}
+
+message ReviewsVerifyCodeResponse {
+    string status = 1;
+    string message = 2;
+    int64 code = 3;
+    ReviewsVerifyCodeResponseData data = 4;
+    repeated Error errors = 5;
+}
+
+message ReviewsVerifyCodeResponseData {
+    int64 mindbox_id = 1;
+}
+
+message LoyaltyBalanceRequest {
+    string phone = 1;
+    string email = 2;
+}
+
+message LoyaltyBalanceResponse {
+    int32 bonus_total = 1;
+    int32 bonus_available = 2;
+    int32 bonus_blocked = 3;
+}

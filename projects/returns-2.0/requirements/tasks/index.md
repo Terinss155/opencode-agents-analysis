@@ -90,6 +90,19 @@
 | Задача | Связь | Статус |
 |---|---|---|
 | [ECOMDEV-2683](https://tracker.yandex.ru/ECOMDEV-2683) [B] Возвраты. Статусы позиции заказа для возвратов | Связана (подзадача US1) | Беклог |
+| [ECOMDEV-2827](https://tracker.yandex.ru/ECOMDEV-2827) Возвраты. Обмен с Mindbox — баллы к возврату и письма о возврате | Связана (история обмена с Mindbox) | Открыт |
+
+## Обмен с Mindbox — [ECOMDEV-2827](https://tracker.yandex.ru/ECOMDEV-2827)
+
+История — подзадача эпика ECOMDEV-2246, заведена 26.11.2026; связана с US1 (ECOMDEV-2281) и US6 (ECOMDEV-2279). Файлы — в [mindbox/](./mindbox/). Описание логики — [BL-RET-BONUS-SUM](../backend/mindbox-return-bonus-summary_backend.md), вопросы — [mindbox-exchange_questions.md](../questions/mindbox-exchange_questions.md).
+
+Статус истории: Открыт.
+
+| Задача | Автор | Исполнитель | Статус | Наш файл / примечание |
+|---|---|---|---|---|
+| [ECOMDEV-2829](https://tracker.yandex.ru/ECOMDEV-2829) [B] Возвраты. Расчёт баллов к возврату в Mindbox | Лемешева | — | Беклог | `mindbox/ECOMDEV-2829 …md`. Зависит от ECOMDEV-1185, ECOMDEV-2828 |
+| [ECOMDEV-2828](https://tracker.yandex.ru/ECOMDEV-2828) [B] Возвраты. Коды статусов строки Mindbox для заявки на возврат и принятого возврата | Лемешева | — | Беклог | `mindbox/ECOMDEV-2828 …md`. Зависит от ECOMDEV-2683 |
+| [ECOMDEV-2831](https://tracker.yandex.ru/ECOMDEV-2831) [B] Возвраты. Фиксация возврата баллов в Mindbox при «Возврат принят» | Лемешева | — | Беклог | `mindbox/ECOMDEV-2831 …md`. Связана с US6 (ECOMDEV-2279); зависит от ECOMDEV-2829, ECOMDEV-2828 |
 
 ## Журнал действий по заявке на возврат — [ECOMDEV-2647](https://tracker.yandex.ru/ECOMDEV-2647)
 
@@ -115,10 +128,10 @@
 
 | Задача | Статус |
 |---|---|
-| [ECOMDEV-2526](https://tracker.yandex.ru/ECOMDEV-2526) [B] Возврат 0.1: единые правила запроса и проверки банковских реквизитов для сайта и МП | Разработка, исполнитель Свистунова |
+| [ECOMDEV-2526](https://tracker.yandex.ru/ECOMDEV-2526) [B] Возврат 0.1: единые правила запроса и проверки банковских реквизитов для сайта и МП | Можно тестировать (MR монолита 6430, гейтов — Go 388, ESB 774), разработчик Свистунова, тестировщик Ватанин |
 | [ECOMDEV-2530](https://tracker.yandex.ru/ECOMDEV-2530) [B] Некорректное сохранение номера банковской карты | Закрыт (Решен) |
 | [ECOMDEV-2532](https://tracker.yandex.ru/ECOMDEV-2532) [F] Возврат 0.1. Проверка банковских реквизитов по общим правилам | Беклог |
-| [ECOMDEV-2649](https://tracker.yandex.ru/ECOMDEV-2649) [B] Возврат 0.1. Реквизиты и подтверждение клиента в запросе создания возврата | Беклог |
+| [ECOMDEV-2649](https://tracker.yandex.ru/ECOMDEV-2649) [B] Возврат 0.1. Реквизиты и подтверждение клиента в запросе создания возврата | Разработка, исполнитель Свистунова |
 | [ECOMDEV-2651](https://tracker.yandex.ru/ECOMDEV-2651) [B] Возврат 0.1. Признаки возврата в обмене с 1С | Беклог |
 | [DEVIOS-2709](https://tracker.yandex.ru/DEVIOS-2709) [iOS] Возврат 0.1. Банковские реквизиты: чекбокс подтверждения и проверка по общим правилам | Открыт |
 | [DEVANDROID-1800](https://tracker.yandex.ru/DEVANDROID-1800) [Android] Возврат 0.1. Банковские реквизиты: чекбокс подтверждения и проверка по общим правилам | Открыт, исполнитель Лопухов |

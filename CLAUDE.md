@@ -21,17 +21,26 @@
 - Графы. `graphify-out/` — граф документов этого репозитория (требования, ADR, встречи,
   `knowledge/`). `graphify-out-12stz/<репозиторий>/graph.json` — граф кода каждого репозитория 12stz:
   `12storeez-master-web` (PHP, Vue и JS из `frontend/src`), `mobile-monorepo-go` (гейт МП),
-  `esb-monorepo`, `esb-protobufs`, `12storeez-ios`; `graphify-out-12stz/merged/graph.json` — все
+  `esb-monorepo`, `esb-protobufs` (GitHub, обновляется редко), `12storeez-ios`, `monolith-bfb-ms`
+  (BFB монолита, PHP), `proto-specifications` (GitLab, контракты новых Go-сервисов);
+  `graphify-out-12stz/merged/graph.json` — все
   репозитории вместе, только для поиска «где вообще есть X» (пути в нём без имени репозитория, связей
   между системами нет).
-- Вопрос о коде — сначала граф нужного репозитория:
-  `graphify query "<вопрос>" --graph graphify-out-12stz/<репозиторий>/graph.json` (так же `path` и
-  `explain` с `--graph`), затем чтение найденных строк. Ответ обрезан — сузить запрос или поднять
-  `--budget`. Тестов, миграций, `.proto` и сжатого JS в графах нет — их читать напрямую.
+- Порядок поиска по коду (по замеру 25.11.2026):
+  1. `knowledge/README.md` → `repo-map.md` нужного репозитория → точечный grep/чтение найденных
+     файлов. Это основной путь: он самый короткий, а карта даёт то, чего нет в коде.
+  2. Граф — вторым шагом, когда нужно найти, «кто ещё это вызывает» или связи, которых не видно
+     по названиям: `graphify explain "<точное имя класса>" --graph graphify-out-12stz/<репозиторий>/graph.json`
+     (так же `path`). Широкий `query` не начинать: выдача обрезается и уводит в тупики.
+  3. `merged` — только для «где вообще есть X», не для вопросов о логике.
+  Тестов, миграций, `.proto` и сжатого JS в графах нет — их читать напрямую.
 - Графы кода пересобираются скриптом `graphify-out-12stz/build_all.py [репозиторий ...]` (по
   структуре кода, без токенов; весь код — около 5 минут) после обновления локальных копий; запуск —
   на E-ядрах с низким приоритетом (см. «Тяжёлые операции»). Результат пишется только в
-  `graphify-out-12stz/`, в `12stz` ничего не пишется.
+  `graphify-out-12stz/`, в `12stz` ничего не пишется. Запускать Python-ом окружения graphify (uv):
+  `C:\Users\RobotComp.ru\AppData\Roaming\uv\tools\graphifyy\Scripts\python.exe` — у системного
+  `python` модуля `graphify` нет. Из сессии `12stz` хук не даёт запустить скрипт — его запускает
+  пользователь через `!`.
 - БД: инструменты `mcp__phpstorm__*` (проект PhpStorm `12stz` — оба репозитория,
   `projectPath`: `C:\Users\RobotComp.ru\Desktop\12stz`), подключения `12stz_staging` и `12stz_prod`
   (схема `12stz_production`, только чтение — см. `AGENTS.md` → «Доступ и запреты»). Каждый запрос проходит SQL-фильтр; отказ фильтра не обходить.
@@ -71,6 +80,8 @@
 - В начале новой сессии прочитай последний файл из `handoff/` (по дате в имени) и продолжи с него. Это рабочий контекст: в артефакты из него ничего не переносится.
 
 ## graphify
+
+Правила ниже — для графа документов `graphify-out/`; порядок поиска по коду 12stz — в разделе «Код и БД».
 
 This project has a knowledge graph at graphify-out/ with god nodes, community structure, and cross-file relationships.
 

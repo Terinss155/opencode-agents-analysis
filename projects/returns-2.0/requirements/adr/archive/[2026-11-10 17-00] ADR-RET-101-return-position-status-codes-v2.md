@@ -2,12 +2,13 @@
 
 | Поле | Значение |
 |---|---|
-| **Статус** | Принято |
+| **Статус** | Решение изменено |
+| **Заменён** | [[2026-11-23 09-59] ADR-RET-112-return-position-status-codes-v3.md](<../[2026-11-23 09-59] ADR-RET-112-return-position-status-codes-v3.md>) |
 | **Дата решения** | 11.11.2026 |
 | **Владелец решения** | System Analyst — Катя Лемешева; согласовано: Лид аналитиков RetailCRM — Алена Господинова, Backend Developer — Оля Свистунова |
 | **Область** | Данные / Интеграция |
 | **Версия** | v2 |
-| **Предыдущая версия** | [[2026-10-02 10-00] ADR-RET-080-return-position-status-codes-v1.md](<./archive/[2026-10-02 10-00] ADR-RET-080-return-position-status-codes-v1.md>) |
+| **Предыдущая версия** | [[2026-10-02 10-00] ADR-RET-080-return-position-status-codes-v1.md](<./[2026-10-02 10-00] ADR-RET-080-return-position-status-codes-v1.md>) |
 | **Заменяет** | ADR-RET-080 |
 
 ## Контекст
@@ -82,20 +83,21 @@ RetailCRM предложил коды `return-requested` («Заявка на в
 
 ## Источники
 
-- [[2026-11-11] Переписка Лемешева — Свистунова, Господинова (обмен возвратами с RetailCRM, тип заказа, статусы позиций, стенды).md](<../../sources/answers/[2026-11-11] Переписка Лемешева — Свистунова, Господинова (обмен возвратами с RetailCRM, тип заказа, статусы позиций, стенды).md>) — RetailCRM 11.11.2026 оставляет `lost`; новые коды включаются после сайта.
-- [[2026-11-16] Переписка Лемешева — Свистунова (статусная модель v4, замечания).md](<../../sources/answers/[2026-11-16] Переписка Лемешева — Свистунова (статусная модель v4, замечания).md>) — Backend Developer за `lost`: с новыми кодами дорабатывать обмен с 1С и Mindbox (более поздний материал).
-- [[bandicam 2026-11-10 17-00-34-059] 12STOREEZ & Intaro RetailCRM   Вопросы по обменам.md](<../../sources/transcriptions/[bandicam 2026-11-10 17-00-34-059] 12STOREEZ & Intaro RetailCRM   Вопросы по обменам.md>) — встреча с RetailCRM об обмене возвратами; дата и время имени файла взяты из неё. Код `lost` на встрече не обсуждался.
-- Справочник статусов позиций — [order-status-dictionaries.md](../../../../knowledge/12storeez-master-web/database/order-status-dictionaries.md).
+- [[2026-11-11] Переписка Лемешева — Свистунова, Господинова (обмен возвратами с RetailCRM, тип заказа, статусы позиций, стенды).md](<../../../sources/answers/[2026-11-11] Переписка Лемешева — Свистунова, Господинова (обмен возвратами с RetailCRM, тип заказа, статусы позиций, стенды).md>) — RetailCRM 11.11.2026 оставляет `lost`; новые коды включаются после сайта.
+- [[2026-11-16] Переписка Лемешева — Свистунова (статусная модель v4, замечания).md](<../../../sources/answers/[2026-11-16] Переписка Лемешева — Свистунова (статусная модель v4, замечания).md>) — Backend Developer за `lost`: с новыми кодами дорабатывать обмен с 1С и Mindbox (более поздний материал).
+- [[bandicam 2026-11-10 17-00-34-059] 12STOREEZ & Intaro RetailCRM   Вопросы по обменам.md](<../../../sources/transcriptions/[bandicam 2026-11-10 17-00-34-059] 12STOREEZ & Intaro RetailCRM   Вопросы по обменам.md>) — встреча с RetailCRM об обмене возвратами; дата и время имени файла взяты из неё. Код `lost` на встрече не обсуждался.
+- Справочник статусов позиций — [order-status-dictionaries.md](../../../../../knowledge/12storeez-master-web/database/order-status-dictionaries.md).
 
 ## Связанные артефакты
 
-- `ADR-RET-039` — [статусы позиций вместо статуса заказа](<./[2026-10-02 10-00] ADR-RET-039-return-tag-without-order-status-change-v2.md>).
-- `ADR-RET-073` — [доступность изделий по заявкам](<./[2026-10-12 13-01] ADR-RET-073-identical-units-repeat-return-v2.md>).
-- Схема статусов, версия 4 — [return-status-v4_state.md](../diagrams/state/return-status-v4_state.md), раздел 3.
-- [Обмен заявками с RetailCRM](../questions/retailcrm-exchange_questions.md) — решения 2, 3; вопрос 6.
+- `ADR-RET-039` — [статусы позиций вместо статуса заказа](<../[2026-10-02 10-00] ADR-RET-039-return-tag-without-order-status-change-v2.md>).
+- `ADR-RET-073` — [доступность изделий по заявкам](<../[2026-10-12 13-01] ADR-RET-073-identical-units-repeat-return-v2.md>).
+- Схема статусов, версия 4 — [return-status-v4_state.md](../../diagrams/state/return-status-v4_state.md), раздел 3.
+- [Обмен заявками с RetailCRM](../../questions/retailcrm-exchange_questions.md) — решения 2, 3; вопрос 6.
 
 ## История изменений
 
 | Дата | Изменение |
 |---|---|
 | 17.11.2026 | ADR создан как v2 решения `return-position-status-codes` по переписке с RetailCRM от 11.11.2026; заменяет `ADR-RET-080` |
+| 24.11.2026 | Статус «Решение изменено»: статус позиции «Частичный возврат» исключён — заменён `ADR-RET-112` (v3); файл перенесён в `archive/` |

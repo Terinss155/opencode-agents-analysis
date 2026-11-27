@@ -3,7 +3,7 @@
 | Поле | Значение |
 |---|---|
 | **Статус** | Решение изменено |
-| **Заменён** | [[2026-11-10 17-00] ADR-RET-101-return-position-status-codes-v2.md](<../[2026-11-10 17-00] ADR-RET-101-return-position-status-codes-v2.md>) |
+| **Заменён** | [[2026-11-10 17-00] ADR-RET-101-return-position-status-codes-v2.md](<./[2026-11-10 17-00] ADR-RET-101-return-position-status-codes-v2.md>) |
 | **Дата решения** | 20.10.2026 |
 | **Владелец решения** | System Analyst — Катя Лемешева |
 | **Область** | Данные / Интеграция |
